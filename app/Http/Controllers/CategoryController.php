@@ -6,22 +6,24 @@ use Illuminate\Http\Request;
 use App\Repositories\Interfaces\CategoryRepositoryInterface;
 
 use App\Models\Category;
+use Illuminate\Http\Response;
+
 class CategoryController extends Controller
 {
-    // protected $categoryRepository;
+    protected $categoryRepository;
 
-    // public function __construct(CategoryRepositoryInterface $categoryRepository)
-    // {
-    //     $this->categoryRepository = $categoryRepository;
-    // }
+    public function __construct(CategoryRepositoryInterface $categoryRepository)
+    {
+        $this->categoryRepository = $categoryRepository;
+    }
 
     public function getAll()
     {
-        $category = Category::all();
+        $category = $this->categoryRepository->getAll();
         return response()->json(
             [
                 'contents' => $category,
-                'code' => '200'
+                'code' => Response::HTTP_OK
             ]);
     }
 }

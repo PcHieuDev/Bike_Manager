@@ -7,9 +7,9 @@ use App\Models\Category;
 
 interface CategoryRepositoryInterface
 {
-    public function all();
+    public function getAll();
 
-    public function get($id);
+    public function get(int $id);
 
     public function create(array $data);
 

@@ -1,99 +1,122 @@
 <template>
   <header class="header">
     <div class="overlap">
-      <div class="s-n-ph-m-2">QUẢN LÝ SẢN PHẨM</div>
-      <div class="s-n-ph-m" >SẢN PHẨM</div>
+      <div
+        class="s-n-ph-m-2"
+        @click="goProductAction"
+        @mouseenter="changeCursor"
+        @mouseleave="restoreCursor"
+      >
+        QUẢN LÝ SẢN PHẨM
+      </div>
+      <div
+        class="s-n-ph-m"
+        @click="goHome"
+        @mouseenter="changeCursor"
+        @mouseleave="restoreCursor"
+      >
+        SẢN PHẨM
+      </div>
       <!-- <div class="s-n-ph-m3" >HOME</div> -->
 
-      
       <div class="overlap-group-3">
-      
-        <div class="text-wrapper-6"@click="goHome" >NCC</div>
-        <img @click="goHome" class="image-3" alt="Image" src="https://c.animaapp.com/6fNIys5x/img/image-5@2x.png"/>
-
+        <div
+          class="text-wrapper-6"
+          @click="goHome"
+          @mouseenter="changeCursor"
+          @mouseleave="restoreCursor"
+        >
+          NCC
+        </div>
+        <img
+          @click="goHome"
+          @mouseenter="changeCursor"
+          @mouseleave="restoreCursor"
+          class="image-3"
+          alt="Image"
+          src="https://ncc.asia/assets/images/logo.png"
+        />
       </div>
       <ul class="nav" style="padding-left: 965px">
         <!--        <li class="nav-item">-->
         <!--          <router-link to="/product/add" class="nav-link" style="margin-left: 45px; font-size: 27px; color: white" href="path_to_your_add_product_page">Thêm sản phẩm</router-link>-->
         <!--        </li>-->
         <li class="nav-item">
-          <button @click="openLogin" class="nav-link" style="margin-left: 362px; font-size: 19px; color: white; margin-top: 10px; background-color: #3787a7; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;"
-                  to="login">LOGIN
-          </button>
+          <RouterLink
+            to="/login"
+            class="nav-link"
+            style="
+              margin-left: 362px;
+              font-size: 19px;
+              color: black;
+              margin-top: 8px;
+              background-color: rgb(255 255 255);
+              border: none;
+              padding: 10px 20px;
+              border-radius: 5px;
+              cursor: pointer;
+            "
+          >
+            LOGIN
+          </RouterLink>
         </li>
       </ul>
     </div>
   </header>
 
-  <!--  popuplogin-->
+  <!--  popuplogin v-model="ShowLogin"  -->
 
-  <v-dialog
-      v-model="ShowLogin"
-      max-width="674"
-  >
+  <!-- <v-dialog v-model="ShowLogin" max-width="674">
     <v-card>
       <v-card-title class="headline">Login</v-card-title>
-      <v-card
-          class="mx-auto pa-12 pb-8"
-          elevation="8"
-          max-width="548"
-          rounded="lg"
-      >
+      <v-card class="mx-auto pa-12 pb-8" elevation="8" max-width="548" rounded="lg">
         <div class="text-subtitle-1 text-medium-emphasis">Account</div>
 
         <v-text-field
-            density="compact"
-            placeholder="Email address"
-            prepend-inner-icon="mdi-email-outline"
-            variant="outlined"
+          density="compact"
+          placeholder="Email address"
+          prepend-inner-icon="mdi-email-outline"
+          variant="outlined"
         ></v-text-field>
 
-        <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
+        <div
+          class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between"
+        >
           Password
 
           <a
-              class="text-caption text-decoration-none text-blue"
-              href="#"
-              rel="noopener noreferrer"
-              target="_blank"
-
-           style="padding-left: 120px">
-            Forgot login password?</a>
+            class="text-caption text-decoration-none text-blue"
+            href="#"
+            rel="noopener noreferrer"
+            target="_blank"
+            style="padding-left: 120px"
+          >
+            Forgot login password?</a
+          >
         </div>
 
         <v-text-field
-            :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-            :type="visible ? 'text' : 'password'"
-            density="compact"
-            placeholder="Enter your password"
-            prepend-inner-icon="mdi-lock-outline"
-            variant="outlined"
-            @click:append-inner="visible = !visible"
+          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+          :type="visible ? 'text' : 'password'"
+          density="compact"
+          placeholder="Enter your password"
+          prepend-inner-icon="mdi-lock-outline"
+          variant="outlined"
+          @click:append-inner="visible = !visible"
         ></v-text-field>
 
-        <v-card
-            class="mb-12"
-            color="surface-variant"
-            variant="tonal"
-        >
-        </v-card>
+        <v-card class="mb-12" color="surface-variant" variant="tonal"> </v-card>
 
-        <v-btn
-            class="mb-8"
-            color="blue"
-            size="large"
-            variant="tonal"
-            block
-        >
+        <v-btn class="mb-8" color="blue" size="large" variant="tonal" block>
           Log In
         </v-btn>
 
         <v-card-text class="text-center">
           <a
-              class="text-blue text-decoration-none"
-              href="#"
-              rel="noopener noreferrer"
-              target="_blank"
+            class="text-blue text-decoration-none"
+            href="#"
+            rel="noopener noreferrer"
+            target="_blank"
           >
             Sign up now
             <v-icon icon="mdi-chevron-right"></v-icon>
@@ -104,37 +127,33 @@
 
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn 
-          color="black"
-          text
-          @click="ShowLogin = false"
-          style="background-color:white;"
+      <v-btn
+        color="black"
+        text
+        @click="ShowLogin = false"
+        style="background-color: white"
       >
         Close
       </v-btn>
     </v-card-actions>
-
-  </v-dialog>
-
+  </v-dialog> -->
 </template>
 
 <script>
-
 export default {
   name: "Header",
   computed: {
     product() {
-      return product
-    }
+      return product;
+    },
   },
 
   data() {
     return {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
       ShowLogin: false,
       visible: false,
-
     };
   },
 
@@ -142,14 +161,21 @@ export default {
     goHome() {
       this.$router.push("/");
     },
-    
-    openLogin() {
-      this.ShowLogin = true;
-    }
-  }
+
+    goProductAction() {
+      this.$router.push("/product/actions");
+    },
+    changeCursor() {
+      // Thay đổi kiểu con trỏ thành bàn tay chỉ
+      document.body.style.cursor = "pointer";
+    },
+    restoreCursor() {
+      // Khôi phục lại kiểu con trỏ mặc định
+      document.body.style.cursor = "auto";
+    },
+  },
 };
 </script>
-
 
 <style>
 .header {
@@ -167,7 +193,7 @@ export default {
   height: 64px;
   position: relative;
   /* width: 1440px; */
-  background-color: #3787a7;
+  background-color: #00ade8;
 }
 
 .header .qu-n-l-s-n-ph-m {
@@ -199,6 +225,7 @@ export default {
   top: 25px;
   width: 125px;
 }
+
 .header .s-n-ph-m-2 {
   color: var(--white);
   font-family: var(--active-font-family);
@@ -245,9 +272,4 @@ export default {
   top: 14px;
   width: 34px;
 }
-
-
-
-
 </style>
-

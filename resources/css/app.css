@@ -967,6 +967,7 @@ body {
   font-weight: 600;
   line-height: 150%;
   margin: 5px 0 0 14px;
+  text-decoration: none !important;
 }
 
 @media (max-width: 991px) {
@@ -982,6 +983,7 @@ body {
   line-height: 170%;
   align-self: start;
   margin: 10px 0 0 10px;
+  text-decoration: none !important;
 }
 
 @media (max-width: 991px) {
@@ -1106,4 +1108,170 @@ body {
 .div-2ab {
   font-family: Inter, sans-serif;
   margin-top: 34px;
+}
+.product-actions {
+  margin-top: 10px; /* Khoảng cách giữa nút và mô tả sản phẩm */
+}
+
+.edit-button,
+.delete-button {
+  padding: 8px 44px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.edit-button {
+  background-color: #2ecc71; /* Màu xanh */
+  color: #fff; /* Màu chữ trắng */
+  margin-right: 10px; /* Khoảng cách giữa các nút */
+  text-decoration: none;
+}
+
+.delete-button {
+  background-color: #e74c3c; /* Màu đỏ */
+  color: #fff; /* Màu chữ trắng */
+}
+.product-details {
+  margin-top: 10px; /* Khoảng cách giữa ảnh sản phẩm và thông tin sản phẩm */
+}
+
+.product-name{
+  color: #333;
+  text-decoration: none;
+  font-size: 20px;
+  display: flex;
+}
+.product-price {
+  display: block; /* Hiển thị trên mỗi dòng */
+  color: #333; /* Màu xám đen */
+  text-decoration: none; /* Loại bỏ gạch chân */
+  display: flex;
+
+}
+
+//
+
+
+.divqw {
+  border-radius: 16px;
+  box-shadow: 0px 4px 8px 0px rgba(136, 152, 170, 0.2);
+  background-color: var(--Neutral-White, #fff);
+  display: flex;
+  max-width: 610px;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  letter-spacing: 0.35px;
+  padding: 58px 60px 36px;
+}
+@media (max-width: 991px) {
+  .div {
+    padding: 0 20px;
+  }
+}
+.div-2d {
+  display: flex;
+  width: 396px;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+}
+.imgsd {
+  aspect-ratio: 1;
+  object-fit: auto;
+  object-position: center;
+  width: 92px;
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+}
+.div-3h {
+  color: #ff4d4d;
+  align-self: stretch;
+  margin-top: 54px;
+  font-weight: bold;
+  font: 400 16px/24px Inter, sans-serif;
+}
+@media (max-width: 991px) {
+  .div-3h {
+    margin-top: 40px;
+  }
+}
+.div-4b {
+  display: flex;
+  margin-top: 51px;
+  width: 354px;
+  max-width: 100%;
+  gap: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  line-height: 170%;
+  justify-content: space-between;
+}
+@media (max-width: 991px) {
+  .div-4b {
+    margin-top: 40px;
+    white-space: initial;
+  }
+}
+.div-5d {
+  font-family: Inter, sans-serif;
+  border-radius: 40px;
+  border-color: rgba(98, 103, 122, 1);
+  border-style: solid;
+  border-width: 1px;
+  align-items: center;
+  color: #62677a;
+  justify-content: center;
+  padding: 15px 60px;
+}
+@media (max-width: 991px) {
+  .div-5d {
+    white-space: initial;
+    padding: 0 20px;
+  }
+}
+.div-6e {
+  font-family: Inter, sans-serif;
+  border-radius: 40px;
+  background-color: var(--Red, #ff4d4d);
+  align-items: center;
+  color: var(--Neutral-White, #fff);
+  justify-content: center;
+  padding: 17px 60px;
+}
+@media (max-width: 991px) {
+  .div-6e {
+    white-space: initial;
+    padding: 0 20px;
+  }
+}
+
+.popup-detail {
+  text-align: center;
+  padding-top: 30px;
+  padding-bottom: 20px;
+}
+
+.popup-detail-btn {
+  width: 164px;
+  padding: 10px 0;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 40px;
+}
+
+.popup-detail-btn.submit {
+  background-color: #FF4D4D;
+  color: #fff !important;
+  border: none;
+}
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px;
+  /* margin-right: 560px; */
 }

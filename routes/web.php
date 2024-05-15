@@ -35,3 +35,18 @@ Route::get('/product/details/{id}', function ($id) {
     return view('welcome');
 });
 
+Route::get('/details', function () {
+    return view('welcome');
+});
+
+Route::get('/product/edit/{id}', function ($id) {
+    return view('welcome');
+});
+
+Route::get('/login', function () {
+    return view('welcome');
+});
+
+Route::get('/register', function () {
+    return view('welcome');
+});

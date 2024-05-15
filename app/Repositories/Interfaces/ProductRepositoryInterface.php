@@ -17,4 +17,6 @@ interface ProductRepositoryInterface
     public function create(array $data);
 
     public function find($id);
+
+    public function count($keyword = null);
 }

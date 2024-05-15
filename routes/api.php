@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
-
+use App\Models\User;
+use App\Http\Controllers\RegisterController ;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -32,6 +33,14 @@ Route::get('/categories', [CategoryController::class, 'getAll']);
 
 Route::get('/', [ProductController::class, 'getProducts']);
 
-Route::get('/products{$id}', [ProductController::class, 'show']);
 
-Route::post('/login',[UserController::class, 'login']);
+
+Route::put('/products/{id}', [ProductController::class, 'update']);
+
+
+Route::get('/products/{id}', [ProductController::class, 'show']);
+
+
+Route::delete('/delete_products/{id}', [App\Http\Controllers\ProductController::class, 'delete']);
+
+

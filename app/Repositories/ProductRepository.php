@@ -7,14 +7,32 @@ use App\Repositories\Interfaces\ProductRepositoryInterface;
 
 class ProductRepository implements ProductRepositoryInterface
 {
+    // public function all($keyword = '')
+    // {
+    //     if ($keyword != '') {
+    //         return Product::where('name', 'like', "%$keyword%")->get();
+    //     } else {   
+    //         return Product::all();
+
+    //     }
+    // }
+    
+  
+ 
+
     public function all($keyword = '')
     {
+        $query = Product::with('brand', 'category');
+
         if ($keyword != '') {
-            return Product::where('name', 'like', "%$keyword%")->get();
-        } else {   
-            return Product::all();
+            $query->where('name', 'like', "%$keyword%");
         }
+
+        return $query->get();
     }
+
+
+
 
     public function paginate($page, $size, $keyword)
     {
@@ -49,8 +67,46 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function find($id)
     {
-        return Product::find($id);
+        return Product::with('brand', 'category')->find($id);
     }
+
+    public function count($keyword = null)
+    {
+
+        if ($keyword != '') {
+            return Product::where('name', 'like', "%$keyword%")->count();
+        }
+        return Product::count();
+    }
+
+
+    public function saveProduct($request)
+    {
+        $product = new Product();
+
+        if (isset($request->name)) {
+            $product->name = $request->name;
+        }
+
+        if (isset($request->price)) {
+            $product->price = $request->price;
+        }
+
+        if (isset($request->description)) {
+            $product->description = $request->description;
+        }
+
+        if (isset($request->image)) {
+            $product->image = $request->image;
+        }
+
+        $product->save();
+
+        return $product;
+    }
+
+
+
 
     // public function find($id)
     // {
