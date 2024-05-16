@@ -60,6 +60,8 @@ const routes = [
         component: () => import('../Components/Auth/Register.vue')
     }
 
+    
+
 
 
 

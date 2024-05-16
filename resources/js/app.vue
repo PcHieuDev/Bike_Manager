@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Header/>
+    <Header />
     <SlideBar />
     <SearchBar />
     <router-view></router-view>
@@ -8,19 +8,17 @@
 </template>
 
 <script>
-import  Header from './Components/header/index.vue'
+import Header from "./Components/header/index.vue";
 
-import SlideBar from './Components/slidebar/index.vue'
-import Search from './Components/SearchBar/Search.vue'
-
+import SlideBar from "./Components/slidebar/index.vue";
+import Search from "./Components/SearchBar/Search.vue";
 
 export default {
-  name: 'app',
+  name: "app",
   components: {
     Header,
     SlideBar,
-    Search
+    Search,
   },
-
-}
+};
 </script>

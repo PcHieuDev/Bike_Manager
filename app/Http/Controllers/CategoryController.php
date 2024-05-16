@@ -10,16 +10,16 @@ use Illuminate\Http\Response;
 
 class CategoryController extends Controller
 {
-    protected $categoryRepository;
+    // protected $categoryRepository;
 
-    public function __construct(CategoryRepositoryInterface $categoryRepository)
-    {
-        $this->categoryRepository = $categoryRepository;
-    }
+    // public function __construct(CategoryRepositoryInterface $categoryRepository)
+    // {
+    //     $this->categoryRepository = $categoryRepository;
+    // }
 
     public function getAll()
     {
-        $category = $this->categoryRepository->getAll();
+        $category = Category::all();
         return response()->json(
             [
                 'contents' => $category,

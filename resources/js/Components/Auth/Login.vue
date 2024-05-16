@@ -5,7 +5,7 @@
         <h2 class="text-center text-dark mt-5">Login NCC</h2>
 
         <div class="card my-5">
-          <form class="card-body cardbody-color p-lg-5" @submit="validateForm">
+          <form class="card-body cardbody-color p-lg-5" @submit.prevent="handleLogin">
             <div class="text-center">
               <img
                 src="storage/images/logo.png"
@@ -20,9 +20,13 @@
                 type="email"
                 class="form-control"
                 id="email"
+                v-model="email"
                 aria-describedby="emailHelp"
                 placeholder="Email Address"
               />
+              <div v-if="emailErrorMessage" class="dfsdfsd">
+                {{ emailErrorMessage }}
+              </div>
               <span id="emailError" class="text-danger d-none" style="color: white"
                 >Please enter a valid email address.</span
               >
@@ -32,9 +36,12 @@
                 type="password"
                 class="form-control"
                 id="password"
-                name="password"
+                v-model="password"
                 placeholder="Password"
               />
+              <div v-if="passwordErrorMessage" class="dfsdfsd">
+                {{ "*" + passwordErrorMessage }}
+              </div>
             </div>
             <div class="text-center">
               <button type="submit" class="btn btn-color px-5 mb-5 w-100">Login</button>
@@ -51,24 +58,6 @@
     </div>
   </div>
 </template>
-
-<script>
-export default {
-  methods: {
-    validateForm(event) {
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      const emailError = document.getElementById("emailError");
-
-      if (!emailPattern.test(this.email)) {
-        emailError.classList.remove("d-none");
-        event.preventDefault(); // Ngăn chặn gửi form nếu có lỗi
-      } else {
-        emailError.classList.add("d-none");
-      }
-    },
-  },
-};
-</script>
 
 <style scoped>
 .btn-color {

@@ -6,7 +6,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Models\User;
-use App\Http\Controllers\RegisterController ;
+use App\Http\Controllers\UserController ;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -43,4 +43,8 @@ Route::get('/products/{id}', [ProductController::class, 'show']);
 
 Route::delete('/delete_products/{id}', [App\Http\Controllers\ProductController::class, 'delete']);
 
+
+Route::post('/register', [UserController::class, 'register']);
+
+Route::post('/login', [UserController::class, 'login']);
 

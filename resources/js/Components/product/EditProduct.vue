@@ -11,21 +11,21 @@
 
           <div class="form-group">
             <label>Danh mục sản phẩm</label>
-            <select class="form-select" aria-label="Default select example">
-              <option selected>Open this select menu</option>
-              <option value="1">One</option>
-              <option value="2">Two</option>
-              <option value="3">Three</option>
+            <select class="form-select" v-model="product.category_id">
+              <!--                <option selected>-&#45;&#45;Chọn-&#45;&#45;</option>-->
+              <template v-for="(item, index) in categories" :key="index">
+                <option :value="item.id">{{ item.name }}</option>
+              </template>
             </select>
           </div>
 
           <div class="form-group">
             <label>Hãng sản xuất</label>
-            <select class="form-select" aria-label="Default select example">
-              <option selected>Open this select menu</option>
-              <option value="1">One</option>
-              <option value="2">Two</option>
-              <option value="3">Three</option>
+            <select class="form-select" v-model="product.brand_id">
+              <!--                <option selected>-&#45;&#45;Chọn-&#45;&#45;</option>-->
+              <template v-for="(item, index) in brands" :key="index">
+                <option :value="item.id">{{ item.name }}</option>
+              </template>
             </select>
           </div>
 
@@ -41,6 +41,11 @@
               id="exampleFormControlTextarea1"
               rows="3"
             ></textarea>
+          </div>
+
+          <div class="div-17">
+            <button class="div-18">Lưu</button>
+            <button class="div-18">Huy</button>
           </div>
         </div>
       </div>
@@ -102,14 +107,26 @@
 import axios from "axios";
 
 export default {
+  name: "EditProduct",
   data() {
     return {
-      product: [],
+      product: {
+        name: "",
+        price: "",
+        note: "",
+        image: null,
+        afterAddProduct: false,
+        category_id: "",
+        brand_id: "",
+      },
+      categories: [],
+      brands: [],
       productId: this.$route.params.id,
     };
   },
   mounted() {
-    this.EditProduct();
+    this.getListCategory();
+    this.getListBrands();
   },
 
   methods: {
@@ -117,13 +134,15 @@ export default {
       this.$router.push("/");
     },
 
-    getData() {
+    getProductDetails() {
       const id = this.$route.params.id; // lấy id từ route
       axios
-        .get(`http://127.0.0.1:8000/api/products/${id}`)
+        .get(`http://127.0.0.1:8000/api/products/${this.$route.params.id}`)
         .then((response) => {
           if (response.data) {
             this.product = response.data.product;
+            console.log(this.product.category.name);
+            console.log(this.product);
           } else {
             // Xử lý trường hợp dữ liệu trả về null ở đây
             console.log("No data returned from API");
@@ -133,14 +152,28 @@ export default {
           console.error(error);
         });
     },
-    changeCursor() {
-      // Thay đổi kiểu con trỏ thành bàn tay chỉ
-      document.body.style.cursor = "pointer";
+    getListCategory() {
+      axios
+        .get("http://127.0.0.1:8000/api/categories")
+        .then((response) => {
+          this.categories = response.data.contents;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
-    restoreCursor() {
-      // Khôi phục lại kiểu con trỏ mặc định
-      document.body.style.cursor = "auto";
+    getListBrands() {
+      axios
+        .get("http://127.0.0.1:8000/api/brands")
+        .then((response) => {
+          this.brands = response.data.contents;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
+
+    updateProduct() {},
   },
 };
 </script>
