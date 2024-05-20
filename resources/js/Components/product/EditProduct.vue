@@ -3,6 +3,7 @@
     <div class="div-2">
       <div class="column">
         <div class="div-3">
+          <div class="div-4x" @click="$router.go(-1)">Quay Lại</div>
           <div class="div-4">Thông tin sản phẩm</div>
           <div class="form-group">
             <label>Tên sản phẩm</label>
@@ -172,8 +173,6 @@ export default {
           console.log(error);
         });
     },
-
-    updateProduct() {},
   },
 };
 </script>
@@ -296,6 +295,17 @@ export default {
 @media (max-width: 991px) {
   .div-4 {
     max-width: 100%;
+  }
+}
+
+.div-4x {
+  color: var(--Neutral-Darkest-Grey, #22dae0);
+  font: 600 18px Open Sans, sans-serif;
+  cursor: pointer;
+}
+
+@media (max-width: 991px) {
+  .div-4x {
   }
 }
 

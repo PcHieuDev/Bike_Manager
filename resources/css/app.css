@@ -444,9 +444,9 @@
 }
 
 .header-product {
-  padding-left: 335px;
+  padding-left: 345px;
   padding-top: 100px;
-  width: 94%;
+  width: 95%;
 }
 
 .custom-search {
@@ -1128,7 +1128,7 @@ body {
 .edit-button {
   background-color: #2ecc71; /* Màu xanh */
   color: #fff; /* Màu chữ trắng */
-  margin-right: 10px; /* Khoảng cách giữa các nút */
+  margin-right: 6px; /* Khoảng cách giữa các nút */
   text-decoration: none;
 }
 
@@ -1276,4 +1276,12 @@ body {
   right: 10px;
   padding: 5px;
   /* margin-right: 560px; */
+}
+
+.custom-profile {
+  display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 64px;
+    margin-right: 30px;
 }

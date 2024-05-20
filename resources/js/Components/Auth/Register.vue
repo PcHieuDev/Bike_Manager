@@ -20,79 +20,115 @@
                 type="text"
                 class="form-control"
                 id="fullname"
-                v-model="fullname"
+                v-model="user.name"
                 placeholder="Full Name"
               />
-              <div v-if="fullnameErrorMessage" class="dfsdfsd">
-                {{ fullnameErrorMessage }}
-              </div>
             </div>
             <div class="mb-3">
               <input
                 type="email"
                 class="form-control"
                 id="email"
-                v-model="email"
+                v-model="user.email"
                 aria-describedby="emailHelp"
                 placeholder="Email Address"
               />
-              <div v-if="emailErrorMessage" class="dfsdfsd">
-                {{ emailErrorMessage }}
-              </div>
             </div>
             <div class="mb-3">
               <input
                 type="password"
                 class="form-control"
                 id="password"
-                v-model="password"
+                v-model="user.password"
                 placeholder="Password"
               />
-              <div v-if="passwordErrorMessage" class="dfsdfsd">
-                {{ "*" + passwordErrorMessage }}
-              </div>
             </div>
             <div class="text-center">
-              <button type="submit" class="btn btn-color px-5 mb-5 w-100">
-                Register
-              </button>
+              <button type="submit" class="btn btn-color px-5 mb-5 w-100">Đăng Ký</button>
+              <p class="canh-bao" v-if="error">{{ error }}</p>
             </div>
             <div id="emailHelp" class="form-text text-center mb-5 text-dark">
-              Already Registered?
-              <router-link to="/login" class="text-dark fw-bold"> Log In</router-link>
+              Đã có tài khoản?
+              <router-link to="/login" class="text-dark fw-bold"> Đăng Nhập</router-link>
             </div>
           </form>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- popup RegisterSucess -->
+  <v-dialog v-model="RegisterSucess" max-width="610">
+    <v-card>
+      <v-btn
+        icon
+        class="close-btn"
+        @click="RegisterSucess = false"
+        style="margin-left: 560px"
+      >
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+      <div class="divqw popup-detail">
+        <div class="div-2d">
+          <img
+            loading="lazy"
+            src="https://icons.veryicon.com/png/o/miscellaneous/8atour/success-35.png"
+            class="imgsd"
+          />
+          <div class="div-3h" style="color: black">Bạn đăng ký thành công</div>
+        </div>
+      </div>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
+import axios from "axios";
 export default {
   data() {
     return {
-      fullname: "",
-      email: "",
-      password: "",
-      fullnameErrorMessage: "",
-      emailErrorMessage: "",
-      passwordErrorMessage: "",
+      RegisterSucess: false,
+      user: {
+        name: "",
+        email: "",
+        password: "",
+      },
+      error: "",
+      RegisterSucess: false,
     };
   },
   methods: {
     handleRegister() {
-      // Add your registration logic here
-      // For example, you can validate the input fields
-      if (!this.fullname.trim()) {
-        this.fullnameErrorMessage = "Please enter your full name.";
+      // Kiểm tra tính hợp lệ của email và mật khẩu
+      if (!this.user.email.includes("@")) {
+        this.error = "email không hơp lệ";
         return;
       }
 
-      // You can add more validation for email and password here
+      if (this.user.password.length < 6) {
+        this.error = "Password phải lớn hơn 6 kí tự";
+        return;
+      }
 
-      // If all fields are valid, you can proceed with registration
-      // For example, you can send a request to your backend API to register the user
+      axios
+        .post("http://127.0.0.1:8000/api/register", this.user)
+        .then((response) => {
+          if (response.status === 201) {
+            this.RegisterSucess = true;
+            setTimeout(() => {
+              this.$router.push("/login");
+            }, 1000);
+          } else {
+            this.error = response.data.message;
+          }
+        })
+        .catch((error) => {
+          if (error.response) {
+            this.error = error.response.data.message;
+          } else {
+            this.error = "An error occurred.";
+          }
+        });
     },
   },
 };
@@ -102,6 +138,13 @@ export default {
 .btn-color {
   background-color: #0e1c36;
   color: #fff;
+}
+
+.canh-bao {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: white;
+  font-weight: bold;
 }
 
 .profile-image-pic {

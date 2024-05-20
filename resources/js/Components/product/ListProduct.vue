@@ -1,8 +1,5 @@
 <template>
   <div class="header-product d-flex justify-content-between">
-    <button type="button" @click="changeDialog" class="btn btn-outline-primary">
-      Thêm sản phẩm
-    </button>
     <div class="input-group custom-search">
       <input
         type="text"
@@ -15,41 +12,18 @@
       />
     </div>
   </div>
-  <div class="product-list">
-    <!-- <template v-for="product in products" :key="product.id">
-      <router-link :to="`/product/details/${product.id}`" style="text-decoration: none">
-        <div class="product-card">
-          <img :src="product.image" class="product-image" :alt="product.name"/>
-          <div class="product-info">
-            <h2 class="product-name">{{ product.name }}</h2>
-            <p class="product-description">{{ product.description }}</p>
-            <p class="product-price">$ {{ product.price }}</p>
-          </div>
-        </div>
-      </router-link>
-    </template> -->
-    <template v-for="product in products" :key="product.id">
-      <router-link :to="`/product/details/${product.id}`" style="text-decoration: none">
-        <div class="column-4">
-          <div class="div-19">
-            <img
-              :src="product.image"
-              style="height: 146px; width: 230px"
-              class="product-image"
-            />
-            <div class="product-details">
-              <span class="product-name">{{ product.name }}</span>
-              <span class="product-price">$ {{ product.price }}</span>
-            </div>
-          </div>
-        </div>
-      </router-link>
-    </template>
-  </div>
 
+  <!-- productlisst -->
+
+  <ProductItem :products="products"></ProductItem>
+
+  <!-- productlisst -->
+
+  <!-- button paginate -->
   <div class="text-xs-center">
     <v-pagination v-model="page" :length="countRercord" :total-visible="5"></v-pagination>
   </div>
+  <!-- button paginate -->
 
   <!--  loading page-->
   <div v-if="isLoading" class="loading-page">
@@ -167,18 +141,6 @@
           variant="outlined"
           @click:append-inner="visible = !visible"
         ></v-text-field>
-
-        <!--        <v-card-->
-        <!--            class="mb-12"-->
-        <!--            color="surface-variant"-->
-        <!--            variant="tonal"-->
-        <!--        >-->
-        <!--          <v-card-text class="text-medium-emphasis text-caption">-->
-        <!--            Warning: After 3 consecutive failed login attempts, you account will be temporarily locked for three hours.-->
-        <!--            If you must login now, you can also click "Forgot login password?" below to reset the login password.-->
-        <!--          </v-card-text>-->
-        <!--        </v-card>-->
-
         <v-btn class="mb-8" color="blue" size="large" variant="tonal" block>
           Log In
         </v-btn>
@@ -197,40 +159,6 @@
       </v-card>
     </v-card>
   </v-dialog>
-
-  <!--  popupAddCucces-->
-  <!-- <v-dialog v-model="addCucces">
-   <v-card>
-    <div class="divab">
-    <img style="  aspect-ratio: 1;
-    object-fit: auto;  object-position: center;
-    width: 24px;
-";
-      loading="lazy"
-      src="https://cdn.builder.io/api/v1/image/assets/TEMP/30a3d4b5ef0147f880c3aef85a902b777a0d1145376670060bcd0eda4376081f?"
-      class="img"
-    /><img
-      loading="lazy"
-      src="https://cdn.builder.io/api/v1/image/assets/TEMP/6998beae4086ea2ecf93be1cb4bac64c753c10c053a00ac87dcfeb4109d1c78b?"
-      class="img-2"
-    />
-    <div class="div-2ab">Thêm thành công!</div>
-  </div>
-
-   </v-card>
-
-    </v-dialog> -->
-
-  <!-- popup tim kiem -->
-
-  <!-- <v-dialog v-model="showErrorPopup">
-    <v-card>
-      <div class="text-center">
-        <div class="error-message">Không được nhập ký tự đặc biệt vào ô tìm kiếm!</div>
-        <v-btn color="primary" @click="showErrorPopup = false">Đóng</v-btn>
-      </div>
-    </v-card>
-  </v-dialog> -->
 
   <!-- popup afterAddProduct -->
   <v-dialog v-model="afterAddProduct" max-width="610">
@@ -259,11 +187,13 @@
 
 <script>
 import axios from "axios";
+import ProductItem from "./ProductItem.vue";
 import Paginate from "vuejs-paginate";
 
 export default {
   name: "list",
   components: {
+    ProductItem,
     Paginate,
   },
 
@@ -273,7 +203,6 @@ export default {
       page: 1,
       totalPages: null,
       countRercord: 0,
-
       itemsPerPage: 12,
       isLoading: false,
       isShowDialog: false,
@@ -281,7 +210,6 @@ export default {
       afterAddProduct: false,
       showErrorPopup: false,
       searchTerm: "",
-      // ShowLogin: false,
       product: {
         name: "",
         price: "",
@@ -308,6 +236,9 @@ export default {
   mounted() {
     this.getListCategory();
     this.getListBrands();
+    var token = localStorage.getItem("token");
+    var user = localStorage.getItem("user");
+    this.user = JSON.parse(localStorage.getItem("user"));
   },
 
   methods: {
@@ -320,7 +251,7 @@ export default {
     },
     async getProducts() {
       this.isLoading = true;
-      let url = "http://127.0.0.1:8000/api/products";
+      let url = "http://127.0.0.1:8000/api/productsFree";
       await axios
         .get(url, {
           params: {
@@ -346,38 +277,6 @@ export default {
 
     changeDialog() {
       this.isShowDialog = !this.isShowDialog;
-    },
-
-    addProduct() {
-      const formData = new FormData();
-      formData.append("name", this.product.name);
-      formData.append("note", this.product.note);
-      formData.append("price", this.product.price);
-      formData.append("category_id", this.product.category_id);
-      formData.append("brand_id", this.product.brand_id);
-      formData.append("image", this.product.image);
-      axios
-        .post("http://127.0.0.1:8000/api/saveProduct", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then((response) => {
-          console.log(response);
-          this.afterAddProduct = true;
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isShowDialog = false;
-          // // this.addCucces = true; after 1s ?
-          //   setTimeout(() => {
-          //   this.addCucces = false;
-          // }, 1000);
-          this.page = 1;
-          this.getProducts();
-        });
     },
 
     getListCategory() {
@@ -428,3 +327,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.custom-search {
+  width: 445px !important;
+  margin-left: 650px;
+}
+</style>

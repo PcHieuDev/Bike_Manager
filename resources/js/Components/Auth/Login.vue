@@ -14,7 +14,9 @@
                 alt="profile"
               />
             </div>
-
+            <div v-if="errorMessage" class="alert alert-danger text-center">
+              {{ errorMessage }}
+            </div>
             <div class="mb-3">
               <input
                 type="email"
@@ -27,9 +29,9 @@
               <div v-if="emailErrorMessage" class="dfsdfsd">
                 {{ emailErrorMessage }}
               </div>
-              <span id="emailError" class="text-danger d-none" style="color: white"
-                >Please enter a valid email address.</span
-              >
+              <span id="emailError" class="text-danger d-none" style="color: white">
+                Please enter a valid email address.
+              </span>
             </div>
             <div class="mb-3">
               <input
@@ -40,24 +42,119 @@
                 placeholder="Password"
               />
               <div v-if="passwordErrorMessage" class="dfsdfsd">
-                {{ "*" + passwordErrorMessage }}
+                {{ passwordErrorMessage }}
               </div>
             </div>
             <div class="text-center">
-              <button type="submit" class="btn btn-color px-5 mb-5 w-100">Login</button>
+              <button type="submit" class="btn btn-color px-5 mb-5 w-100">
+                Đăng Nhập
+              </button>
             </div>
-            <div id="emailHelp" class="form-text text-center mb-5 text-dark">
-              Not Registered?
-              <router-link to="/register" class="text-dark fw-bold">
-                Create an Account</router-link
+            <div id="emailHelp" class="form-text text-center mb-5 text-light">
+              Chưa có tài khoản?
+              <router-link
+                to="/register"
+                class="text-light fw-bold"
+                style="margin-left: 5px"
               >
+                Tạo tài khoản
+              </router-link>
             </div>
           </form>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- popup LoginSuccess -->
+  <v-dialog v-model="LoginSuccess" max-width="610">
+    <v-card>
+      <v-btn
+        icon
+        class="close-btn"
+        @click="LoginSuccess = false"
+        style="margin-left: 560px"
+      >
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+      <div class="divqw popup-detail">
+        <div class="div-2d">
+          <img
+            loading="lazy"
+            src="https://icons.veryicon.com/png/o/miscellaneous/8atour/success-35.png"
+            class="imgsd"
+          />
+          <div class="div-3h" style="color: black">Bạn đăng nhập thành công</div>
+        </div>
+      </div>
+    </v-card>
+  </v-dialog>
 </template>
+
+<script>
+import axios from "axios";
+
+export default {
+  data() {
+    return {
+      LoginSuccess: false,
+      email: "",
+      password: "",
+      emailErrorMessage: "",
+      passwordErrorMessage: "",
+      errorMessage: "",
+    };
+  },
+  methods: {
+    handleLogin() {
+      if (this.email === "") {
+        this.emailErrorMessage = "Làm ơn nhập email.";
+      } else {
+        this.emailErrorMessage = "";
+      }
+
+      if (this.password === "") {
+        this.passwordErrorMessage = "Làm ơn nhập mật khẩu.";
+      } else {
+        this.passwordErrorMessage = "";
+      }
+
+      if (this.email !== "" && this.password !== "") {
+        axios
+          .post("/api/login", {
+            email: this.email,
+            password: this.password,
+          })
+          .then((response) => {
+            console.log(response.data);
+            localStorage.setItem("token", response.data.token);
+
+            localStorage.setItem("user", JSON.stringify(response.data.user));
+            this.user = JSON.parse(localStorage.getItem("user"));
+
+            this.LoginSuccess = true;
+            setTimeout(() => {
+              this.$router.push("/product/actions");
+            }, 1200);
+          })
+          .catch((error) => {
+            if (error.response) {
+              if (error.response.status === 401) {
+                // Unauthorized
+                this.errorMessage = "Email hoặc mật khẩu không đúng.";
+              } else {
+                this.errorMessage = "Đã xảy ra lỗi. Vui lòng thử lại.";
+              }
+            } else {
+              this.errorMessage = "Đã xảy ra lỗi. Vui lòng thử lại.";
+            }
+            console.log(error);
+          });
+      }
+    },
+  },
+};
+</script>
 
 <style scoped>
 .btn-color {
@@ -73,6 +170,15 @@
 
 .cardbody-color {
   background-color: #00ade8;
+}
+
+.dfsdfsd {
+  padding: 0;
+  margin: 0;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: white;
+  font-weight: bold;
 }
 
 a {

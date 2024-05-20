@@ -118,19 +118,31 @@ export default {
       formData.append("category_id", this.product.category_id);
       formData.append("brand_id", this.product.brand_id);
       formData.append("image", this.product.image);
+      let token = localStorage.getItem("token");
+
       axios
-        .post("http://127.0.0.1:8000/api/saveProduct", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then((response) => {
-          console.log(response);
-          this.afterAddProduct = true;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+          .post("http://127.0.0.1:8000/api/saveProduct", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then((response) => {
+            console.log(response);
+            this.afterAddProduct = true;
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+          .finally(() => {
+            this.isShowDialog = false;
+            // // this.addCucces = true; after 1s ?
+            //   setTimeout(() => {
+            //   this.addCucces = false;
+            // }, 1000);
+            this.page = 1;
+            this.getProducts();
+          });
     },
     onChange(e) {
       this.product.image = e.target.files[0];

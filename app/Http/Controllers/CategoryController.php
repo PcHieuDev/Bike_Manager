@@ -8,22 +8,14 @@ use App\Repositories\Interfaces\CategoryRepositoryInterface;
 use App\Models\Category;
 use Illuminate\Http\Response;
 
-class CategoryController extends Controller
+class CategoryController extends BaseController
 {
-    // protected $categoryRepository;
+    protected $categoryRepository;
 
-    // public function __construct(CategoryRepositoryInterface $categoryRepository)
-    // {
-    //     $this->categoryRepository = $categoryRepository;
-    // }
-
-    public function getAll()
+    public function __construct(CategoryRepositoryInterface $categoryRepository)
     {
-        $category = Category::all();
-        return response()->json(
-            [
-                'contents' => $category,
-                'code' => Response::HTTP_OK
-            ]);
+        $this->categoryRepository = $categoryRepository;
     }
+
+    
 }

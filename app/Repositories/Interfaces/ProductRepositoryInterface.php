@@ -18,4 +18,6 @@ interface ProductRepositoryInterface
 
     public function find($id);
 
+    public function count($keyword = '');
+
 }

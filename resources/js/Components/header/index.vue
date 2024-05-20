@@ -1,145 +1,59 @@
 <template>
   <header class="header">
     <div class="overlap">
-      <div
-        class="s-n-ph-m-2"
-        @click="goProductAction"
-        @mouseenter="changeCursor"
-        @mouseleave="restoreCursor"
-      >
-        QUẢN LÝ SẢN PHẨM
-      </div>
-      <div
-        class="s-n-ph-m"
-        @click="goHome"
-        @mouseenter="changeCursor"
-        @mouseleave="restoreCursor"
-      >
-        SẢN PHẨM
-      </div>
-      <!-- <div class="s-n-ph-m3" >HOME</div> -->
+      <div v-if="user" class="s-n-ph-m-2" @click="goProductAction">QUẢN LÝ SẢN PHẨM</div>
+      <div class="s-n-ph-m" @click="goHome">SẢN PHẨM</div>
 
       <div class="overlap-group-3">
-        <div
-          class="text-wrapper-6"
-          @click="goHome"
-          @mouseenter="changeCursor"
-          @mouseleave="restoreCursor"
-        >
-          NCC
-        </div>
+        <div class="text-wrapper-6" @click="goHome">NCC</div>
         <img
           @click="goHome"
-          @mouseenter="changeCursor"
-          @mouseleave="restoreCursor"
           class="image-3"
           alt="Image"
           src="https://ncc.asia/assets/images/logo.png"
         />
       </div>
-      <ul class="nav" style="padding-left: 965px">
-        <!--        <li class="nav-item">-->
-        <!--          <router-link to="/product/add" class="nav-link" style="margin-left: 45px; font-size: 27px; color: white" href="path_to_your_add_product_page">Thêm sản phẩm</router-link>-->
-        <!--        </li>-->
-        <li class="nav-item">
-          <RouterLink
-            to="/login"
-            class="nav-link"
-            style="
-              margin-left: 362px;
-              font-size: 19px;
-              color: black;
-              margin-top: 8px;
-              background-color: rgb(255 255 255);
-              border: none;
-              padding: 10px 20px;
-              border-radius: 5px;
-              cursor: pointer;
-            "
-          >
-            LOGIN
-          </RouterLink>
-        </li>
-      </ul>
+
+      <div class="custom-profile">
+        <template v-if="user">
+          <span class="mr-2">{{ user.name }}</span>
+          <button @click="handleLogout" class="btn btn-success">Logout</button>
+        </template>
+        <template v-else>
+          <RouterLink to="/Login" class="btn btn-success"> Login </RouterLink>
+        </template>
+      </div>
     </div>
   </header>
 
-  <!--  popuplogin v-model="ShowLogin"  -->
-
-  <!-- <v-dialog v-model="ShowLogin" max-width="674">
+  <!-- popup LogoutSuccess -->
+  <v-dialog v-model="LogoutSuccess" max-width="610">
     <v-card>
-      <v-card-title class="headline">Login</v-card-title>
-      <v-card class="mx-auto pa-12 pb-8" elevation="8" max-width="548" rounded="lg">
-        <div class="text-subtitle-1 text-medium-emphasis">Account</div>
-
-        <v-text-field
-          density="compact"
-          placeholder="Email address"
-          prepend-inner-icon="mdi-email-outline"
-          variant="outlined"
-        ></v-text-field>
-
-        <div
-          class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between"
-        >
-          Password
-
-          <a
-            class="text-caption text-decoration-none text-blue"
-            href="#"
-            rel="noopener noreferrer"
-            target="_blank"
-            style="padding-left: 120px"
-          >
-            Forgot login password?</a
-          >
-        </div>
-
-        <v-text-field
-          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-          :type="visible ? 'text' : 'password'"
-          density="compact"
-          placeholder="Enter your password"
-          prepend-inner-icon="mdi-lock-outline"
-          variant="outlined"
-          @click:append-inner="visible = !visible"
-        ></v-text-field>
-
-        <v-card class="mb-12" color="surface-variant" variant="tonal"> </v-card>
-
-        <v-btn class="mb-8" color="blue" size="large" variant="tonal" block>
-          Log In
-        </v-btn>
-
-        <v-card-text class="text-center">
-          <a
-            class="text-blue text-decoration-none"
-            href="#"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Sign up now
-            <v-icon icon="mdi-chevron-right"></v-icon>
-          </a>
-        </v-card-text>
-      </v-card>
-    </v-card>
-
-    <v-card-actions>
-      <v-spacer></v-spacer>
       <v-btn
-        color="black"
-        text
-        @click="ShowLogin = false"
-        style="background-color: white"
+        icon
+        class="close-btn"
+        @click="LogoutSuccess = false"
+        style="margin-left: 560px"
       >
-        Close
+        <v-icon>mdi-close</v-icon>
       </v-btn>
-    </v-card-actions>
-  </v-dialog> -->
+      <div class="divqw popup-detail">
+        <div class="div-2d">
+          <img
+            loading="lazy"
+            src="https://icons.veryicon.com/png/o/miscellaneous/8atour/success-35.png"
+            class="imgsd"
+          />
+          <div class="div-3h" style="color: black">Bạn đã đăng xuất</div>
+        </div>
+      </div>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
+import { RouterLink } from "vue-router";
+
 export default {
   name: "Header",
   computed: {
@@ -153,8 +67,24 @@ export default {
       email: "",
       password: "",
       ShowLogin: false,
+      LogoutSuccess: false,
       visible: false,
+      user: null,
     };
+  },
+  created() {
+    this.user = JSON.parse(localStorage.getItem("user"));
+  },
+
+  mounted() {
+    var token = localStorage.getItem("token");
+    var user = localStorage.getItem("user");
+    if (token && user) {
+      this.user = JSON.parse(localStorage.getItem("user"));
+    } else {
+      this.user = null;
+      this.$router.push("/login");
+    }
   },
 
   methods: {
@@ -162,22 +92,32 @@ export default {
       this.$router.push("/");
     },
 
+    handleLogout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      this.LogoutSuccess = true;
+      setTimeout(() => {
+        this.$router.push("/login");
+      }, 1000);
+
+      this.user = null;
+    },
+
     goProductAction() {
       this.$router.push("/product/actions");
-    },
-    changeCursor() {
-      // Thay đổi kiểu con trỏ thành bàn tay chỉ
-      document.body.style.cursor = "pointer";
-    },
-    restoreCursor() {
-      // Khôi phục lại kiểu con trỏ mặc định
-      document.body.style.cursor = "auto";
     },
   },
 };
 </script>
 
-<style>
+<style scoped>
+.mr-2 {
+  margin-right: 8px !important;
+  color: white;
+  font-size: 23px;
+  font-weight: bold;
+}
+
 .header {
   background-color: transparent;
   height: 64px;
@@ -209,6 +149,7 @@ export default {
   position: absolute;
   top: 25px;
   width: 247px;
+  cursor: pointer;
 }
 
 .header .s-n-ph-m {
@@ -224,6 +165,7 @@ export default {
   position: absolute;
   top: 25px;
   width: 125px;
+  cursor: pointer;
 }
 
 .header .s-n-ph-m-2 {
@@ -239,6 +181,7 @@ export default {
   position: absolute;
   top: 25px;
   width: 220px;
+  cursor: pointer;
 }
 
 .header .overlap-group-3 {
@@ -262,6 +205,7 @@ export default {
   text-align: center;
   top: 5px;
   width: 318px;
+  cursor: pointer;
 }
 
 .header .image-3 {

@@ -4,7 +4,6 @@ import Products from '../pages/product/index.vue'
 import AddProduct from "../Components/product/AddProduct.vue"
 import ProductDetails from "../Components/product/ProductDetails.vue"
 import ProductActions from '../Components/product/ProductActions.vue'
-import Detail from '../Components/product/Detail.vue'
 import EditProduct from '../Components/product/EditProduct.vue'
 import Login from '../Components/Auth/Login.vue'
 
@@ -38,11 +37,7 @@ const routes = [
         path: '/product/actions',
         component: ProductActions
     },
-    {
-        name: 'detail',
-        path: '/details',
-        component: Detail
-    },
+   
     {
         name: 'EditProduct',
         path: '/product/edit/:id',

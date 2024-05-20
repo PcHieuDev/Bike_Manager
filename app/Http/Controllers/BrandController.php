@@ -5,19 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Repositories\Interfaces\BrandRepositoryInterface;
 
-class BrandController extends Controller
+class BrandController extends BaseController
 {
-    public function getAll()
+
+    protected $brandRepository;
+
+    public function __construct(BrandRepositoryInterface $brandRepository)
     {
-
-        $brands = Brand::all();
-        return response()->json(
-            [
-                'contents' => $brands,
-                'code' => Response::HTTP_OK
-
-            ]);
-
+        parent::__construct($brandRepository);
     }
 }
