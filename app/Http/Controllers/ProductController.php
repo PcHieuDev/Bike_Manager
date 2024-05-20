@@ -22,16 +22,13 @@ class ProductController extends Controller
 
     protected $productRepository;
 
-
     public function __construct(ProductRepositoryInterface $productRepository)
     {
         $this->productRepository = $productRepository;
     }
 
-
     public function getProducts()
     {
-
         $products = $this->productRepository->all();
         return response()->json(
             [
@@ -43,24 +40,9 @@ class ProductController extends Controller
             ]
         );
     }
-    // public function getData(Request $request)
-    // {
-    //     $page = $request->input('page', 1);
-    //     $keyword = $request->input('keyword', '');
-    //     $size = $request->input('size', 12);
-
-    //     $data = $this->productRepository->paginate($page, $size, $keyword);
-    //     return response()->json([
-    //         'contents' => $data,
-    //         'count' => $keyword != '' ? $this->productRepository->count($keyword) : $this->productRepository->count(),
-    //         'code' => $this->ok()
-    //     ]);
-    // }
-
 
     public function getData(Request $request)
     {
-
         $inputs = $request->all();
         $page = ArrayHelper::getValue($inputs, 'page', Constants::DEFAULT_PAGE_NUMBER);
         $keyword = ArrayHelper::getValue($inputs, 'keyword', '');
@@ -91,9 +73,7 @@ class ProductController extends Controller
     public function saveProduct(ProductRequest $request)
     {
         try {
-
             $image = $request->file('image');
-
             if ($image) {
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
                 $image->storeAs('public/images', $imageName);
@@ -101,7 +81,6 @@ class ProductController extends Controller
             } else {
                 $imagePath = '';
             }
-
             $this->productRepository->create([
                 'name' => $request->input('name'),
                 'note' => $request->input('note'),
@@ -122,7 +101,6 @@ class ProductController extends Controller
         }
     }
 
-
     public function updateProduct(ProductRequest $request, $productId)
     {
         try {
@@ -136,7 +114,6 @@ class ProductController extends Controller
             }
 
             $image = $request->file('image');
-
             if ($image) {
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
                 $image->storeAs('public/images', $imageName);
