@@ -7,7 +7,7 @@ use App\Models\Category;
 
 interface CategoryRepositoryInterface
 {
-    public function getAll();
+    public function all();
 
     public function get(int $id);
 

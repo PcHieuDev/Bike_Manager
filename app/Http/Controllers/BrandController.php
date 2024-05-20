@@ -9,9 +9,7 @@ use App\Repositories\Interfaces\BrandRepositoryInterface;
 
 class BrandController extends BaseController
 {
-
     protected $brandRepository;
-
     public function __construct(BrandRepositoryInterface $brandRepository)
     {
         parent::__construct($brandRepository);
