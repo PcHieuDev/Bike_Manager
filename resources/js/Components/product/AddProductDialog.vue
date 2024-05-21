@@ -1,5 +1,9 @@
 <template>
-  <v-dialog v-model="isShowDialog" max-width="674">
+  <v-dialog
+    :value="isShowDialog"
+    @input="$emit('update:isShowDialog', $event)"
+    max-width="674"
+  >
     <v-card>
       <v-card-title class="headline">Thêm sản phẩm</v-card-title>
       <v-card-text>
@@ -36,7 +40,6 @@
             <div class="form-group">
               <label class="form-label mt-4">category</label>
               <select class="form-select" v-model="product.category_id">
-                <!--                <option selected>-&#45;&#45;Chọn-&#45;&#45;</option>-->
                 <template v-for="(item, index) in categories" :key="index">
                   <option :value="item.id">{{ item.name }}</option>
                 </template>
@@ -46,7 +49,6 @@
             <div class="form-group">
               <label class="form-label mt-4">Hãng sản xuất</label>
               <select class="form-select" v-model="product.brand_id">
-                <!--                <option selected>-&#45;&#45;Chọn-&#45;&#45;</option>-->
                 <template v-for="(item, index) in brands" :key="index">
                   <option :value="item.id">{{ item.name }}</option>
                 </template>
@@ -73,15 +75,38 @@
 <script>
 export default {
   name: "AddProductDialog",
-  props: [
-    "isShowDialog",
-    "getListCategory",
-    "getListBrands",
-    "addProduct",
-    "onChange",
-    "product",
-    "getProducts",
-    "changeDialog",
-  ],
+  props: ["isShowDialog", "categories", "brands", "addProduct", "onChange"],
+
+  data() {
+    return {
+      product: {
+        name: "",
+        price: "",
+        note: "",
+        image: "",
+        category_id: "",
+        brand_id: "",
+      },
+    };
+  },
+
+  methods: {
+    addProduct() {
+      this.$emit("submit", this.product);
+    },
+    onChange(e) {
+      this.product.image = e.target.files[0];
+    },
+  },
+  // props: [
+  //   "isShowDialog",
+  //   "getListCategory",
+  //   "getListBrands",
+  //   "addProduct",
+  //   "onChange",
+  //   "product",
+  //   "getProducts",
+  //   "changeDialog",
+  // ],
 };
 </script>

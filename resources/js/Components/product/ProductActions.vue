@@ -21,7 +21,12 @@
     </div>
   </div>
   <!-- List san pham -->
-  <ProductItem :products="products" :showActions="true" :showPrice="false"></ProductItem>
+  <ProductItem
+    :products="products"
+    :showActions="true"
+    :showPrice="false"
+    @showModalDelete="showModalDelete"
+  ></ProductItem>
 
   <div class="text-xs-center">
     <v-pagination v-model="page" :length="countRercord" :total-visible="5"></v-pagination>
@@ -33,85 +38,12 @@
   </div>
   <!--  loading page-->
 
-  <!-- popup add product-->
-  <!-- <v-dialog v-model="isShowDialog" max-width="674">
-    <v-card>
-      <v-card-title class="headline">Thêm sản phẩm</v-card-title>
-      <v-card-text>
-        <form>
-          <fieldset>
-            <div class="form-group">
-              <label class="form-label mt-4">Name</label>
-              <input
-                type="text"
-                class="form-control"
-                v-model="product.name"
-                placeholder="Enter name"
-              />
-            </div>
-            <div class="form-group">
-              <label class="form-label mt-4">Price</label>
-              <input
-                type="text"
-                class="form-control"
-                v-model="product.price"
-                placeholder="Enter price"
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label mt-4">image</label>
-              <input
-                type="file"
-                class="form-control"
-                @change="onChange"
-                placeholder="Enter image"
-              />
-            </div>
-            <div class="form-group">
-              <label class="form-label mt-4">category</label>
-              <select class="form-select" v-model="product.category_id">
-                <template v-for="(item, index) in categories" :key="index">
-                  <option :value="item.id">{{ item.name }}</option>
-                </template>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label mt-4">Hãng sản xuất</label>
-              <select class="form-select" v-model="product.brand_id">
-                <template v-for="(item, index) in brands" :key="index">
-                  <option :value="item.id">{{ item.name }}</option>
-                </template>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label mt-4">Note</label>
-              <textarea class="form-control" v-model="product.note" rows="3"></textarea>
-            </div>
-          </fieldset>
-        </form>
-      </v-card-text>
-
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <button @click="addProduct" type="button" class="btn btn-outline-primary">
-          Thêm sản phẩm
-        </button>
-      </v-card-actions>
-    </v-card>
-  </v-dialog> -->
-
+  <!-- popup add product -->
   <AddProductDialog
-    @click="changeDialog"
-    :isShowDialog="isShowDialog"
-    :getListCategory="getListCategory"
-    :getListBrands="getListBrands"
-    :addProduct="addProduct"
-    :onChange="onChange"
-    :product="product"
-    :getProducts="getProducts"
-    :changeDialog="changeDialog"
+    v-model="isShowDialog"
+    @submit="addProduct"
+    :categories="categories"
+    :brands="brands"
   ></AddProductDialog>
 
   <!-- popup beforeDelete -->
@@ -173,7 +105,7 @@
   <!-- popup afterAddProduct  -->
 
   <!-- popup afterAddProduct -->
-  <v-dialog v-model="afterAddProduct" max-width="610">
+  <!-- <v-dialog v-model="afterAddProduct" max-width="610">
     <v-card>
       <v-btn
         icon
@@ -194,7 +126,10 @@
         </div>
       </div>
     </v-card>
-  </v-dialog>
+  </v-dialog> -->
+
+  <!-- popup afterAddProduct -->
+  <PupupAddSuccess v-model="afterAddProduct"></PupupAddSuccess>
 </template>
 
 <script>
@@ -203,6 +138,7 @@ import { RouterLink } from "vue-router";
 import ProductItem from "./ProductItem.vue";
 import Paginate from "vuejs-paginate";
 import AddProductDialog from "./AddProductDialog.vue";
+import PupupAddSuccess from "./PupupAddSuccess.vue";
 
 export default {
   name: "list",
@@ -210,6 +146,7 @@ export default {
     Paginate,
     ProductItem,
     AddProductDialog,
+    PupupAddSuccess,
   },
 
   data() {
@@ -307,16 +244,15 @@ export default {
       this.isShowDialog = !this.isShowDialog;
     },
 
-    addProduct() {
+    addProduct(product) {
       const formData = new FormData();
-      formData.append("name", this.product.name);
-      formData.append("note", this.product.note);
-      formData.append("price", this.product.price);
-      formData.append("category_id", this.product.category_id);
-      formData.append("brand_id", this.product.brand_id);
-      formData.append("image", this.product.image);
+      formData.append("name", product.name);
+      formData.append("note", product.note);
+      formData.append("price", product.price);
+      formData.append("category_id", product.category_id);
+      formData.append("brand_id", product.brand_id);
+      formData.append("image", product.image);
       let token = localStorage.getItem("token");
-
       axios
         .post("http://127.0.0.1:8000/api/saveProduct", formData, {
           headers: {
@@ -327,6 +263,9 @@ export default {
         .then((response) => {
           console.log(response);
           this.afterAddProduct = true;
+          setTimeout(() => {
+            this.afterAddProduct = false;
+          }, 700);
         })
         .catch((error) => {
           console.log(error);

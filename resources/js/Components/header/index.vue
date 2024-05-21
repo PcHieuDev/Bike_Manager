@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import { RouterLink } from "vue-router";
+import { RouterLink, useRoute } from "vue-router";
 
 export default {
   name: "Header",
@@ -70,26 +70,37 @@ export default {
       LogoutSuccess: false,
       visible: false,
       user: null,
+      route: useRoute(),
     };
   },
-  created() {
-    this.user = JSON.parse(localStorage.getItem("user"));
+
+  watch: {
+    route: {
+      handler: function (val) {
+        this.getAuth();
+      },
+      deep: true,
+    },
   },
 
   mounted() {
-    var token = localStorage.getItem("token");
-    var user = localStorage.getItem("user");
-    if (token && user) {
-      this.user = JSON.parse(localStorage.getItem("user"));
-    } else {
-      this.user = null;
-      this.$router.push("/login");
-    }
+    this.getAuth();
   },
 
   methods: {
     goHome() {
       this.$router.push("/");
+    },
+
+    getAuth() {
+      var token = localStorage.getItem("token");
+      var user = localStorage.getItem("user");
+      if (token && user) {
+        this.user = JSON.parse(localStorage.getItem("user"));
+      } else {
+        this.user = null;
+        this.$router.push("/login");
+      }
     },
 
     handleLogout() {

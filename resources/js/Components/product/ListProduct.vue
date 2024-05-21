@@ -1,10 +1,6 @@
 <template>
   <div class="header-product d-flex justify-content-between">
-    <SearchBar
-      :keyword="keyword"
-      @handleSearch="handleSearch"
-      @getProducts="getProducts"
-    ></SearchBar>
+    <SearchBar @handleSearch="handleSearch"></SearchBar>
   </div>
 
   <!-- productlisst -->
@@ -103,7 +99,8 @@ export default {
     onChange(e) {
       this.product.image = e.target.files[0];
     },
-    handleSearch() {
+    handleSearch(key) {
+      this.keyword = key;
       this.page = 1;
       this.getProducts();
     },

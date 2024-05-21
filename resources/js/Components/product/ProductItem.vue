@@ -54,5 +54,14 @@ export default {
       required: true,
     },
   },
+
+  methods: {
+    showModalDelete(id) {
+      this.$emit("showModalDelete", id);
+    },
+    handleSearch() {
+      this.$emit("handleSearch");
+    },
+  },
 };
 </script>

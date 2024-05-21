@@ -1,14 +1,18 @@
 <template>
-  <v-dialog v-model="afterAddProduct" max-width="610">
+  <v-dialog
+    :value="afterAddProduct"
+    @input="$emit('update:isShowDialog', $event)"
+    max-width="610"
+  >
     <v-card>
-      <v-btn
+      <!-- <v-btn
         icon
         class="close-btn"
-        @click="afterAddProduct = false"
+        @click="$emit('update:afterAddProduct', false)"
         style="margin-left: 560px"
       >
         <v-icon>mdi-close</v-icon>
-      </v-btn>
+      </v-btn> -->
       <div class="divqw popup-detail">
         <div class="div-2d">
           <img

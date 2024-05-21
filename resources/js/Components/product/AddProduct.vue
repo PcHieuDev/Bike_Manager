@@ -32,6 +32,7 @@
                 placeholder="Enter image"
               />
             </div>
+
             <div class="form-group">
               <label class="form-label mt-4">category</label>
               <select class="form-select" v-model="product.category_id">
@@ -121,28 +122,28 @@ export default {
       let token = localStorage.getItem("token");
 
       axios
-          .post("http://127.0.0.1:8000/api/saveProduct", formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${token}`,
-            },
-          })
-          .then((response) => {
-            console.log(response);
-            this.afterAddProduct = true;
-          })
-          .catch((error) => {
-            console.log(error);
-          })
-          .finally(() => {
-            this.isShowDialog = false;
-            // // this.addCucces = true; after 1s ?
-            //   setTimeout(() => {
-            //   this.addCucces = false;
-            // }, 1000);
-            this.page = 1;
-            this.getProducts();
-          });
+        .post("http://127.0.0.1:8000/api/saveProduct", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          this.afterAddProduct = true;
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .finally(() => {
+          this.isShowDialog = false;
+          // // this.addCucces = true; after 1s ?
+          //   setTimeout(() => {
+          //   this.addCucces = false;
+          // }, 1000);
+          this.page = 1;
+          this.getProducts();
+        });
     },
     onChange(e) {
       this.product.image = e.target.files[0];

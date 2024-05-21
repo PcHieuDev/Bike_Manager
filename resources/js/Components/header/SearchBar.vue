@@ -14,6 +14,16 @@
 <script>
 export default {
   name: "SearchBar",
-  props: ["keyword", "handleSearch", "getProducts"],
+  data() {
+    return {
+      keyword: "",
+    };
+  },
+
+  methods: {
+    handleSearch() {
+      this.$emit("handleSearch", this.keyword);
+    },
+  },
 };
 </script>
