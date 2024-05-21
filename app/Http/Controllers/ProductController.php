@@ -14,6 +14,7 @@ use App\Exceptions\ProductDeletionException;
 use Illuminate\Http\Response;
 use App\Constants\Constants;
 use App\Helpers\ArrayHelper;
+use App\Models\ProductImage;
 
 
 class ProductController extends Controller
@@ -95,12 +96,16 @@ class ProductController extends Controller
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => error_deleting_product(),
+                'message' => error_saving_product(),
                 'code' => $this->internalServerError()
             ]);
         }
     }
+    
 
+
+
+ 
     public function updateProduct(ProductRequest $request, $productId)
     {
         try {

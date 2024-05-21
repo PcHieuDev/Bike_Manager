@@ -7,18 +7,6 @@ use App\Repositories\Interfaces\ProductRepositoryInterface;
 
 class ProductRepository implements ProductRepositoryInterface
 {
-    // public function all($keyword = '')
-    // {
-    //     if ($keyword != '') {
-    //         return Product::where('name', 'like', "%$keyword%")->get();
-    //     } else {   
-    //         return Product::all();
-
-    //     }
-    // }
-    
-  
- 
 
     public function all($keyword = '')
     {

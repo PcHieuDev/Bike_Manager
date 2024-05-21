@@ -44,6 +44,8 @@ Route::get('productsFree', [ProductController::class, 'getData']);
 
 
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/saveProduct', [ProductController::class, 'saveProduct']);
+
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -52,7 +54,6 @@ Route::group(['middleware' => 'api.login'], function () {
 
     Route::get('products', [ProductController::class, 'getData']);
 
-    Route::post('/saveProduct', [ProductController::class, 'saveProduct']);
 
 });
 

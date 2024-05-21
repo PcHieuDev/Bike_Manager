@@ -411,7 +411,7 @@
 }
 
 .product-image {
-  width: 237px;
+  width: 227px;
   height: 140px;
 }
 
@@ -1128,7 +1128,7 @@ body {
 .edit-button {
   background-color: #2ecc71; /* Màu xanh */
   color: #fff; /* Màu chữ trắng */
-  margin-right: 6px; /* Khoảng cách giữa các nút */
+  
   text-decoration: none;
 }
 

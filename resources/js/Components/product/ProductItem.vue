@@ -6,12 +6,27 @@
           <div class="div-19">
             <img
               :src="product.image"
-              style="height: 146px; width: 230px"
+              style="height: 140px; width: 227px"
               class="product-image"
             />
             <div class="product-details">
               <span class="product-name">{{ product.name }}</span>
-              <span class="product-price">$ {{ product.price }}</span>
+              <span v-if="showPrice" class="product-price">$ {{ product.price }}</span>
+              <div class="product-actions">
+                <RouterLink
+                  :to="`/product/edit/${product.id}`"
+                  v-if="showButton"
+                  class="edit-button"
+                  >Sửa
+                </RouterLink>
+                <button
+                  v-if="showButton"
+                  @click.prevent="showModalDelete(product.id)"
+                  class="delete-button"
+                >
+                  Xóa
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -21,11 +36,21 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "ProductItem",
   props: {
+    showPrice: {
+      type: Boolean,
+      default: true,
+    },
+    showButton: {
+      type: Boolean,
+      default: true,
+    },
     products: {
       type: Array,
+
       required: true,
     },
   },

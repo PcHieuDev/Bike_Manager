@@ -55,4 +55,11 @@ if(! function_exists('product_updated')) {
         }
     }
 
+    if (!function_exists('error_saving_product')) {
+        function error_saving_product()
+        {
+            return 'Error saving product';
+        }
+    }   
+
 }
