@@ -48,7 +48,7 @@ export default {
     SearchBar,
     AddProductDialog,
     PupupAddSuccess,
-    SearchBar,
+    // SearchBar,
   },
 
   data() {

@@ -27,7 +27,8 @@
   </header>
 
   <!-- popup LogoutSuccess -->
-  <v-dialog v-model="LogoutSuccess" max-width="610">
+  <LogoutPopup v-model="LogoutSuccess"></LogoutPopup>
+  <!-- <v-dialog v-model="LogoutSuccess" max-width="610">
     <v-card>
       <v-btn
         icon
@@ -48,14 +49,20 @@
         </div>
       </div>
     </v-card>
-  </v-dialog>
+  </v-dialog> -->
 </template>
 
 <script>
 import { RouterLink, useRoute } from "vue-router";
+import LogoutPopup from "../Auth/LogoutPopup.vue";
 
 export default {
   name: "Header",
+
+  components: {
+    LogoutPopup,
+  },
+
   computed: {
     product() {
       return product;
@@ -92,6 +99,16 @@ export default {
       this.$router.push("/");
     },
 
+    // getAuth() {
+    //   var token = localStorage.getItem("token");
+    //   var user = localStorage.getItem("user");
+    //   if (token && user) {
+    //     this.user = JSON.parse(localStorage.getItem("user"));
+    //   } else {
+    //     this.user = null;
+    //     this.$router.push("/login");
+    //   }
+    // },
     getAuth() {
       var token = localStorage.getItem("token");
       var user = localStorage.getItem("user");
@@ -99,7 +116,9 @@ export default {
         this.user = JSON.parse(localStorage.getItem("user"));
       } else {
         this.user = null;
-        this.$router.push("/login");
+        if (this.$route.path !== "/register" && this.$route.path !== "/") {
+          this.$router.push("/login");
+        }
       }
     },
 
@@ -108,8 +127,11 @@ export default {
       localStorage.removeItem("user");
       this.LogoutSuccess = true;
       setTimeout(() => {
+        this.LogoutSuccess = false;
+      }, 600);
+      setTimeout(() => {
         this.$router.push("/login");
-      }, 1000);
+      }, 600);
 
       this.user = null;
     },
@@ -139,11 +161,9 @@ export default {
 }
 
 .header .overlap {
-  /* background-image: url(https://c.animaapp.com/6fNIys5x/img/rectangle-1.svg); */
   background-size: 100% 100%;
   height: 64px;
   position: relative;
-  /* width: 1440px; */
   background-color: #00ade8;
 }
 

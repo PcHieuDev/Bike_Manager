@@ -117,7 +117,7 @@ export default {
             this.RegisterSucess = true;
             setTimeout(() => {
               this.$router.push("/login");
-            }, 1000);
+            }, 700);
           } else {
             this.error = response.data.message;
           }
@@ -135,6 +135,9 @@ export default {
 </script>
 
 <style scoped>
+.row {
+  padding-top: 50px;
+}
 .btn-color {
   background-color: #0e1c36;
   color: #fff;

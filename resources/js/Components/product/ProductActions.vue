@@ -46,90 +46,24 @@
     :brands="brands"
   ></AddProductDialog>
 
+
   <!-- popup beforeDelete -->
-  <v-dialog v-model="beforeDelete" max-width="610">
-    <v-card>
-      <div class="divqw popup-detail">
-        <div class="div-2d">
-          <img
-            loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/e8f2d1f13b8ec9969b70e9b0e791eb4958cb760378a08537602787e8bfeefd1b?apiKey=c828819b5944477ab9c72fd951f3ee71&"
-            class="imgsd"
-          />
-          <div class="div-3h" style="color: black">
-            Bạn có chắc muốn xóa sản phẩm
-            <span style="color: rgba(255, 77, 77, 1)">Streetfighter V4</span>?<br />Sản
-            phẩm sẽ bị <span style="color: rgba(255, 77, 77, 1)">xóa vĩnh viễn</span>.
-          </div>
-          <div class="div-4b">
-            <button
-              type="button"
-              @click="beforeDelete = !beforeDelete"
-              class="popup-detail-btn cancel"
-            >
-              Hủy
-            </button>
-            <button type="button" @click="deleteProduct" class="popup-detail-btn submit">
-              Xóa
-            </button>
-          </div>
-        </div>
-      </div>
-    </v-card>
-  </v-dialog>
+  <PopupBeforeDelete
+    v-model="beforeDelete"
+    :deleteProduct="deleteProduct"
+    :afterDelete="afterDelete"
+    @close="beforeDelete = false"
+  ></PopupBeforeDelete>
 
   <!-- popup afterdelete -->
-  <v-dialog v-model="afterDelete" max-width="610">
-    <v-card>
-      <v-btn
-        icon
-        class="close-btn"
-        @click="afterDelete = false"
-        style="margin-left: 560px"
-      >
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-      <div class="divqw popup-detail">
-        <div class="div-2d">
-          <img
-            loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/e8f2d1f13b8ec9969b70e9b0e791eb4958cb760378a08537602787e8bfeefd1b?apiKey=c828819b5944477ab9c72fd951f3ee71&"
-            class="imgsd"
-          />
-          <div class="div-3h" style="color: black">Bạn đã xóa thành công</div>
-        </div>
-      </div>
-    </v-card>
-  </v-dialog>
+  <PopupDeleteSuccess v-model="afterDelete" @close="afterDelete = false"></PopupDeleteSuccess>
+  <!-- popup afterdelete -->
 
-  <!-- popup afterAddProduct  -->
-
-  <!-- popup afterAddProduct -->
-  <!-- <v-dialog v-model="afterAddProduct" max-width="610">
-    <v-card>
-      <v-btn
-        icon
-        class="close-btn"
-        @click="afterAddProduct = false"
-        style="margin-left: 560px"
-      >
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-      <div class="divqw popup-detail">
-        <div class="div-2d">
-          <img
-            loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/e8f2d1f13b8ec9969b70e9b0e791eb4958cb760378a08537602787e8bfeefd1b?apiKey=c828819b5944477ab9c72fd951f3ee71&"
-            class="imgsd"
-          />
-          <div class="div-3h" style="color: black">Bạn đã thêm thành công</div>
-        </div>
-      </div>
-    </v-card>
-  </v-dialog> -->
 
   <!-- popup afterAddProduct -->
   <PupupAddSuccess v-model="afterAddProduct"></PupupAddSuccess>
+  <!-- popup afterAddProduct -->
+
 </template>
 
 <script>
@@ -139,6 +73,8 @@ import ProductItem from "./ProductItem.vue";
 import Paginate from "vuejs-paginate";
 import AddProductDialog from "./AddProductDialog.vue";
 import PupupAddSuccess from "./PupupAddSuccess.vue";
+import PopupDeleteSuccess from "./PopupDeleteSuccess.vue";
+import PopupBeforeDelete from "./PopupBeforeDelete.vue";
 
 export default {
   name: "list",
@@ -147,6 +83,8 @@ export default {
     ProductItem,
     AddProductDialog,
     PupupAddSuccess,
+    PopupDeleteSuccess,
+    PopupBeforeDelete,
   },
 
   data() {
@@ -265,7 +203,7 @@ export default {
           this.afterAddProduct = true;
           setTimeout(() => {
             this.afterAddProduct = false;
-          }, 700);
+          }, 800);
         })
         .catch((error) => {
           console.log(error);
@@ -346,6 +284,6 @@ export default {
   padding-left: 347px;
   padding-top: 100px;
   width: 95%;
-  margin-left: -12px;
+  margin-left: 0px;
 }
 </style>

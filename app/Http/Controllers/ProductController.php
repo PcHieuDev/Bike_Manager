@@ -101,16 +101,16 @@ class ProductController extends Controller
             ]);
         }
     }
-    
 
 
 
- 
-    public function updateProduct(ProductRequest $request, $productId)
+
+
+    public function updateProduct(ProductRequest $request, $id)
     {
         try {
-            $product = $this->productRepository->find($productId);
-
+            // Tìm sản phẩm theo ID
+            $product = $this->productRepository->find($id);
             if (!$product) {
                 return response()->json([
                     'message' => product_not_found(),
@@ -118,25 +118,34 @@ class ProductController extends Controller
                 ]);
             }
 
+            // Xử lý hình ảnh nếu có
             $image = $request->file('image');
             if ($image) {
+                // Xóa hình ảnh cũ nếu có
+                if ($product->image) {
+                    $oldImagePath = public_path($product->image);
+                    if (file_exists($oldImagePath)) {
+                        unlink($oldImagePath);
+                    }
+                }
+
+                // Lưu hình ảnh mới
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
                 $image->storeAs('public/images', $imageName);
                 $imagePath = '/storage/images/' . $imageName;
-                // Xóa ảnh cũ trước khi lưu ảnh mới
-                if ($product->image) {
-                    Storage::delete('public/images/' . basename($product->image));
-                }
-                $product->image = $imagePath;
+            } else {
+                $imagePath = $product->image; // Giữ nguyên hình ảnh cũ nếu không có hình ảnh mới
             }
 
-            $product->name = $request->input('name');
-            $product->note = $request->input('note');
-            $product->price = $request->input('price');
-            $product->category_id = $request->input('category_id');
-            $product->brand_id = $request->input('brand_id');
-
-            $this->productRepository->create($product);
+            // Cập nhật sản phẩm
+            $this->productRepository->update($id, [
+                'name' => $request->input('name'),
+                'note' => $request->input('note'),
+                'price' => $request->input('price'),
+                'category_id' => $request->input('category_id'),
+                'brand_id' => $request->input('brand_id'),
+                'image' => $imagePath
+            ]);
 
             return response()->json([
                 'message' => product_updated(),
@@ -149,6 +158,7 @@ class ProductController extends Controller
             ]);
         }
     }
+
 
     public function update(ProductRequest $request, $id)
     {

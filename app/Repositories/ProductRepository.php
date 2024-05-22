@@ -19,6 +19,19 @@ class ProductRepository implements ProductRepositoryInterface
         return $query->get();
     }
 
+    public function update($id, array $data)
+    {
+        $product = $this->find($id);
+        if ($product) {
+            $product->update($data);
+            return $product;
+        }
+        return null;
+    }
+
+
+
+
 
 
 

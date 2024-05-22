@@ -33,10 +33,11 @@
               <input
                 type="file"
                 class="form-control"
-                @change="onChange"
+                @change="onImageChange"
                 placeholder="Enter image"
               />
             </div>
+
             <div class="form-group">
               <label class="form-label mt-4">category</label>
               <select class="form-select" v-model="product.category_id">
@@ -75,7 +76,7 @@
 <script>
 export default {
   name: "AddProductDialog",
-  props: ["isShowDialog", "categories", "brands", "addProduct", "onChange"],
+  props: ["isShowDialog", "categories", "brands"],
 
   data() {
     return {
@@ -94,19 +95,10 @@ export default {
     addProduct() {
       this.$emit("submit", this.product);
     },
-    onChange(e) {
+
+    onImageChange(e) {
       this.product.image = e.target.files[0];
     },
   },
-  // props: [
-  //   "isShowDialog",
-  //   "getListCategory",
-  //   "getListBrands",
-  //   "addProduct",
-  //   "onChange",
-  //   "product",
-  //   "getProducts",
-  //   "changeDialog",
-  // ],
 };
 </script>

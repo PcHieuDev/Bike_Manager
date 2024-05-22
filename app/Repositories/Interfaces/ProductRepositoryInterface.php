@@ -20,4 +20,6 @@ interface ProductRepositoryInterface
 
     public function count($keyword = '');
 
+    public function update($id, array $productData);
+
 }

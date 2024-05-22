@@ -66,35 +66,22 @@
     </div>
   </div>
 
-  <!-- popup LoginSuccess -->
-  <v-dialog v-model="LoginSuccess" max-width="610">
-    <v-card>
-      <v-btn
-        icon
-        class="close-btn"
-        @click="LoginSuccess = false"
-        style="margin-left: 560px"
-      >
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-      <div class="divqw popup-detail">
-        <div class="div-2d">
-          <img
-            loading="lazy"
-            src="https://icons.veryicon.com/png/o/miscellaneous/8atour/success-35.png"
-            class="imgsd"
-          />
-          <div class="div-3h" style="color: black">Bạn đăng nhập thành công</div>
-        </div>
-      </div>
-    </v-card>
-  </v-dialog>
+
+  <!-- popup Login success -->
+  <LoginPopupSuccess v-model="LoginSuccess"  @close="LoginSuccess = false"></LoginPopupSuccess>
+  <!-- popup Login success -->
+
 </template>
 
 <script>
+
 import axios from "axios";
+import LoginPopupSuccess from "./LoginPopupSuccess.vue";
 
 export default {
+ components: {
+    LoginPopupSuccess,
+  },
   data() {
     return {
       LoginSuccess: false,
@@ -135,7 +122,7 @@ export default {
             this.LoginSuccess = true;
             setTimeout(() => {
               this.$router.push("/product/actions");
-            }, 1200);
+            }, 1000);
           })
           .catch((error) => {
             if (error.response) {
@@ -157,6 +144,10 @@ export default {
 </script>
 
 <style scoped>
+.row {
+  padding-top: 50px;
+}
+
 .btn-color {
   background-color: #0e1c36;
   color: #fff;
