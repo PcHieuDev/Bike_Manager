@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="beforeDelete" max-width="610">
+  <v-dialog :value="beforeDelete" max-width="610">
     <v-card>
       <div class="divqw popup-detail">
         <div class="div-2d">

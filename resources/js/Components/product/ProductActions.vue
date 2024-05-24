@@ -46,7 +46,6 @@
     :brands="brands"
   ></AddProductDialog>
 
-
   <!-- popup beforeDelete -->
   <PopupBeforeDelete
     v-model="beforeDelete"
@@ -56,14 +55,15 @@
   ></PopupBeforeDelete>
 
   <!-- popup afterdelete -->
-  <PopupDeleteSuccess v-model="afterDelete" @close="afterDelete = false"></PopupDeleteSuccess>
+  <PopupDeleteSuccess
+    v-model="afterDelete"
+    @close="afterDelete = false"
+  ></PopupDeleteSuccess>
   <!-- popup afterdelete -->
-
 
   <!-- popup afterAddProduct -->
   <PupupAddSuccess v-model="afterAddProduct"></PupupAddSuccess>
   <!-- popup afterAddProduct -->
-
 </template>
 
 <script>
@@ -183,6 +183,26 @@ export default {
     },
 
     addProduct(product) {
+      // Kiểm tra xem giá sản phẩm có phải là số không
+      if (isNaN(product.price)) {
+        alert("Giá sản phẩm phải là số");
+        return;
+      }
+      // Chuyển đổi giá sản phẩm thành số thập phân
+      const price = parseFloat(product.price);
+
+      // Kiểm tra xem giá sản phẩm có nằm trong phạm vi mong muốn không
+      if (price <= 0 || price > 1000000000 || price < 10000) {
+        alert(
+          "Giá sản phẩm phải lớn hơn 0, nhỏ hơn hoặc bằng 1000000000 và lớn hơn hoặc bằng 10000"
+        );
+        return;
+      }
+      // Kiểm tra xem note có quá 500 ký tự không
+      if (product.note.length > 500) {
+        alert("Note không được quá 500 ký tự");
+        return;
+      }
       const formData = new FormData();
       formData.append("name", product.name);
       formData.append("note", product.note);
@@ -199,11 +219,12 @@ export default {
           },
         })
         .then((response) => {
-          console.log(response);
+          console.log(response); // Ghi lại phản hồi của API
           this.afterAddProduct = true;
           setTimeout(() => {
             this.afterAddProduct = false;
           }, 800);
+          this.$router.push(`/products/${newProductId}`);
         })
         .catch((error) => {
           console.log(error);
@@ -214,6 +235,7 @@ export default {
           this.getProducts();
         });
     },
+
     onChange(e) {
       this.product.image = e.target.files[0];
     },
@@ -271,7 +293,9 @@ export default {
           console.log(error);
         })
         .finally(() => {
-          this.page = 1;
+          if (this.products.length === 1 && this.page > 1) {
+            this.page--;
+          }
           this.getProducts();
         });
     },

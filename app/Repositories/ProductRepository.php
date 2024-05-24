@@ -29,6 +29,19 @@ class ProductRepository implements ProductRepositoryInterface
         return null;
     }
 
+    public function getByBrand($brandId)
+    {
+        return Product::with('brand', 'category')
+            ->where('brand_id', $brandId)
+            ->get();
+    }
+    public function getByCategory($categoryId)
+    {
+        return Product::with('brand', 'category')
+            ->where('category_id', $categoryId)
+            ->get();
+    }
+
 
 
 

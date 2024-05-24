@@ -4,57 +4,53 @@
 
 <script>
 import axios from "axios";
-import  ProductList from '../../Components/product/ListProduct.vue'
+import ProductList from "../../Components/product/ListProduct.vue";
 
 export default {
-  name: 'products',
+  name: "products",
   data() {
     return {
       products: [],
       page: 1,
       totalPages: null,
-      // page: 1,
-      // totalPages: null,
-    }
+    };
   },
   components: {
-    ProductList
+    ProductList,
   },
   created() {
     this.getProducts();
-    // this.fetchData();
-
   },
-
   methods: {
     async getProducts() {
-      let url = 'http://127.0.0.1:8000/api/products';
-      await axios.get(url).then(response => {
-        this.products = response.data.products;
-        console.log(this.products);
-      }).catch(error => {
-        console.log(error);
-      });
+      var token = localStorage.getItem("token");
+      this.isLoading = true;
+      let url = "http://127.0.0.1:8000/api/products";
+      await axios
+        .get(url, {
+          params: {
+            page: this.page,
+            keyword: this.keyword,
+          },
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((response) => {
+          this.products = response.data.contents;
+          this.countRercord = Math.ceil(response.data.count / this.itemsPerPage);
+          console.log(this.products);
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
     },
-    // async searchProducts() {
-    //   try {
-    //     let url = `http://127.0.0.1:8000/api/products?search=${this.searchTerm}`;
-    //     const response = await axios.get(url);
-    //     this.products = response.data.products;
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // }
   },
-
-
-
   mounted() {
-    console.log('Component productList mounted.')
-  }
-}
+    console.log("Component productList mounted.");
+  },
+};
 </script>
 
-<style>
-
-</style>
+<style></style>

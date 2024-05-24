@@ -1,19 +1,17 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Http\Requests\ProductRequest;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 use App\Http\Traits\HttpResponseCode;
 use Illuminate\Support\Facades\Storage;
-use App\Helpers\MessageHelper;
 use App\Exceptions\ProductNotFoundException;
 use App\Exceptions\ProductDeletionException;
 use Illuminate\Http\Response;
 use App\Constants\Constants;
 use App\Helpers\ArrayHelper;
+use lang\en\Message;
 use App\Models\ProductImage;
 
 
@@ -34,12 +32,22 @@ class ProductController extends Controller
         return response()->json(
             [
                 'products' => $products,
-                'message' => product_found(),
-
+                'message' => product_found(),   
                 'status' => $this->ok()
 
             ]
         );
+    }
+    public function getByBrand($brandId)
+    {
+        $products = $this->productRepository->getByBrand($brandId);
+        return response()->json($products, 200);
+    }
+
+    public function getByCategory($categoryId)
+    {
+        $products = $this->productRepository->getByCategory($categoryId);
+        return response()->json($products, 200);
     }
 
     public function getData(Request $request)
@@ -48,12 +56,9 @@ class ProductController extends Controller
         $page = ArrayHelper::getValue($inputs, 'page', Constants::DEFAULT_PAGE_NUMBER);
         $keyword = ArrayHelper::getValue($inputs, 'keyword', '');
         $size = ArrayHelper::getValue($inputs, 'size', Constants::DEFAULT_PAGE_SIZE);
-
         $data = $this->productRepository->paginate($page, $size, $keyword);
-
         // Sử dụng biến trung gian để lưu trữ kết quả của hàm count
         $count = $this->productRepository->count($keyword);
-
         return response()->json([
             'contents' => $data,
             'count' => $count,
@@ -61,13 +66,10 @@ class ProductController extends Controller
         ]);
     }
 
-
     public function search(Request $request)
     {
         $query = $request->input('query');
-
         $products = $this->productRepository->search($query);
-
         return response()->json($products);
     }
 
@@ -92,19 +94,15 @@ class ProductController extends Controller
             ]);
             return response()->json([
                 'message' => product_saved(),
-                'code' => $this->ok()
+                'status' => $this->ok()
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => error_saving_product(),
-                'code' => $this->internalServerError()
+                'status' => $this->internalServerError()
             ]);
         }
     }
-
-
-
-
 
     public function updateProduct(ProductRequest $request, $id)
     {
@@ -114,10 +112,9 @@ class ProductController extends Controller
             if (!$product) {
                 return response()->json([
                     'message' => product_not_found(),
-                    'code' => $this->notFound()
+                    'status' => $this->notFound()
                 ]);
             }
-
             // Xử lý hình ảnh nếu có
             $image = $request->file('image');
             if ($image) {
@@ -128,7 +125,6 @@ class ProductController extends Controller
                         unlink($oldImagePath);
                     }
                 }
-
                 // Lưu hình ảnh mới
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
                 $image->storeAs('public/images', $imageName);
@@ -136,7 +132,6 @@ class ProductController extends Controller
             } else {
                 $imagePath = $product->image; // Giữ nguyên hình ảnh cũ nếu không có hình ảnh mới
             }
-
             // Cập nhật sản phẩm
             $this->productRepository->update($id, [
                 'name' => $request->input('name'),
@@ -146,19 +141,17 @@ class ProductController extends Controller
                 'brand_id' => $request->input('brand_id'),
                 'image' => $imagePath
             ]);
-
             return response()->json([
                 'message' => product_updated(),
-                'code' => $this->ok()
+                'status' => $this->ok()
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => error_updating_product(),
-                'code' => $this->internalServerError()
+                'status' => $this->internalServerError()
             ]);
         }
     }
-
 
     public function update(ProductRequest $request, $id)
     {
@@ -173,22 +166,21 @@ class ProductController extends Controller
                 return response()->json([
                     'product' => $product,
                     'message' => product_found(),
-                    'code' => $this->ok()
+                    'status' => $this->ok()
                 ]);
             } else {
                 return response()->json([
                     'message' => product_not_found(),
-                    'code' => $this->notFound()
+                    'status' => $this->notFound()
                 ]);
             }
         } catch (\Exception $e) {
             return response()->json([
                 'message' => error_finding_product(),
-                'code' => $this->internalServerError()
+                'status' => $this->internalServerError()
             ]);
         }
     }
-
 
     public function delete($id)
     {
@@ -202,36 +194,10 @@ class ProductController extends Controller
             $product->delete();
             return response()->json([
                 'message' => product_deleted(),
-                'code' => Response::HTTP_OK
+                'status' => Response::HTTP_OK
             ], Response::HTTP_OK);
         } catch (\Exception $e) {
             throw new ProductDeletionException($e->getMessage(), $e->getCode(), $e);
         }
     }
-
-
-
-    // public function delete($id)
-    // {
-    //     try {
-    //         $product = $this->productRepository->find($id);
-    //         if ($product) {
-    //             $product->delete();
-    //             return response()->json([
-    //                 'message' => product_deleted(),
-    //                 'code' => $this->ok()
-    //             ]);
-    //         } else {
-    //             return response()->json([
-    //                 'message' => product_not_found(),
-    //                 'code' => $this->notFound()
-    //             ]);
-    //         }
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'message' => error_deleting_product(),
-    //             'code' => $this->internalServerError()
-    //         ]);
-    //     }
-    // }
 }

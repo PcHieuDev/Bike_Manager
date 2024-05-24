@@ -19,8 +19,4 @@ trait HttpResponseCode {
         return '500';
 
     }
-
-
-
-    
 }

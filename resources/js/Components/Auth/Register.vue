@@ -3,7 +3,6 @@
     <div class="row">
       <div class="col-md-6 offset-md-3">
         <h2 class="text-center text-dark mt-5">Register NCC</h2>
-
         <div class="card my-5">
           <form class="card-body cardbody-color p-lg-5" @submit.prevent="handleRegister">
             <div class="text-center">
@@ -14,7 +13,6 @@
                 alt="profile"
               />
             </div>
-
             <div class="mb-3">
               <input
                 type="text"
@@ -58,32 +56,16 @@
   </div>
 
   <!-- popup RegisterSucess -->
-  <v-dialog v-model="RegisterSucess" max-width="610">
-    <v-card>
-      <v-btn
-        icon
-        class="close-btn"
-        @click="RegisterSucess = false"
-        style="margin-left: 560px"
-      >
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-      <div class="divqw popup-detail">
-        <div class="div-2d">
-          <img
-            loading="lazy"
-            src="https://icons.veryicon.com/png/o/miscellaneous/8atour/success-35.png"
-            class="imgsd"
-          />
-          <div class="div-3h" style="color: black">Bạn đăng ký thành công</div>
-        </div>
-      </div>
-    </v-card>
-  </v-dialog>
+  <RegisterPopupSuccess
+    v-model="RegisterSucess"
+    @close="RegisterSucess = false"
+  ></RegisterPopupSuccess>
+  <!-- popup RegisterSucess -->
 </template>
 
 <script>
 import axios from "axios";
+import RegisterPopupSuccess from "./RegisterPopupSuccess.vue";
 export default {
   data() {
     return {
@@ -96,6 +78,9 @@ export default {
       error: "",
       RegisterSucess: false,
     };
+  },
+  components: {
+    RegisterPopupSuccess,
   },
   methods: {
     handleRegister() {
@@ -138,6 +123,7 @@ export default {
 .row {
   padding-top: 50px;
 }
+
 .btn-color {
   background-color: #0e1c36;
   color: #fff;

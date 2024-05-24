@@ -45,6 +45,8 @@ Route::post('/register', [AuthController::class, 'register']);
 
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/brands/{brandId}/products', [ProductController::class,'getByBrand']);
+Route::get('/categories/{categoryId}/products', [ProductController::class,'getByCategory']);
 
 Route::group(['middleware' => 'api.login'], function () {
     Route::delete('/delete_products/{id}', [ProductController::class, 'delete']);

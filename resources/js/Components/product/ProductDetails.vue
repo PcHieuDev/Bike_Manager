@@ -81,6 +81,17 @@ export default {
   data() {
     return {
       product: [],
+      product: {
+        name: "",
+        price: "",
+        note: "",
+        image: "",
+        category_id: "",
+        brand_id: "",
+      },
+      categories: [],
+      brands: [],
+
       productId: this.$route.params.id,
     };
   },
@@ -109,6 +120,29 @@ export default {
         })
         .catch((error) => {
           console.error(error);
+        });
+    },
+
+    async getProducts() {
+      this.isLoading = true;
+      let url = "http://127.0.0.1:8000/api/productsFree";
+      await axios
+        .get(url, {
+          params: {
+            page: this.page,
+            keyword: this.keyword,
+          },
+        })
+        .then((response) => {
+          this.products = response.data.contents;
+          this.countRercord = Math.ceil(response.data.count / this.itemsPerPage);
+          console.log(this.products);
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .finally(() => {
+          this.isLoading = false;
         });
     },
   },

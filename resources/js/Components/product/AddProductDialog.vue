@@ -10,7 +10,7 @@
         <form>
           <fieldset>
             <div class="form-group">
-              <label class="form-label mt-4">Name</label>
+              <label class="form-label mt-4">Tên sản phẩm</label>
               <input
                 type="text"
                 class="form-control"
@@ -19,7 +19,7 @@
               />
             </div>
             <div class="form-group">
-              <label class="form-label mt-4">Price</label>
+              <label class="form-label mt-4">Giá</label>
               <input
                 type="text"
                 class="form-control"
@@ -29,7 +29,7 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label mt-4">image</label>
+              <label class="form-label mt-4">Hình ảnh</label>
               <input
                 type="file"
                 class="form-control"
@@ -39,7 +39,7 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label mt-4">category</label>
+              <label class="form-label mt-4">Danh Mục</label>
               <select class="form-select" v-model="product.category_id">
                 <template v-for="(item, index) in categories" :key="index">
                   <option :value="item.id">{{ item.name }}</option>
@@ -56,8 +56,8 @@
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label mt-4">Note</label>
-              <textarea class="form-control" v-model="product.note" rows="3"></textarea>
+              <label class="form-label mt-4">Mô tả</label>
+              <textarea class="form-control" v-model="product.note" rows="2"></textarea>
             </div>
           </fieldset>
         </form>
@@ -102,3 +102,15 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.btn-outline-primary {
+  background-color: #007bff;
+  color: white;
+  border: 1px solid #007bff;
+  border-radius: 5px;
+  padding: 5px 10px;
+  display: block;
+  margin-right: 244px;
+}
+</style>

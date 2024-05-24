@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="afterDelete" max-width="610">
+  <v-dialog :value="afterDelete" max-width="610">
     <v-card>
       <v-btn
           icon

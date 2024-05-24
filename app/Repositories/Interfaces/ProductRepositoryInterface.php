@@ -22,4 +22,8 @@ interface ProductRepositoryInterface
 
     public function update($id, array $productData);
 
+    public function getByBrand($brandId);   
+    
+    public function getByCategory($categoryId);
+
 }

@@ -4,9 +4,7 @@
   </div>
 
   <!-- productlisst -->
-
   <ProductItem :products="products" :showButton="false"></ProductItem>
-
   <!-- productlisst -->
 
   <!-- button paginate -->
@@ -64,6 +62,7 @@ export default {
       afterAddProduct: false,
       showErrorPopup: false,
       searchTerm: "",
+      currentCategoryId: null,
       product: {
         name: "",
         price: "",
@@ -112,6 +111,7 @@ export default {
           params: {
             page: this.page,
             keyword: this.keyword,
+            category_id: this.currentCategoryId,
           },
         })
         .then((response) => {
@@ -154,6 +154,10 @@ export default {
         .catch((error) => {
           console.log(error);
         });
+    },
+    selectCategory(categoryId) {
+      this.currentCategoryId = categoryId;
+      this.getProducts();
     },
   },
 };

@@ -3,7 +3,6 @@
     <div class="row">
       <div class="col-md-6 offset-md-3">
         <h2 class="text-center text-dark mt-5">Login NCC</h2>
-
         <div class="card my-5">
           <form class="card-body cardbody-color p-lg-5" @submit.prevent="handleLogin">
             <div class="text-center">
@@ -66,20 +65,19 @@
     </div>
   </div>
 
-
   <!-- popup Login success -->
-  <LoginPopupSuccess v-model="LoginSuccess"  @close="LoginSuccess = false"></LoginPopupSuccess>
+  <LoginPopupSuccess
+    v-model="LoginSuccess"
+    @close="LoginSuccess = false"
+  ></LoginPopupSuccess>
   <!-- popup Login success -->
-
 </template>
-
 <script>
-
 import axios from "axios";
 import LoginPopupSuccess from "./LoginPopupSuccess.vue";
 
 export default {
- components: {
+  components: {
     LoginPopupSuccess,
   },
   data() {
@@ -115,10 +113,8 @@ export default {
           .then((response) => {
             console.log(response.data);
             localStorage.setItem("token", response.data.token);
-
             localStorage.setItem("user", JSON.stringify(response.data.user));
             this.user = JSON.parse(localStorage.getItem("user"));
-
             this.LoginSuccess = true;
             setTimeout(() => {
               this.$router.push("/product/actions");
@@ -142,27 +138,22 @@ export default {
   },
 };
 </script>
-
 <style scoped>
 .row {
   padding-top: 50px;
 }
-
 .btn-color {
   background-color: #0e1c36;
   color: #fff;
 }
-
 .profile-image-pic {
   height: 200px;
   width: 200px;
   object-fit: cover;
 }
-
 .cardbody-color {
   background-color: #00ade8;
 }
-
 .dfsdfsd {
   padding: 0;
   margin: 0;
@@ -171,7 +162,6 @@ export default {
   color: white;
   font-weight: bold;
 }
-
 a {
   text-decoration: none;
 }

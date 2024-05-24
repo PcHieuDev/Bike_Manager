@@ -7,9 +7,8 @@
           <div class="div-4">Thông tin sản phẩm</div>
           <div class="form-group">
             <label>Tên sản phẩm</label>
-            <input type="text" class="form-control" placeholder="Nhập tên sản phẩm"/>
+            <input type="text" class="form-control" placeholder="Nhập tên sản phẩm" />
           </div>
-
           <div class="form-group">
             <label>Danh mục sản phẩm</label>
             <select class="form-select" v-model="product.category_id">
@@ -18,7 +17,6 @@
               </template>
             </select>
           </div>
-
           <div class="form-group">
             <label>Hãng sản xuất</label>
             <select class="form-select" v-model="product.brand_id">
@@ -26,23 +24,19 @@
                 <option :value="item.id">{{ item.name }}</option>
               </template>
             </select>
-
           </div>
-
           <div class="form-group">
             <label>Giá</label>
-            <input type="number" class="form-control" placeholder="Nhập giá"/>
+            <input type="number" class="form-control" placeholder="Nhập giá" />
           </div>
-
           <div class="form-group">
             <label>Mô tả</label>
             <textarea
-                class="form-control"
-                id="exampleFormControlTextarea1"
-                rows="3"
+              class="form-control"
+              id="exampleFormControlTextarea1"
+              rows="3"
             ></textarea>
           </div>
-
           <div class="div-17">
             <button class="div-18">Lưu</button>
             <button class="div-18">Huy</button>
@@ -55,22 +49,21 @@
             Ảnh minh họa
             <span style="color: rgba(255, 77, 77, 1)">*</span>
             <img
-                src="https://mdbcdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(73).webp"
-                class="w-100 shadow-1-strong rounded mb-4"
-                alt="Boat on Calm Water"
+              src="https://mdbcdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(73).webp"
+              class="w-100 shadow-1-strong rounded mb-4"
+              alt="Boat on Calm Water"
             />
           </div>
           <div class="div-22">
             <div class="row p-4">
               <!-- image detail -->
-
               <div class="col-lg-6 col-md-12 mb-6 mb-lg-0">
                 <span>Ảnh 1</span>
                 <div class="image-detail">
                   <img
-                      style="height: 146px; width: 237px"
-                      :src="product.image"
-                      class="w-100 shadow-1-strong rounded mb-4"
+                    style="height: 146px; width: 237px"
+                    :src="product.image"
+                    class="w-100 shadow-1-strong rounded mb-4"
                   />
                   <div class="button-hover">
                     <div>
@@ -82,21 +75,20 @@
                   </div>
                 </div>
               </div>
-
               <!-- button add image -->
               <div class="col-lg-6 col-md-12 mb-6 mb-lg-0 custom-btn-add-img">
                 <div class="file-input">
                   <input
-                      type="file"
-                      name="file-input"
-                      id="file-input"
-                      class="file-input__input"
+                    type="file"
+                    name="file-input"
+                    id="file-input"
+                    class="file-input__input"
                   />
                   <label class="file-input__label" for="file-input">
                     <img
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/d9db3dbd583a98e15fc1248e1af2e10cfbac954d35db499e1c898150c3f0fa90?apiKey=c828819b5944477ab9c72fd951f3ee71&"
-                        alt="Boat on Calm Water"
-                    /></label>
+                      src="https://cdn.builder.io/api/v1/image/assets/TEMP/d9db3dbd583a98e15fc1248e1af2e10cfbac954d35db499e1c898150c3f0fa90?apiKey=c828819b5944477ab9c72fd951f3ee71&"
+                      alt="Boat on Calm Water"
+                  /></label>
                 </div>
               </div>
             </div>
@@ -114,7 +106,6 @@ export default {
   name: "EditProduct",
   data() {
     return {
-
       product: {
         name: "",
         price: "",
@@ -142,40 +133,40 @@ export default {
     getProductDetails() {
       const id = this.$route.params.id; // lấy id từ route
       axios
-          .get(`http://127.0.0.1:8000/api/products/${id}`)
-          .then((response) => {
-            if (response.data) {
-              this.product = response.data.product;
-              console.log(this.product.category.name);
-              console.log(this.product);
-            } else {
-              // Xử lý trường hợp dữ liệu trả về null ở đây
-              console.log("No data returned from API");
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-          });
+        .get(`http://127.0.0.1:8000/api/products/${id}`)
+        .then((response) => {
+          if (response.data) {
+            this.product = response.data.product;
+            console.log(this.product.category.name);
+            console.log(this.product);
+          } else {
+            // Xử lý trường hợp dữ liệu trả về null ở đây
+            console.log("No data returned from API");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
     getListCategory() {
       axios
-          .get("http://127.0.0.1:8000/api/categories")
-          .then((response) => {
-            this.categories = response.data.contents;
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        .get("http://127.0.0.1:8000/api/categories")
+        .then((response) => {
+          this.categories = response.data.contents;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     getListBrands() {
       axios
-          .get("http://127.0.0.1:8000/api/brands")
-          .then((response) => {
-            this.brands = response.data.contents;
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        .get("http://127.0.0.1:8000/api/brands")
+        .then((response) => {
+          this.brands = response.data.contents;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
   },
 };

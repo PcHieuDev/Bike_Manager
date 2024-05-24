@@ -27,7 +27,7 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "app/Helpers/MessageHelper.php"
+            "lang/en/message.php"
         ]
     },
     "autoload-dev": {
