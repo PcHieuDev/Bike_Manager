@@ -42,21 +42,17 @@ class ProductRepository implements ProductRepositoryInterface
             ->get();
     }
 
-
-
-
-
-
-
     public function paginate($page, $size, $keyword)
     {
         $offset = ($page - 1) * $size;
+        $query = Product::query();
         if ($keyword != '') {
-            return Product::where('name', 'like', "%$keyword%")->orderBy('id', 'DESC')->skip($offset)->take($size)->get();
-        } else {
-
-            return Product::orderBy('id', 'DESC')->skip($offset)->take($size)->get();
+            $query->where('name', 'like', "%$keyword%");
         }
+        return $query->orderBy('id', 'DESC')
+            ->skip($offset)
+            ->take($size)
+            ->get();
     }
 
     public function search($query)
@@ -124,6 +120,6 @@ class ProductRepository implements ProductRepositoryInterface
 
     // public function find($id)
     // {
-    //     return Product::find($id);
+    //     return product::find($id);
     // }
 }

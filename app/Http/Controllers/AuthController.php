@@ -7,27 +7,30 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Http\Requests\LoginRequest;
+use Illuminate\Http\Response;
 
-use Laravel\Passport\Passport;
 
-// Add this line
 
 class AuthController extends Controller
 {
     public function login(LoginRequest $request)
     {
-        if (Auth::attempt(
-            [
-                'email' => $request->email,
-                'password' => $request->password
-            ]
-        )) {
-            $user = Auth::user();
-            $token = $user->createToken('token')->accessToken;
+        try {
+            if (Auth::attempt(
+                [
+                    'email' => $request->email,
+                    'password' => $request->password
+                ]
+            )) {
+                $user = Auth::user();
+                $token = $user->createToken('token')->accessToken;
 
-            return response()->json(['token' => $token, 'user' => $user], 200);
-        } else {
-            return response()->json(['error' => 'Unauthenticated'], 401);
+                return response()->json(['token' => $token, 'user' => $user], Response::HTTP_OK);
+            } else {
+                return response()->json(['error' => 'Unauthenticated'], Response::HTTP_UNAUTHORIZED);
+            }
+        } catch (\Exception $e) {
+            throw $e;
         }
     }
 
@@ -48,10 +51,12 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->token()->revoke();
-        return response()->json(['message' => 'User logged out'], 200);
+        try {
+            $request->user()->token()->revoke();
+            return response()->json(['message' => 'User logged out'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            // Throw the exception again so it can be handled by the exception handler
+            throw $e;
+        }
     }
-
 }
-
-?>

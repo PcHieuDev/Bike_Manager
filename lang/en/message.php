@@ -1,65 +1,21 @@
 <?php
-
-if (! function_exists('product_not_found')) {
-    function product_not_found()
+if (! function_exists('get_messages')) {
+    function get_messages()
     {
-        return 'Product not found';
+        return [
+            'errors' => [
+                'product_not_found' => 'product not found',
+                'error_updating_product' => 'Error updating product',
+                'error_finding_product' => 'Error finding product',
+                'error_deleting_product' => 'Error deleting product',
+                'error_saving_product' => 'Error saving product',
+            ],
+            'success' => [
+                'product_found' => 'product found',
+                'product_deleted' => 'product deleted',
+                'product_updated' => 'product updated',
+                'product_saved' => 'product saved',
+            ],
+        ];
     }
-}
-if (! function_exists('Error updating product')) {
-    function error_updating_product()
-    {
-        return 'Error updating product';
-    }
-}
-
-if (! function_exists('product_found')) {
-    function product_found()
-    {
-        return 'Product found';
-    }
-}
-
-if (! function_exists('error_finding_product')) {
-    function error_finding_product()
-    {
-        return 'Error finding product';
-    }
-}
-
-if (! function_exists('product_deleted')) {
-    function product_deleted()
-    {
-        return 'Product deleted';
-    }
-}
-if(! function_exists('product_updated')) {
-    function product_updated()
-    {
-        return 'Product updated';
-    }
-
-
-    if (!function_exists('error_deleting_product')) {
-        function error_deleting_product()
-        {
-            return 'Error deleting product';
-        }
-
-    }
-
-    if (!function_exists('product_saved')) {
-        function product_saved()
-        {
-            return 'Product saved';
-        }
-    }
-
-    if (!function_exists('error_saving_product')) {
-        function error_saving_product()
-        {
-            return 'Error saving product';
-        }
-    }   
-
 }

@@ -32,7 +32,7 @@ class ProductController extends Controller
         return response()->json(
             [
                 'products' => $products,
-                'message' => product_found(),   
+                'message' => __('messages.success.product_found'),  
                 'status' => $this->ok()
 
             ]
@@ -93,12 +93,12 @@ class ProductController extends Controller
                 'image' => $imagePath
             ]);
             return response()->json([
-                'message' => product_saved(),
+                'message' => __('messages.product_saved'),
                 'status' => $this->ok()
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => error_saving_product(),
+                'message' => __('messages.error_saving_product'),
                 'status' => $this->internalServerError()
             ]);
         }
@@ -111,7 +111,7 @@ class ProductController extends Controller
             $product = $this->productRepository->find($id);
             if (!$product) {
                 return response()->json([
-                    'message' => product_not_found(),
+                    'message' => __('messages.product_not_found'),
                     'status' => $this->notFound()
                 ]);
             }
@@ -142,12 +142,12 @@ class ProductController extends Controller
                 'image' => $imagePath
             ]);
             return response()->json([
-                'message' => product_updated(),
+                'message' => __('messages.product_updated'),
                 'status' => $this->ok()
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => error_updating_product(),
+                'message' => __('messages.error_updating_product'),
                 'status' => $this->internalServerError()
             ]);
         }
@@ -165,18 +165,18 @@ class ProductController extends Controller
             if ($product) {
                 return response()->json([
                     'product' => $product,
-                    'message' => product_found(),
+                    'message' => __('messages.product_found'),
                     'status' => $this->ok()
                 ]);
             } else {
                 return response()->json([
-                    'message' => product_not_found(),
+                    'message' => __('messages.product_not_found'),
                     'status' => $this->notFound()
                 ]);
             }
         } catch (\Exception $e) {
             return response()->json([
-                'message' => error_finding_product(),
+                'message' => __('messages.error_finding_product'),
                 'status' => $this->internalServerError()
             ]);
         }
@@ -193,7 +193,7 @@ class ProductController extends Controller
         try {
             $product->delete();
             return response()->json([
-                'message' => product_deleted(),
+                'message' => __('messages.product_deleted'),
                 'status' => Response::HTTP_OK
             ], Response::HTTP_OK);
         } catch (\Exception $e) {

@@ -34,9 +34,9 @@
 import axios from "axios";
 import ProductItem from "./ProductItem.vue";
 import Paginate from "vuejs-paginate";
-import SearchBar from "../header/SearchBar.vue";
-import AddProductDialog from "./AddProductDialog.vue";
-import PupupAddSuccess from "./PupupAddSuccess.vue";
+import SearchBar from "../common/header/SearchBar.vue";
+import AddProductDialog from "../Popup/addProduct/AddProductDialog.vue";
+import PupupAddSuccess from "../Popup/addProduct/PupupAddSuccess.vue";
 
 export default {
   name: "list",
