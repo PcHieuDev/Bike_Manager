@@ -24,6 +24,7 @@
                 v-model="email"
                 aria-describedby="emailHelp"
                 placeholder="Email Address"
+                autocomplete="off"
               />
               <div v-if="emailErrorMessage" class="dfsdfsd">
                 {{ emailErrorMessage }}
@@ -39,6 +40,8 @@
                 id="password"
                 v-model="password"
                 placeholder="Password"
+                autocomplete="off"
+
               />
               <div v-if="passwordErrorMessage" class="dfsdfsd">
                 {{ passwordErrorMessage }}
@@ -52,7 +55,7 @@
             <div id="emailHelp" class="form-text text-center mb-5 text-light">
               Chưa có tài khoản?
               <router-link
-                to="/register"
+                to="/Register"
                 class="text-light fw-bold"
                 style="margin-left: 5px"
               >
@@ -74,7 +77,7 @@
 </template>
 <script>
 import axios from "axios";
-import LoginPopupSuccess from "../../Components/Popup/login/LoginPopupSuccess.vue";
+import LoginPopupSuccess from "../../Components/Popup/Login/LoginPopupSuccess.vue";
 
 export default {
   components: {
@@ -106,7 +109,7 @@ export default {
 
       if (this.email !== "" && this.password !== "") {
         axios
-          .post("/api/login", {
+          .post("/api/Login", {
             email: this.email,
             password: this.password,
           })
@@ -117,7 +120,7 @@ export default {
             this.user = JSON.parse(localStorage.getItem("user"));
             this.LoginSuccess = true;
             setTimeout(() => {
-              this.$router.push("/product/actions");
+              this.$router.push("/ProductActions/actions");
             }, 1000);
           })
           .catch((error) => {

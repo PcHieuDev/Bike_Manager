@@ -1,9 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Products from '../pages/product/index.vue'
-import ProductDetails from "../Components/product/ProductDetails.vue"
+import ProductDetails from "../pages/product/ProductDetails.vue"
 import ProductActions from '../pages/product/ProductActions.vue'
-import EditProduct from '../Components/product/EditProduct.vue'
+import EditProduct from '../Components/ProductActions/EditProduct.vue'
 import Login from '../pages/Auth/Login.vue'
+import Register from '../pages/Auth/Register.vue'
 
 const routes = [
     {
@@ -14,31 +15,31 @@ const routes = [
     },
     {
         name: 'productDetails',
-        path: '/product/details/:id',
+        path: '/ProductActions/details/:id',
         component: ProductDetails
     },
 
     {
         name: 'ProductAction',
-        path: '/product/actions',
+        path: '/ProductActions/actions',
         component: ProductActions
     },
    
     {
         name: 'EditProduct',
-        path: '/product/edit/:id',
+        path: '/ProductActions/edit/:id',
         component: EditProduct
     },
     {                                                                                       
         name: 'Login',
-        path: '/login',
+        path: '/Login',
         component: Login
     },
 
     {
         name: 'register',
-        path: '/register',
-        component: () => import('../pages/Auth/Register.vue')
+        path: '/Register',
+        component: Register
     }
 
     

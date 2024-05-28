@@ -34,7 +34,7 @@
 
 <script>
 import { RouterLink, useRoute } from "vue-router";
-import LogoutPopup from "../../Popup/logout/LogoutPopup.vue";
+import LogoutPopup from "../../Popup/Logout/LogoutPopup.vue";
 
 export default {
   name: "Header",
@@ -86,7 +86,7 @@ export default {
     //     this.user = JSON.parse(localStorage.getItem("user"));
     //   } else {
     //     this.user = null;
-    //     this.$router.push("/login");
+    //     this.$router.push("/Login");
     //   }
     // },
     getAuth() {
@@ -96,8 +96,8 @@ export default {
         this.user = JSON.parse(localStorage.getItem("user"));
       } else {
         this.user = null;
-        if (this.$route.path !== "/register" && this.$route.path !== "/") {
-          this.$router.push("/login");
+        if (this.$route.path !== "/Register" && this.$route.path !== "/") {
+          this.$router.push("/Login");
         }
       }
     },
@@ -110,14 +110,14 @@ export default {
         this.LogoutSuccess = false;
       }, 600);
       setTimeout(() => {
-        this.$router.push("/login");
+        this.$router.push("/Login");
       }, 600);
 
       this.user = null;
     },
 
     goProductAction() {
-      this.$router.push("/product/actions");
+      this.$router.push("/ProductActions/actions");
     },
   },
 };

@@ -39,7 +39,7 @@
   </div>
   <!--  loading page-->
 
-  <!-- popup add product -->
+  <!-- popup add ProductActions -->
   <AddProductDialog
     v-model="isShowDialog"
     @submit="addProduct"
@@ -70,18 +70,23 @@
   <!-- popup AddError -->
   <AddProductError v-model="AddError" @close="AddError = false"></AddProductError>
   <!-- popup AddError -->
+
+  <!-- popup AddMissing -->
+  <Popupaddmissing v-model="AddMissing" @close="AddMissing = false"></Popupaddmissing>
+  <!-- popup AddMissing -->
 </template>
 
 <script>
 import axios from "axios";
 import { RouterLink } from "vue-router";
-import ProductItem from "../../Components/product/ProductItem.vue";
+import ProductItem from "../../Components/ProductActions/ProductItem.vue";
 import Paginate from "vuejs-paginate";
-import AddProductDialog from "../../Components/Popup/addProduct/AddProductDialog.vue";
-import PupupAddSuccess from "../../Components/Popup/addProduct/PupupAddSuccess.vue";
-import PopupDeleteSuccess from "../../Components/Popup/deleteProduct/PopupDeleteSuccess.vue";
-import PopupBeforeDelete from "../../Components/Popup/deleteProduct/PopupBeforeDelete.vue";
-import AddProductError from "../../Components/Popup/addProduct/AddProductError.vue";
+import AddProductDialog from "../../Components/ProductActions/AddProductDialog.vue";
+import PupupAddSuccess from "../../Components/Popup/AddProduct/PupupAddSuccess.vue";
+import PopupDeleteSuccess from "../../Components/Popup/DeleteProduct/PopupDeleteSuccess.vue";
+import PopupBeforeDelete from "../../Components/Popup/DeleteProduct/PopupBeforeDelete.vue";
+import AddProductError from "../../Components/Popup/AddProduct/AddProductError.vue";
+import Popupaddmissing from "../../Components/Popup/AddProduct/AddproductMissing.vue";
 
 export default {
   name: "list",
@@ -93,6 +98,7 @@ export default {
     PopupDeleteSuccess,
     PopupBeforeDelete,
     AddProductError,
+    Popupaddmissing,
   },
 
   data() {
@@ -109,6 +115,7 @@ export default {
       searchTerm: "",
       beforeDelete: false,
       AddError: false,
+      AddMissing: false,
       afterDelete: false,
       editproduct: false,
       productIdDelete: null,
@@ -183,7 +190,7 @@ export default {
 
     computed: {
       isProductActionsPath() {
-        return this.$route.path === "/product/actions";
+        return this.$route.path === "/ProductActions/actions";
       },
     },
 
@@ -191,14 +198,14 @@ export default {
       this.isShowDialog = !this.isShowDialog;
     },
 
-    // addProduct(product) {
+    // AddProduct(ProductActions) {
     //   // Kiểm tra xem giá sản phẩm có phải là số không
-    //   if (isNaN(product.price)) {
+    //   if (isNaN(ProductActions.price)) {
     //     alert("Giá sản phẩm phải là số");
     //     return;
     //   }
     //   // Chuyển đổi giá sản phẩm thành số thập phân
-    //   const price = parseFloat(product.price);
+    //   const price = parseFloat(ProductActions.price);
 
     //   // Kiểm tra xem giá sản phẩm có nằm trong phạm vi mong muốn không
     //   if (price <= 0 || price > 1000000000 || price < 10000) {
@@ -208,17 +215,17 @@ export default {
     //     return;
     //   }
     //   // Kiểm tra xem note có quá 500 ký tự không
-    //   if (product.note.length > 500) {
+    //   if (ProductActions.note.length > 500) {
     //     alert("Note không được quá 500 ký tự");
     //     return;
     //   }
     //   const formData = new FormData();
-    //   formData.append("name", product.name);
-    //   formData.append("note", product.note);
-    //   formData.append("price", product.price);
-    //   formData.append("category_id", product.category_id);
-    //   formData.append("brand_id", product.brand_id);
-    //   formData.append("image", product.image);
+    //   formData.append("name", ProductActions.name);
+    //   formData.append("note", ProductActions.note);
+    //   formData.append("price", ProductActions.price);
+    //   formData.append("category_id", ProductActions.category_id);
+    //   formData.append("brand_id", ProductActions.brand_id);
+    //   formData.append("image", ProductActions.image);
     //   let token = localStorage.getItem("token");
     //   axios
     //     .post("http://127.0.0.1:8000/api/saveProduct", formData, {
@@ -253,10 +260,10 @@ export default {
         !product.brand_id ||
         !product.image
       ) {
-        this.AddError = true;
+        this.AddMissing = true;
         return;
       } else {
-        this.AddError = false;
+        this.AddMissing = false;
       }
 
       // Kiểm tra xem giá sản phẩm có phải là số không

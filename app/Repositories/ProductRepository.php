@@ -120,6 +120,6 @@ class ProductRepository implements ProductRepositoryInterface
 
     // public function find($id)
     // {
-    //     return product::find($id);
+    //     return ProductActions::find($id);
     // }
 }

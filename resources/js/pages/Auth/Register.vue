@@ -65,7 +65,7 @@
 
 <script>
 import axios from "axios";
-import RegisterPopupSuccess from "../../Components/Popup/register/RegisterPopupSuccess.vue";
+import RegisterPopupSuccess from "../../Components/Popup/Register/RegisterPopupSuccess.vue";
 export default {
   data() {
     return {
@@ -76,7 +76,6 @@ export default {
         password: "",
       },
       error: "",
-      RegisterSucess: false,
     };
   },
   components: {
@@ -96,12 +95,12 @@ export default {
       }
 
       axios
-        .post("http://127.0.0.1:8000/api/register", this.user)
+        .post("http://127.0.0.1:8000/api/Register", this.user)
         .then((response) => {
           if (response.status === 201) {
             this.RegisterSucess = true;
             setTimeout(() => {
-              this.$router.push("/login");
+              this.$router.push("/Login");
             }, 700);
           } else {
             this.error = response.data.message;

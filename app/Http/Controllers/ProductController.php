@@ -164,7 +164,7 @@ class ProductController extends Controller
             $product = $this->productRepository->find($id);
             if ($product) {
                 return response()->json([
-                    'product' => $product,
+                    'ProductActions' => $product,
                     'message' => __('messages.product_found'),
                     'status' => $this->ok()
                 ]);

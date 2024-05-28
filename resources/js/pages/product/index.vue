@@ -4,7 +4,7 @@
 
 <script>
 import axios from "axios";
-import ProductList from "../../Components/product/ListProduct.vue";
+import ProductList from "../../Components/ProductActions/ListProduct.vue";
 
 export default {
   name: "products",
