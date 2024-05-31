@@ -13,7 +13,13 @@ class ProductRepository implements ProductRepositoryInterface
         $query = Product::with('brand', 'category');
 
         if ($keyword != '') {
-            $query->where('name', 'like', "%$keyword%");
+            $query->where('name', 'like', "%$keyword%")
+                ->orWhereHas('brand', function ($query) use ($keyword) {
+                    $query->where('name', 'like', "%$keyword%");
+                })
+                ->orWhereHas('category', function ($query) use ($keyword) {
+                    $query->where('name', 'like', "%$keyword%");
+                });
         }
 
         return $query->get();
@@ -45,10 +51,18 @@ class ProductRepository implements ProductRepositoryInterface
     public function paginate($page, $size, $keyword)
     {
         $offset = ($page - 1) * $size;
-        $query = Product::query();
+        $query = Product::with('brand', 'category');
+    
         if ($keyword != '') {
-            $query->where('name', 'like', "%$keyword%");
+            $query->where('name', 'like', "%$keyword%")
+                ->orWhereHas('category', function ($q) use ($keyword) {
+                    $q->where('name', 'like', "%$keyword%");
+                })
+                ->orWhereHas('brand', function ($q) use ($keyword) {
+                    $q->where('name', 'like', "%$keyword%");
+                });
         }
+    
         return $query->orderBy('id', 'DESC')
             ->skip($offset)
             ->take($size)
@@ -57,7 +71,19 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function search($query)
     {
-        return Product::where('name', 'like', "%$query%")->get();
+        $products = Product::query();
+
+        if (!empty($query)) {
+            $products->where('name', 'like', "%$query%")
+                ->whereHas('category', function ($q) use ($query) {
+                    $q->where('name', 'like', "%$query%");
+                })
+                ->whereHas('brand', function ($q) use ($query) {
+                    $q->where('name', 'like', "%$query%");
+                });
+        }
+
+        return $products->paginate(12);
     }
 
     public function create(array $data)
@@ -115,11 +141,11 @@ class ProductRepository implements ProductRepositoryInterface
         return $product;
     }
 
+    
+
+   
+
+    
 
 
-
-    // public function find($id)
-    // {
-    //     return ProductActions::find($id);
-    // }
 }

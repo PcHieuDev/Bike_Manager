@@ -8,17 +8,7 @@
     >
       Thêm sản phẩm
     </button>
-    <div class="input-group custom-search">
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Tìm kiếm"
-        aria-label="Username"
-        @keyup.enter="handleSearch"
-        aria-describedby="basic-addon1"
-        v-model="keyword"
-      />
-    </div>
+    <SearchBar @handleSearch="handleSearch"></SearchBar>
   </div>
   <!-- List san pham -->
   <ProductItem
@@ -64,7 +54,10 @@
   <!-- popup afterdelete -->
 
   <!-- popup afterAddProduct -->
-  <PupupAddSuccess v-model="afterAddProduct"></PupupAddSuccess>
+  <PupupAddSuccess
+    v-model="afterAddProduct"
+    @close="afterAddProduct = false"
+  ></PupupAddSuccess>
   <!-- popup afterAddProduct -->
 
   <!-- popup AddError -->
@@ -78,7 +71,6 @@
 
 <script>
 import axios from "axios";
-import { RouterLink } from "vue-router";
 import ProductItem from "../../Components/ProductActions/ProductItem.vue";
 import Paginate from "vuejs-paginate";
 import AddProductDialog from "../../Components/ProductActions/AddProductDialog.vue";
@@ -87,6 +79,8 @@ import PopupDeleteSuccess from "../../Components/Popup/DeleteProduct/PopupDelete
 import PopupBeforeDelete from "../../Components/Popup/DeleteProduct/PopupBeforeDelete.vue";
 import AddProductError from "../../Components/Popup/AddProduct/AddProductError.vue";
 import Popupaddmissing from "../../Components/Popup/AddProduct/AddproductMissing.vue";
+import { BASE_URL } from "../../configUrl.js";
+import SearchBar from "../../Components/common/header/SearchBar.vue";
 
 export default {
   name: "list",
@@ -99,6 +93,7 @@ export default {
     PopupBeforeDelete,
     AddProductError,
     Popupaddmissing,
+    SearchBar,
   },
 
   data() {
@@ -159,14 +154,15 @@ export default {
     openEditPopup() {
       this.editproduct = !this.editproduct;
     },
-    handleSearch() {
+    handleSearch(key) {
+      this.keyword = key;
       this.page = 1;
       this.getProducts();
     },
     async getProducts() {
       var token = localStorage.getItem("token");
       this.isLoading = true;
-      let url = "http://127.0.0.1:8000/api/products";
+      let url = BASE_URL + "products";
       await axios
         .get(url, {
           params: {
@@ -198,59 +194,6 @@ export default {
       this.isShowDialog = !this.isShowDialog;
     },
 
-    // AddProduct(ProductActions) {
-    //   // Kiểm tra xem giá sản phẩm có phải là số không
-    //   if (isNaN(ProductActions.price)) {
-    //     alert("Giá sản phẩm phải là số");
-    //     return;
-    //   }
-    //   // Chuyển đổi giá sản phẩm thành số thập phân
-    //   const price = parseFloat(ProductActions.price);
-
-    //   // Kiểm tra xem giá sản phẩm có nằm trong phạm vi mong muốn không
-    //   if (price <= 0 || price > 1000000000 || price < 10000) {
-    //     alert(
-    //       "Giá sản phẩm phải lớn hơn 0, nhỏ hơn hoặc bằng 1000000000 và lớn hơn hoặc bằng 10000"
-    //     );
-    //     return;
-    //   }
-    //   // Kiểm tra xem note có quá 500 ký tự không
-    //   if (ProductActions.note.length > 500) {
-    //     alert("Note không được quá 500 ký tự");
-    //     return;
-    //   }
-    //   const formData = new FormData();
-    //   formData.append("name", ProductActions.name);
-    //   formData.append("note", ProductActions.note);
-    //   formData.append("price", ProductActions.price);
-    //   formData.append("category_id", ProductActions.category_id);
-    //   formData.append("brand_id", ProductActions.brand_id);
-    //   formData.append("image", ProductActions.image);
-    //   let token = localStorage.getItem("token");
-    //   axios
-    //     .post("http://127.0.0.1:8000/api/saveProduct", formData, {
-    //       headers: {
-    //         "Content-Type": "multipart/form-data",
-    //         Authorization: `Bearer ${token}`,
-    //       },
-    //     })
-    //     .then((response) => {
-    //       console.log(response); // Ghi lại phản hồi của API
-    //       this.afterAddProduct = true;
-    //       setTimeout(() => {
-    //         this.afterAddProduct = false;
-    //       }, 800);
-    //       this.$router.push(`/products/${newProductId}`);
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //     })
-    //     .finally(() => {
-    //       this.isShowDialog = false;
-    //       this.page = 1;
-    //       this.getProducts();
-    //     });
-    // },
     addProduct(product) {
       // Kiểm tra xem các trường bắt buộc có bị thiếu không
       if (
@@ -299,7 +242,7 @@ export default {
       let token = localStorage.getItem("token");
 
       axios
-        .post("http://127.0.0.1:8000/api/saveProduct", formData, {
+        .post(BASE_URL + "saveProduct", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
@@ -308,10 +251,7 @@ export default {
         .then((response) => {
           console.log(response); // Ghi lại phản hồi của API
           this.afterAddProduct = true;
-          setTimeout(() => {
-            this.afterAddProduct = false;
-          }, 800);
-          this.$router.push(`/products/${newProductId}`);
+          // this.$router.push(`/products/${newProductId}`);
         })
         .catch((error) => {
           console.log(error);
@@ -329,7 +269,7 @@ export default {
 
     getListCategory() {
       axios
-        .get("http://127.0.0.1:8000/api/categories")
+        .get(BASE_URL + "categories")
         .then((response) => {
           this.categories = response.data.contents;
         })
@@ -340,7 +280,7 @@ export default {
 
     getListBrands() {
       axios
-        .get("http://127.0.0.1:8000/api/brands")
+        .get(BASE_URL + "brands")
         .then((response) => {
           this.brands = response.data.contents;
         })
@@ -351,7 +291,7 @@ export default {
 
     searchProducts(query) {
       axios
-        .get("http://127.0.0.1:8000/api/search", {
+        .get(BASE_URL + "search", {
           params: {
             query: query,
           },
@@ -365,7 +305,7 @@ export default {
     },
 
     deleteProduct() {
-      let url = `http://127.0.1:8000/api/delete_products/${this.productIdDelete}`;
+      let url = BASE_URL + `delete_products/${this.productIdDelete}`;
       let token = localStorage.getItem("token");
       axios
         .delete(url, {

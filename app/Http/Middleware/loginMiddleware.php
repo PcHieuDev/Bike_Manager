@@ -20,7 +20,7 @@ class loginMiddleware
         if (Auth::guard('api')->check()) {
             return $next($request);
         } else {
-            $message = ["message" => "Hành động bị từ chối!"];
+            $message = ["message" => "Actions Deniny!"];
             return response($message, 401);
         }
     }

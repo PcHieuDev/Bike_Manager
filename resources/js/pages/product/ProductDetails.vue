@@ -35,51 +35,43 @@
       </div>
     </div>
     <div class="div-13">gợi ý cho bạn:</div>
-    <div class="div-14">
-      <div class="div-15">
-        <div class="column-3">
-          <div class="div-16">
-            <img
-              style="height: 146px; width: 237px"
-              loading="lazy"
-              :src="product.image"
-              class="mg-3"
-            />
-            <div class="div-17">Multistrada V4 Pikes Peak</div>
-            <div class="div-18">$ 100,000,000</div>
-          </div>
-        </div>
-        <div class="column-4">
-          <div class="div-19">
-            <img
-              loading="lazy"
-              style="height: 146px; width: 237px"
-              :src="product.image"
-              class="mg-4"
-            />
-            <div class="div-20">Multistrada V4 Pikes Peak</div>
-            <div class="div-21">$ 100,000,000</div>
-          </div>
-        </div>
-
-        <div class="column-4">
-          <div class="div-19">
-            <img style="height: 146px; width: 237px" :src="product.image" class="mg-4" />
-            <div class="div-20">Multistrada V4 Pikes Peak</div>
-            <div class="div-21">$ 100,000,000</div>
+    <div class="container">
+      <div class="div-14" v-for="item in randomProducts" :key="item.id">
+        <div class="div-15">
+          <div class="column-3">
+            <div class="div-16">
+              <img
+                style="height: 146px; width: 237px"
+                loading="lazy"
+                :src="item.image"
+                class="mg-3"
+              />
+              <div class="div-17">{{ item.name }}</div>
+              <div class="div-18">{{ item.price }}</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <div v-if="isLoading" class="loading-page">
+    <v-progress-circular indeterminate color="primary"></v-progress-circular>
+  </div>
 </template>
 
 <script>
 import axios from "axios";
+import { BASE_URL } from "../../configUrl.js";
 
 export default {
   data() {
     return {
+      isLoading: false,
+      itemsPerPage: 12,
+      countRercord: 0,
+
+      products: [],
       product: {
         name: "",
         price: "",
@@ -97,6 +89,24 @@ export default {
   mounted() {
     this.getProductDetails();
   },
+  computed:{
+    randomProducts() {
+    let productsCopy = [...this.products];
+    let result = [];
+    for (let i = 0; i < 3; i++) {
+      if (productsCopy.length > 0) {
+        let randomIndex = Math.floor(Math.random() * productsCopy.length);
+        result.push(productsCopy[randomIndex]);
+        productsCopy.splice(randomIndex, 1);
+      }
+    }
+    return result;
+  }
+},
+  
+  created() {
+    this.getProducts();
+  },
 
   methods: {
     goHome() {
@@ -106,7 +116,7 @@ export default {
     getProductDetails() {
       const id = this.$route.params.id; // lấy id từ route
       axios
-        .get(`http://127.0.0.1:8000/api/products/${id}`)
+        .get(BASE_URL + `products/${id}`)
         .then((response) => {
           if (response.data) {
             this.product = response.data.product;
@@ -124,11 +134,10 @@ export default {
 
     async getProducts() {
       this.isLoading = true;
-      let url = "http://127.0.0.1:8000/api/productsFree";
+      let url = BASE_URL + "productsFree";
       await axios
         .get(url, {
           params: {
-            page: this.page,
             keyword: this.keyword,
           },
         })
@@ -147,3 +156,25 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between; /* Tùy chọn: để các phần tử cách đều nhau */
+  padding-top: 5px;
+}
+
+.div-14 {
+  flex: 1; /* Điều chỉnh chiều rộng của mỗi phần tử theo ý muốn */
+  margin: 0 2px; /* Tùy chọn: thêm khoảng cách giữa các phần tử */
+}
+
+.div-15,
+.column-3,
+.div-16 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+</style>

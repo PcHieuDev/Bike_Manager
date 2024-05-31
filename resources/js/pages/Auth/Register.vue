@@ -30,6 +30,7 @@
                 v-model="user.email"
                 aria-describedby="emailHelp"
                 placeholder="Email Address"
+                autocomplete="off"
               />
             </div>
             <div class="mb-3">
@@ -39,6 +40,7 @@
                 id="password"
                 v-model="user.password"
                 placeholder="Password"
+                autocomplete="off"
               />
             </div>
             <div class="text-center">
@@ -66,6 +68,7 @@
 <script>
 import axios from "axios";
 import RegisterPopupSuccess from "../../Components/Popup/Register/RegisterPopupSuccess.vue";
+import { BASE_URL } from "../../configUrl.js";
 export default {
   data() {
     return {
@@ -95,7 +98,7 @@ export default {
       }
 
       axios
-        .post("http://127.0.0.1:8000/api/Register", this.user)
+        .post(BASE_URL + "Register", this.user)
         .then((response) => {
           if (response.status === 201) {
             this.RegisterSucess = true;

@@ -1,8 +1,8 @@
 <template>
   <v-dialog
-      :value="isShowDialog"
-      @input="$emit('update:isShowDialog', $event)"
-      max-width="674"
+    :value="isShowDialog"
+    @input="$emit('update:isShowDialog', $event)"
+    max-width="674"
   >
     <v-card>
       <v-card-title class="headline">Thêm sản phẩm</v-card-title>
@@ -12,29 +12,19 @@
             <div class="form-group">
               <label class="form-label mt-4 required">Tên sản phẩm</label>
               <input
-                  type="text"
-                  class="form-control"
-                  v-model="product.name"
-                  placeholder="Enter name"
+                type="text"
+                class="form-control"
+                v-model="product.name"
+                placeholder="Enter name"
               />
             </div>
             <div class="form-group">
               <label class="form-label mt-4 required">Giá</label>
               <input
-                  type="text"
-                  class="form-control"
-                  v-model="product.price"
-                  placeholder="Enter price"
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label mt-4 required">Hình ảnh</label>
-              <input
-                  type="file"
-                  class="form-control"
-                  @change="onImageChange"
-                  placeholder="Enter image"
+                type="text"
+                class="form-control"
+                v-model="product.price"
+                placeholder="Enter price"
               />
             </div>
 
@@ -58,6 +48,18 @@
             <div class="form-group">
               <label class="form-label mt-4 required">Mô tả</label>
               <textarea class="form-control" v-model="product.note" rows="2"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label mt-4 required" style="color: green"
+                >Thêm hình ảnh minh họa</label
+              >
+              <input
+                type="file"
+                class="form-control"
+                @change="onImageChange"
+                placeholder="Enter image"
+              />
             </div>
           </fieldset>
         </form>

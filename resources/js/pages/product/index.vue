@@ -5,6 +5,7 @@
 <script>
 import axios from "axios";
 import ProductList from "../../Components/ProductActions/ListProduct.vue";
+import { BASE_URL } from "../../configUrl.js";
 
 export default {
   name: "products",
@@ -25,7 +26,7 @@ export default {
     async getProducts() {
       var token = localStorage.getItem("token");
       this.isLoading = true;
-      let url = "http://127.0.0.1:8000/api/products";
+      let url = BASE_URL + "products";
       await axios
         .get(url, {
           params: {

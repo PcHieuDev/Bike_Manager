@@ -5,7 +5,6 @@ import ProductActions from '../pages/product/ProductActions.vue'
 import EditProduct from '../Components/ProductActions/EditProduct.vue'
 import Login from '../pages/Auth/Login.vue'
 import Register from '../pages/Auth/Register.vue'
-
 const routes = [
     {
         name: 'Home',
@@ -14,20 +13,18 @@ const routes = [
         // component: Products
     },
     {
-        name: 'productDetails',
-        path: '/ProductActions/details/:id',
+        name: 'ProductDetails',
+        path: '/product/details/:id',
         component: ProductDetails
     },
-
     {
         name: 'ProductAction',
         path: '/ProductActions/actions',
         component: ProductActions
     },
-   
     {
         name: 'EditProduct',
-        path: '/ProductActions/edit/:id',
+        path: '/product/edit/:id',
         component: EditProduct
     },
     {                                                                                       
@@ -35,19 +32,11 @@ const routes = [
         path: '/Login',
         component: Login
     },
-
     {
         name: 'register',
         path: '/Register',
         component: Register
     }
-
-    
-
-
-
-
-
 ];
 
 const router = createRouter({

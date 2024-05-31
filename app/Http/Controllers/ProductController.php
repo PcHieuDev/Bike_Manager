@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Controllers;
+
 use App\Http\Requests\ProductRequest;
 use Illuminate\Http\Request;
 use App\Models\Product;
@@ -32,7 +34,7 @@ class ProductController extends Controller
         return response()->json(
             [
                 'products' => $products,
-                'message' => __('messages.success.product_found'),  
+                'message' => __('messages.success.product_found'),
                 'status' => $this->ok()
 
             ]
@@ -69,7 +71,9 @@ class ProductController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('query');
-        $products = $this->productRepository->search($query);
+        $categoryName = $request->input('categoryName');
+        $brandName = $request->input('brandName');
+        $products = $this->productRepository->search($query, $categoryName, $brandName);
         return response()->json($products);
     }
 
@@ -164,7 +168,7 @@ class ProductController extends Controller
             $product = $this->productRepository->find($id);
             if ($product) {
                 return response()->json([
-                    'ProductActions' => $product,
+                    'product' => $product,
                     'message' => __('messages.product_found'),
                     'status' => $this->ok()
                 ]);
@@ -185,11 +189,9 @@ class ProductController extends Controller
     public function delete($id)
     {
         $product = $this->productRepository->find($id);
-
         if (!$product) {
             throw new ProductNotFoundException();
         }
-
         try {
             $product->delete();
             return response()->json([
@@ -200,4 +202,6 @@ class ProductController extends Controller
             throw new ProductDeletionException($e->getMessage(), $e->getCode(), $e);
         }
     }
+
+
 }

@@ -1,6 +1,14 @@
 <template>
   <v-dialog :value="afterAddProduct" max-width="610">
     <v-card>
+      <v-btn
+          icon
+          class="close-btn"
+          @click="closePopup"
+          style="margin-left: 560px"
+      >
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
       <div class="divqw popup-detail">
         <div class="div-2d">
           <img
@@ -19,5 +27,10 @@
 export default {
   name: "PupupAddSuccess",
   props: ["afterAddProduct"],
+  methods: {
+    closePopup() {
+      this.$emit("close");
+    },
+  },
 };
 </script>

@@ -1,11 +1,11 @@
 <template>
-  <div class="filter">
+  <div v-if="showNavbar" class="filter">
     <div class="category">
       <div class="t-t-c">Tất Cả</div>
       <img
-          class="ic-arrow-top"
-          alt="Ic arrow top"
-          src="https://c.animaapp.com/6fNIys5x/img/ic-arrow-top.svg"
+        class="ic-arrow-top"
+        alt="Ic arrow top"
+        src="https://c.animaapp.com/6fNIys5x/img/ic-arrow-top.svg"
       />
 
       <div class="overlap-group-2">
@@ -17,17 +17,17 @@
         <div class="text-wrapper-5">Hãng Sản Xuất</div>
       </div>
     </div>
-    <img class="line" alt="Line" src="https://c.animaapp.com/6fNIys5x/img/line-1.svg"/>
+    <img class="line" alt="Line" src="https://c.animaapp.com/6fNIys5x/img/line-1.svg" />
 
     <div class="category-2">
       <div class="overlap-group-2">
         <div class="text-wrapper-5">Danh Mục</div>
       </div>
       <div
-          v-for="(category, index) in categories"
-          :key="index"
-          v-if="showCategories"
-          class="category-item"
+        v-for="(category, index) in categories"
+        :key="index"
+        v-if="showCategories"
+        class="category-item"
       >
         <div class="t">
           {{ category.name }}
@@ -35,11 +35,11 @@
       </div>
       <div class="t-t-c">Tất Cả</div>
       <img
-          class="ic-arrow-top"
-          alt="Ic arrow top"
-          style="cursor: pointer"
-          src="https://c.animaapp.com/6fNIys5x/img/ic-arrow-top-1.svg"
-          @click="toggleCategories"
+        class="ic-arrow-top"
+        alt="Ic arrow top"
+        style="cursor: pointer"
+        src="https://c.animaapp.com/6fNIys5x/img/ic-arrow-top-1.svg"
+        @click="toggleCategories"
       />
     </div>
   </div>
@@ -47,55 +47,42 @@
 
 <script>
 import axios from "axios";
-import {get} from "lodash";
+import { get } from "lodash";
 
 export default {
   name: "Filter",
   data() {
     return {
       categories: [], // Khai báo mảng categories để lưu danh sách danh mục
-      // brands: [],
-      // showBrands: false,
-
       showCategories: true,
+      showBrands: false,
     };
+  },
+  computed: {
+    showNavbar() {
+      return this.$route.path !== "/Login" && this.$route.path !== "/Register";
+    },
   },
   mounted() {
     this.getListCategory(); // Gọi hàm getListCategory khi component được mount
-    // this.brands = response.data;
-    // this.getListBrands();
   },
   methods: {
     getListCategory() {
       axios
-          .get("http://127.0.0.1:8000/api/categories")
-          .then((response) => {
-            this.categories = response.data.contents; // Gán dữ liệu categories từ API
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        .get("http://127.0.0.1:8000/api/categories")
+        .then((response) => {
+          this.categories = response.data.contents; // Gán dữ liệu categories từ API
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
-    // getListBrands() {
-    //   axios
-    //     .get("http://127.0.0.1:8000/api/brands")
-    //     .then((response) => {
-    //       this.brands = response.data.contents;
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //     });
-    // },
-
     selectCategory(categoryId) {
       this.$emit("selectCategory", categoryId);
     },
     toggleCategories() {
       this.showCategories = !this.showCategories;
     },
-    // toggleBrands() {
-    //   this.showBrands = !this.showBrands;
-    // },
   },
 };
 </script>

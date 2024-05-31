@@ -50,7 +50,6 @@ export default {
     },
     products: {
       type: Array,
-
       required: true,
     },
   },

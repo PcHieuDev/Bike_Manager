@@ -41,7 +41,6 @@
                 v-model="password"
                 placeholder="Password"
                 autocomplete="off"
-
               />
               <div v-if="passwordErrorMessage" class="dfsdfsd">
                 {{ passwordErrorMessage }}

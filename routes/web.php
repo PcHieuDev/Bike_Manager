@@ -31,7 +31,7 @@ Route::post('/addproduct', function () {
     return view('welcome');
 });
 
-Route::get('/ProductActions/details/{id}', function ($id) {
+Route::get('/product/details/{id}', function ($id) {
     return view('welcome');
 });
 
@@ -39,7 +39,7 @@ Route::get('/details', function () {
     return view('welcome');
 });
 
-Route::get('/ProductActions/edit/{id}', function ($id) {
+Route::get('/product/edit/{id}', function ($id) {
     return view('welcome');
 });
 

@@ -29,7 +29,6 @@
   <!-- popup LogoutSuccess -->
   <LogoutPopup v-model="LogoutSuccess"></LogoutPopup>
   <!-- popup LogoutSuccess -->
-
 </template>
 
 <script>
@@ -78,17 +77,6 @@ export default {
     goHome() {
       this.$router.push("/");
     },
-
-    // getAuth() {
-    //   var token = localStorage.getItem("token");
-    //   var user = localStorage.getItem("user");
-    //   if (token && user) {
-    //     this.user = JSON.parse(localStorage.getItem("user"));
-    //   } else {
-    //     this.user = null;
-    //     this.$router.push("/Login");
-    //   }
-    // },
     getAuth() {
       var token = localStorage.getItem("token");
       var user = localStorage.getItem("user");

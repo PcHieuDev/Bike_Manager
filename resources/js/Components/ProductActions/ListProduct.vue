@@ -37,6 +37,7 @@ import Paginate from "vuejs-paginate";
 import SearchBar from "../common/header/SearchBar.vue";
 import AddProductDialog from "./AddProductDialog.vue";
 import PupupAddSuccess from "../Popup/AddProduct/PupupAddSuccess.vue";
+import { BASE_URL } from "../../configUrl.js";
 
 export default {
   name: "list",
@@ -63,6 +64,7 @@ export default {
       showErrorPopup: false,
       searchTerm: "",
       currentCategoryId: null,
+      currentBrandName: "",
       product: {
         name: "",
         price: "",
@@ -103,15 +105,15 @@ export default {
       this.page = 1;
       this.getProducts();
     },
+
     async getProducts() {
       this.isLoading = true;
-      let url = "http://127.0.0.1:8000/api/productsFree";
+      let url = BASE_URL + "productsFree";
       await axios
         .get(url, {
           params: {
             page: this.page,
             keyword: this.keyword,
-            category_id: this.currentCategoryId,
           },
         })
         .then((response) => {
@@ -136,7 +138,7 @@ export default {
 
     getListCategory() {
       axios
-        .get("http://127.0.0.1:8000/api/categories")
+        .get(BASE_URL + "categories")
         .then((response) => {
           this.categories = response.data.contents;
         })
@@ -147,7 +149,7 @@ export default {
 
     getListBrands() {
       axios
-        .get("http://127.0.0.1:8000/api/brands")
+        .get(BASE_URL + "brands")
         .then((response) => {
           this.brands = response.data.contents;
         })
@@ -156,8 +158,18 @@ export default {
         });
     },
     selectCategory(categoryId) {
-      this.currentCategoryId = categoryId;
-      this.getProducts();
+      let category = this.categories.find((c) => c.id === categoryId);
+      if (category) {
+        this.currentCategoryName = category.name;
+        this.getProducts();
+      }
+    },
+    selectBrand(brandId) {
+      let brand = this.brands.find((b) => b.id === brandId);
+      if (brand) {
+        this.currentBrandName = brand.name;
+        this.getProducts();
+      }
     },
   },
 };
