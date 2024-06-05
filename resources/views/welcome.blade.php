@@ -12,9 +12,11 @@
     <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/sidebars/">
 
     <!-- Fonts -->
+
+   
 </head>
 <body>
-<div id="app"></div>
+     <div id="app"></div>
 <script src="{{ mix('js/app.js') }}"></script>
 </body>
 </html>

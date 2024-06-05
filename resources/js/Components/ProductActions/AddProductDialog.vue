@@ -5,9 +5,11 @@
     max-width="674"
   >
     <v-card>
+      <v-spacer></v-spacer>
+
       <v-card-title class="headline">Thêm sản phẩm</v-card-title>
       <v-card-text>
-        <form>
+        <form ref="productForm">
           <fieldset>
             <div class="form-group">
               <label class="form-label mt-4 required">Tên sản phẩm</label>
@@ -47,7 +49,7 @@
             </div>
             <div class="form-group">
               <label class="form-label mt-4 required">Mô tả</label>
-              <textarea class="form-control" v-model="product.note" rows="2"></textarea>
+              <textarea class="form-control" v-model="product.note" rows="1"></textarea>
             </div>
 
             <div class="form-group">
@@ -57,6 +59,7 @@
               <input
                 type="file"
                 class="form-control"
+                ref="imageInput"
                 @change="onImageChange"
                 placeholder="Enter image"
               />
@@ -69,6 +72,9 @@
         <v-spacer></v-spacer>
         <button @click="addProduct" type="button" class="btn btn-outline-primary">
           Thêm sản phẩm
+        </button>
+        <button @click="closePopup" type="button" class="btn btn-outline-secondary">
+          Hủy
         </button>
       </v-card-actions>
     </v-card>
@@ -101,6 +107,24 @@ export default {
     onImageChange(e) {
       this.product.image = e.target.files[0];
     },
+
+    resetForm() {
+      this.product = {
+        name: "",
+        price: "",
+        note: "",
+        image: "",
+        category_id: "",
+        brand_id: "",
+      };
+      // Reset the file input
+      this.$refs.imageInput.value = "";
+    },
+
+    closePopup() {
+      this.resetForm();
+      this.$emit("close");
+    },
   },
 };
 </script>
@@ -115,6 +139,7 @@ export default {
   display: block;
   margin-right: 244px;
 }
+
 .required::after {
   content: "*";
   color: red;

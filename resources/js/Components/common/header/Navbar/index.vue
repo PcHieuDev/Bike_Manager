@@ -1,59 +1,57 @@
 <template>
   <div v-if="showNavbar" class="filter">
     <div class="category">
-      <div class="t-t-c">Tất Cả</div>
-      <img
-        class="ic-arrow-top"
-        alt="Ic arrow top"
-        src="https://c.animaapp.com/6fNIys5x/img/ic-arrow-top.svg"
-      />
-
-      <div class="overlap-group-2">
-        <div v-if="showBrands">
-          <div v-for="(brand, index) in brands" :key="index" class="mvnvbnv">
-            {{ brand.name }}
-          </div>
+      <div class="category-header" @click="toggleBrands">
+        <div class="text">Hãng Sản Xuất</div>
+        <img
+          class="ic-arrow-top"
+          :class="{ rotated: showBrands }"
+          alt="Ic arrow top"
+          src="https://c.animaapp.com/6fNIys5x/img/ic-arrow-top.svg"
+        />
+      </div>
+      <div v-if="showBrands" class="brands-list">
+        <div v-for="(brand, index) in brands" :key="index" class="brand-item">
+          {{ brand.name }}
         </div>
-        <div class="text-wrapper-5">Hãng Sản Xuất</div>
       </div>
     </div>
     <img class="line" alt="Line" src="https://c.animaapp.com/6fNIys5x/img/line-1.svg" />
 
     <div class="category-2">
-      <div class="overlap-group-2">
-        <div class="text-wrapper-5">Danh Mục</div>
+      <div class="category-header" @click="toggleCategories">
+        <div class="text">Danh Mục</div>
+        <img
+          class="ic-arrow-top"
+          :class="{ rotated: showCategories }"
+          alt="Ic arrow top"
+          src="https://c.animaapp.com/6fNIys5x/img/ic-arrow-top-1.svg"
+        />
       </div>
-      <div
-        v-for="(category, index) in categories"
-        :key="index"
-        v-if="showCategories"
-        class="category-item"
-      >
-        <div class="t">
+      <div v-if="showCategories" class="categories-list">
+        <div
+          v-for="(category, index) in categories"
+          :key="index"
+          class="category-item"
+          @click="selectCategory(category.id)"
+        >
           {{ category.name }}
         </div>
       </div>
-      <div class="t-t-c">Tất Cả</div>
-      <img
-        class="ic-arrow-top"
-        alt="Ic arrow top"
-        style="cursor: pointer"
-        src="https://c.animaapp.com/6fNIys5x/img/ic-arrow-top-1.svg"
-        @click="toggleCategories"
-      />
+      <!-- <div class="all-categories" @click="selectCategory(null)">Tất Cả</div> -->
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import { get } from "lodash";
 
 export default {
   name: "Filter",
   data() {
     return {
-      categories: [], // Khai báo mảng categories để lưu danh sách danh mục
+      categories: [],
+      brands: [],
       showCategories: true,
       showBrands: false,
     };
@@ -64,14 +62,26 @@ export default {
     },
   },
   mounted() {
-    this.getListCategory(); // Gọi hàm getListCategory khi component được mount
+    this.getListCategory();
+    this.getListBrand();
+    this.showBrands = true;
   },
   methods: {
     getListCategory() {
       axios
         .get("http://127.0.0.1:8000/api/categories")
         .then((response) => {
-          this.categories = response.data.contents; // Gán dữ liệu categories từ API
+          this.categories = response.data.contents;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    getListBrand() {
+      axios
+        .get("http://127.0.0.1:8000/api/brands")
+        .then((response) => {
+          this.brands = response.data.contents;
         })
         .catch((error) => {
           console.log(error);
@@ -83,125 +93,78 @@ export default {
     toggleCategories() {
       this.showCategories = !this.showCategories;
     },
+    toggleBrands() {
+      this.showBrands = !this.showBrands;
+    },
   },
 };
 </script>
 
-<style>
+<style scoped>
 .filter {
   background-color: #ffffff;
-  height: 916px;
-  left: 0;
+  height: 100vh; /* Full viewport height */
+  position: fixed; /* Fixed position */
+  top: 0; /* Align to the top */
+  left: 0; /* Align to the left */
+  width: 269px; /* Width of the sidebar */
+  overflow-y: auto; /* Enable vertical scrolling if the content exceeds the height */
+  border-right: 1px solid #e0e0e0; /* Right border */
+  padding: 20px;
+  top: 25px;
+  padding-top: 64px; /* Add top padding to account for the top bar */
+}
+
+.category,
+.category-2 {
+  margin-bottom: 20px; /* Space between categories */
+}
+
+.category-header {
   display: flex;
-  position: absolute;
-  top: 64px;
-  width: 269px;
-}
-
-.filter .category {
-  height: 84px;
-  left: 35px;
-  position: absolute;
-  top: 318px;
-  width: 201px;
-}
-
-.filter .category-item {
-  position: relative;
-}
-
-.mvnvbnv {
-  color: #000000;
-  font-family: "Roboto", Helvetica;
-  font-size: 16px;
-  font-weight: 400;
-  height: 42px;
-  left: 1px;
-  letter-spacing: 0;
-  line-height: 14.2px;
-  position: absolute;
-}
-
-.filter .t-t-c {
-  color: var(--blue);
-  font-family: "Roboto", Helvetica;
-  font-size: 16px;
-  font-weight: 700;
-  height: 42px;
-  left: 0;
-  letter-spacing: 0;
-  line-height: 14.2px;
-  position: absolute;
-  top: 42px;
-  width: 197px;
-}
-
-.filter .overlap-group-2 {
-  height: 42px;
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 197px;
-}
-
-.filter .text-wrapper-5 {
-  color: #000000;
-  font-family: "Roboto", Helvetica;
-  font-size: 16px;
-  font-weight: 400;
-  height: 42px;
-  left: 0;
-  letter-spacing: 0;
-  line-height: 14.2px;
-  position: absolute;
-  top: 0;
-  width: 197px;
-}
-
-.filter .ic-arrow-top {
-  height: 16px;
-  left: 167px;
-  position: absolute;
-  top: 10px;
-  width: 16px;
-}
-
-.filter .line {
-  height: 1px;
-  left: 0;
-  object-fit: cover;
-  position: absolute;
-  top: 275px;
-  width: 269px;
-}
-
-.filter .category-2 {
-  height: 210px;
-  left: 43px;
-  position: absolute;
-  top: 38px;
-  width: 208px;
-  height: auto;
-}
-
-.filter .t {
-  color: #000000;
-  font-family: "Roboto", Helvetica;
-  font-size: 16px;
-  font-weight: 400;
-  height: 42px;
-  left: 1px;
-  letter-spacing: 0;
-  line-height: 14.2px;
-  position: absolute;
-  top: 84px;
-  width: 197px;
+  justify-content: space-between;
+  align-items: center;
   cursor: pointer;
 }
 
-.filter .category-item .t {
-  position: relative;
-  left: 0;
-  width: 100%; /* Phần tử con chiếm toàn bộ chiều rộng của phần tử cha */
+.category-header .text {
+  font-size: 16px;
+  font-weight: 700;
+  color: #000;
+}
+
+.ic-arrow-top {
+  transition: transform 0.3s;
+}
+
+.ic-arrow-top.rotated {
+  transform: rotate(180deg);
+}
+
+.brands-list,
+.categories-list {
+  margin-top: 10px;
+}
+
+.brand-item,
+.category-item,
+.all-categories {
+  padding: 10px 0;
+  font-size: 16px;
+  font-weight: 400;
+  color: #000;
+  cursor: pointer;
+}
+
+.brand-item:hover,
+.category-item:hover,
+.all-categories:hover {
+  color: var(--blue);
+}
+
+.line {
+  width: 100%;
+  margin: 20px 0;
+  object-fit: cover;
 }
 </style>

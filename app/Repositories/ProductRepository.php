@@ -35,17 +35,24 @@ class ProductRepository implements ProductRepositoryInterface
         return null;
     }
 
-    public function getByBrand($brandId)
+
+    // public function getByBrand($brandId)
+    // {
+    //     return Product::with('brand')
+    //         ->where('brand_id', $brandId)
+    //         ->get();
+    // }
+    // public function getByCategory($categoryId)
+    // {
+    //     return Product::with('brand')
+    //         ->where('category_id', $categoryId)
+    //         ->get();
+    // }
+    public function getBybrand($brandId)
     {
-        return Product::with('brand', 'category')
+        return Product::with('brand')
             ->where('brand_id', $brandId)
-            ->get();
-    }
-    public function getByCategory($categoryId)
-    {
-        return Product::with('brand', 'category')
-            ->where('category_id', $categoryId)
-            ->get();
+            ->get();                                                    
     }
 
     public function paginate($page, $size, $keyword)

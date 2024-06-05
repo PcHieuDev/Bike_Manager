@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Response;
+use App\Exceptions\ErrorRegisteringUserException;
+use App\Exceptions\ErrorLoginException;
+use App\Exceptions\ErrorLogoutException;
+
 
 
 
@@ -30,7 +34,7 @@ class AuthController extends Controller
                 return response()->json(['error' => 'Unauthenticated'], Response::HTTP_UNAUTHORIZED);
             }
         } catch (\Exception $e) {
-            throw $e;
+            throw new ErrorLoginException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -45,7 +49,7 @@ class AuthController extends Controller
 
             return response()->json(['message' => 'User created'], 201);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 401);
+            throw new ErrorRegisteringUserException($e->getMessage(), $e->getCode(), $e); 
         }
     }
 
@@ -55,8 +59,7 @@ class AuthController extends Controller
             $request->user()->token()->revoke();
             return response()->json(['message' => 'User logged out'], Response::HTTP_OK);
         } catch (\Exception $e) {
-            // Throw the exception again so it can be handled by the exception handler
-            throw $e;
+            throw new ErrorLogoutException($e->getMessage(), $e->getCode(), $e);
         }
     }
 }

@@ -1,5 +1,5 @@
 <?php
-    
+
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -7,6 +7,12 @@ use Throwable;
 use Illuminate\Http\Response;
 use App\Exceptions\ProductDeletionException;
 use App\Exceptions\ProductNotFoundException;
+use App\Exceptions\ErrorRegisteringUserException;
+use App\Exceptions\ErrorFindingProductException;
+use App\Exceptions\ErrorUpdatingProductException;
+use App\Exceptions\ErrorLoginException;
+use App\Exceptions\ErrorLogoutException;
+use App\Exceptions\ErrorSavingProductException;
 
 class Handler extends ExceptionHandler
 {
@@ -56,14 +62,50 @@ class Handler extends ExceptionHandler
                 'status' => Response::HTTP_NOT_FOUND
             ], Response::HTTP_NOT_FOUND);
         }
-
         if ($exception instanceof ProductDeletionException) {
             return response()->json([
                 'message' => __('messages.errors.error_deleting_product'),
                 'status' => Response::HTTP_INTERNAL_SERVER_ERROR
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+        if ($exception instanceof ErrorRegisteringUserException) {
+            return response()->json([
+                'message' => __('messages.errors.error_registering_user'),
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+        if ($exception instanceof ErrorFindingProductException) {
+            return response()->json([
+                'message' => __('messages.error_finding_product'),
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+        if ($exception instanceof ErrorUpdatingProductException) {
+            return response()->json([
+                'message' => __('messages.error_updating_product'),
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+        if ($exception instanceof ErrorLoginException) {
+            return response()->json([
+                'message' => __('messages.error_login'),
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+        if ($exception instanceof ErrorLogoutException) {
+            return response()->json([
+                'message' => __('messages.error_logout'),
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+        if ($exception instanceof ErrorSavingProductException) {
+            return response()->json([
+                'message' => __('messages.errors.error_saving_product'),
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
-        return parent::render($request, $exception);
+
+        throw new \RuntimeException("An error occurred");
     }
 }

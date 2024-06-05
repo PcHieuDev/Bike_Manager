@@ -16,8 +16,7 @@
             </div>
             <div class="div-7">{{ product.name }}</div>
             <div class="div-8">
-              Danh mục:
-              {{ product.category ? product.category.name : "" }}
+              Danh mục: {{ product.category ? product.category.name : "" }}
             </div>
             <div class="div-9">
               Hãng sản xuất: {{ product.brand ? product.brand.name : "" }}
@@ -36,25 +35,27 @@
     </div>
     <div class="div-13">gợi ý cho bạn:</div>
     <div class="container">
-      <div class="div-14" v-for="item in randomProducts" :key="item.id">
-        <div class="div-15">
-          <div class="column-3">
-            <div class="div-16">
-              <img
-                style="height: 146px; width: 237px"
-                loading="lazy"
-                :src="item.image"
-                class="mg-3"
-              />
-              <div class="div-17">{{ item.name }}</div>
-              <div class="div-18">{{ item.price }}</div>
+      <div class="product-list">
+        <template v-for="item in randomProducts" :key="item.id">
+          <router-link :to="`/product/details/${item.id}`" style="text-decoration: none">
+            <div class="column-4">
+              <div class="div-19">
+                <img
+                  :src="item.image"
+                  style="height: 140px; width: 227px"
+                  class="product-image"
+                />
+                <div class="product-details">
+                  <span class="product-name">{{ item.name }}</span>
+                  <span class="product-price">$ {{ item.price }}</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </router-link>
+        </template>
       </div>
     </div>
   </div>
-
   <div v-if="isLoading" class="loading-page">
     <v-progress-circular indeterminate color="primary"></v-progress-circular>
   </div>
@@ -63,14 +64,18 @@
 <script>
 import axios from "axios";
 import { BASE_URL } from "../../configUrl.js";
+import "vue-slick-carousel/dist/vue-slick-carousel.css";
+import "vue-slick-carousel/dist/vue-slick-carousel-theme.css";
+import VueSlickCarousel from "vue-slick-carousel";
 
 export default {
   data() {
     return {
+      item: null,
       isLoading: false,
       itemsPerPage: 12,
       countRercord: 0,
-
+      productId: this.$route.params.id,
       products: [],
       product: {
         name: "",
@@ -82,56 +87,58 @@ export default {
       },
       categories: [],
       brands: [],
-
-      productId: this.$route.params.id,
     };
   },
   mounted() {
-    this.getProductDetails();
+    this.fetchProductDetails();
   },
-  computed:{
-    randomProducts() {
-    let productsCopy = [...this.products];
-    let result = [];
-    for (let i = 0; i < 3; i++) {
-      if (productsCopy.length > 0) {
-        let randomIndex = Math.floor(Math.random() * productsCopy.length);
-        result.push(productsCopy[randomIndex]);
-        productsCopy.splice(randomIndex, 1);
+  watch: {
+    "$route.params.id": function (newId, oldId) {
+      if (newId !== oldId) {
+        this.fetchProductDetails();
       }
-    }
-    return result;
-  }
-},
-  
+    },
+  },
+  computed: {
+    randomProducts() {
+      let productsCopy = [...this.products];
+      let result = [];
+      for (let i = 0; i < 3; i++) {
+        if (productsCopy.length > 0) {
+          let randomIndex = Math.floor(Math.random() * productsCopy.length);
+          result.push(productsCopy[randomIndex]);
+          productsCopy.splice(randomIndex, 1);
+        }
+      }
+      return result;
+    },
+  },
   created() {
     this.getProducts();
   },
-
   methods: {
     goHome() {
       this.$router.push("/");
     },
-
-    getProductDetails() {
-      const id = this.$route.params.id; // lấy id từ route
+    fetchProductDetails() {
+      const id = this.$route.params.id;
+      this.isLoading = true;
       axios
         .get(BASE_URL + `products/${id}`)
         .then((response) => {
           if (response.data) {
             this.product = response.data.product;
-            console.log(this.product.category.name);
-            console.log(this.product);
           } else {
-            // Xử lý trường hợp dữ liệu trả về null ở đây
             console.log("No data returned from API");
           }
         })
         .catch((error) => {
           console.error(error);
+        })
+        .finally(() => {
+          this.isLoading = false;
         });
     },
-
     async getProducts() {
       this.isLoading = true;
       let url = BASE_URL + "productsFree";
@@ -144,7 +151,6 @@ export default {
         .then((response) => {
           this.products = response.data.contents;
           this.countRercord = Math.ceil(response.data.count / this.itemsPerPage);
-          console.log(this.products);
         })
         .catch((error) => {
           console.log(error);
@@ -154,22 +160,28 @@ export default {
         });
     },
   },
+  beforeRouteUpdate(to, from, next) {
+    this.productId = to.params.id;
+    this.fetchProductDetails();
+    next();
+  },
 };
 </script>
 
 <style scoped>
+.product-list {
+  padding-left: 0px;
+}
 .container {
   display: flex;
   flex-direction: row;
-  justify-content: space-between; /* Tùy chọn: để các phần tử cách đều nhau */
+  justify-content: space-between; /* Optional: space items evenly */
   padding-top: 5px;
 }
-
 .div-14 {
-  flex: 1; /* Điều chỉnh chiều rộng của mỗi phần tử theo ý muốn */
-  margin: 0 2px; /* Tùy chọn: thêm khoảng cách giữa các phần tử */
+  flex: 1; /* Adjust width of each item as needed */
+  margin: 0 2px; /* Optional: add space between items */
 }
-
 .div-15,
 .column-3,
 .div-16 {

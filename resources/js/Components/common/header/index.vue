@@ -17,10 +17,10 @@
       <div class="custom-profile">
         <template v-if="user">
           <span class="mr-2">{{ user.name }}</span>
-          <button @click="handleLogout" class="btn btn-success">Logout</button>
+          <button @click="handleLogout" class="btn btn-custom">Logout</button>
         </template>
         <template v-else>
-          <RouterLink to="/Login" class="btn btn-success"> Login </RouterLink>
+          <RouterLink to="/Login" class="btn btn-custom"> Login </RouterLink>
         </template>
       </div>
     </div>
@@ -123,9 +123,10 @@ export default {
   background-color: transparent;
   height: 64px;
   left: 0;
-  position: absolute;
+  position: fixed; /* Changed from absolute to fixed */
   top: 0;
   width: 100%;
+  z-index: 1000; /* Added to ensure the header stays on top */
 }
 
 .header .overlap {
@@ -214,5 +215,21 @@ export default {
   position: absolute;
   top: 14px;
   width: 34px;
+}
+
+.header .btn-custom {
+  background-color: white;
+  color: #00ade8;
+  border: 2px solid #00ade8;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.header .btn-custom:hover {
+  background-color: #00ade8;
+  color: white;
 }
 </style>

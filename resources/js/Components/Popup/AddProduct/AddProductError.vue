@@ -24,6 +24,14 @@ export default {
 
   methods: {
     closePopup() {
+      this.product = {
+        name: "",
+        price: "",
+        note: "",
+        image: "",
+        category_id: "",
+        brand_id: "",
+      };
       this.$emit("close");
     },
   },

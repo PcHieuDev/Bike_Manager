@@ -813,7 +813,8 @@ body {
     letter-spacing: 0.35px;
     text-transform: capitalize;
     margin-top: 48px;
-    font: 600 14px/150% Open Sans, sans-serif;
+    font-family: none;
+    font-weight:bold;
 }
 
 @media (max-width: 991px) {

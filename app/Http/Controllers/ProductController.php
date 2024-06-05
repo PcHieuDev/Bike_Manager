@@ -10,8 +10,12 @@ use App\Http\Traits\HttpResponseCode;
 use Illuminate\Support\Facades\Storage;
 use App\Exceptions\ProductNotFoundException;
 use App\Exceptions\ProductDeletionException;
+use App\Exceptions\ErrorFindingProductException;
+use App\Exceptions\ErrorUpdatingProductException;
+use App\Exceptions\ErrorSavingProductException;
 use Illuminate\Http\Response;
 use App\Constants\Constants;
+use Illuminate\Support\Facades\Log;
 use App\Helpers\ArrayHelper;
 use lang\en\Message;
 use App\Models\ProductImage;
@@ -40,17 +44,14 @@ class ProductController extends Controller
             ]
         );
     }
-    public function getByBrand($brandId)
-    {
-        $products = $this->productRepository->getByBrand($brandId);
-        return response()->json($products, 200);
-    }
+    
+    
 
-    public function getByCategory($categoryId)
-    {
-        $products = $this->productRepository->getByCategory($categoryId);
-        return response()->json($products, 200);
-    }
+    // public function getByCategory($categoryId)
+    // {
+    //     $products = $this->productRepository->getByCategory($categoryId);
+    //     return response()->json($products, 200);
+    // }
 
     public function getData(Request $request)
     {
@@ -68,46 +69,64 @@ class ProductController extends Controller
         ]);
     }
 
-    public function search(Request $request)
-    {
-        $query = $request->input('query');
-        $categoryName = $request->input('categoryName');
-        $brandName = $request->input('brandName');
-        $products = $this->productRepository->search($query, $categoryName, $brandName);
-        return response()->json($products);
-    }
+    // public function search(Request $request)
+    // {
+    //     $query = $request->input('query');
+    //     $categoryName = $request->input('categoryName');
+    //     $brandName = $request->input('brandName');
+    //     $products = $this->productRepository->search($query, $categoryName, $brandName);
+    //     return response()->json($products);
+    // }
+public function search(Request $request)
+{
+    $validated = $request->validate([
+        'query' => 'required|string',
+        'categoryName' => 'required|string',
+        'brandName' => 'required|string',
+    ]);
 
-    public function saveProduct(ProductRequest $request)
+    $query = $validated['query'];
+    $categoryName = $validated['categoryName'];
+    $brandName = $validated['brandName'];
+    $products = $this->productRepository->search($query, $categoryName, $brandName);
+    return response()->json($products);
+}
+
+    public function createProduct(ProductRequest $request)
     {
         try {
+            $data = $request->all();
             $image = $request->file('image');
             if ($image) {
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
                 $image->storeAs('public/images', $imageName);
-                $imagePath = '/storage/images/' . $imageName;
+                $data['image'] = '/storage/images/' . $imageName;
             } else {
-                $imagePath = '';
+                $data['image'] = '';
             }
-            $this->productRepository->create([
-                'name' => $request->input('name'),
-                'note' => $request->input('note'),
-                'price' => $request->input('price'),
-                'category_id' => $request->input('category_id'),
-                'brand_id' => $request->input('brand_id'),
-                'image' => $imagePath
-            ]);
+            $this->productRepository->create($data);
             return response()->json([
                 'message' => __('messages.product_saved'),
-                'status' => $this->ok()
+                'status' => $this->ok(),
+                'product' => $data
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => __('messages.error_saving_product'),
-                'status' => $this->internalServerError()
-            ]);
+            throw new ErrorSavingProductException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
+public function getByBrand($brandId)
+{
+    
+    $products = $this->productRepository->getByBrand($brandId);
+    return response()->json([
+        'products' => $products,
+        'message' => __('messages.success.product_found'),
+        'status' => $this->ok()
+
+    ]);
+}
+ 
     public function updateProduct(ProductRequest $request, $id)
     {
         try {
@@ -150,39 +169,27 @@ class ProductController extends Controller
                 'status' => $this->ok()
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => __('messages.error_updating_product'),
-                'status' => $this->internalServerError()
-            ]);
+           throw new ErrorUpdatingProductException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
-    public function update(ProductRequest $request, $id)
-    {
-        return $this->updateProduct($request, $id);
-    }
+    // public function update(ProductRequest $request, $id)
+    // {
+    //     return $this->updateProduct($request, $id);
+    // }
 
     public function show($id)
     {
         try {
             $product = $this->productRepository->find($id);
-            if ($product) {
-                return response()->json([
-                    'product' => $product,
-                    'message' => __('messages.product_found'),
-                    'status' => $this->ok()
-                ]);
-            } else {
-                return response()->json([
-                    'message' => __('messages.product_not_found'),
-                    'status' => $this->notFound()
-                ]);
-            }
-        } catch (\Exception $e) {
+    
             return response()->json([
-                'message' => __('messages.error_finding_product'),
-                'status' => $this->internalServerError()
+                'product' => $product,
+                'message' => $product ? __('messages.product_found') : __('messages.product_not_found'),
+                'status' => $product ? $this->ok() : $this->notFound()
             ]);
+        } catch (\Exception $e) {
+           throw new ErrorFindingProductException($e->getMessage(), $e->getCode(), $e);            
         }
     }
 
@@ -202,6 +209,5 @@ class ProductController extends Controller
             throw new ProductDeletionException($e->getMessage(), $e->getCode(), $e);
         }
     }
-
 
 }

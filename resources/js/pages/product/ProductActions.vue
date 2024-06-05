@@ -33,6 +33,7 @@
   <AddProductDialog
     v-model="isShowDialog"
     @submit="addProduct"
+    @close="isShowDialog = false"
     :categories="categories"
     :brands="brands"
   >
@@ -81,6 +82,7 @@ import AddProductError from "../../Components/Popup/AddProduct/AddProductError.v
 import Popupaddmissing from "../../Components/Popup/AddProduct/AddproductMissing.vue";
 import { BASE_URL } from "../../configUrl.js";
 import SearchBar from "../../Components/common/header/SearchBar.vue";
+import { validateProduct } from "../../validateProduct.js";
 
 export default {
   name: "list",
@@ -196,42 +198,10 @@ export default {
 
     addProduct(product) {
       // Kiểm tra xem các trường bắt buộc có bị thiếu không
-      if (
-        !product.name ||
-        !product.price ||
-        !product.category_id ||
-        !product.brand_id ||
-        !product.image
-      ) {
+      if (!validateProduct(product)) {
         this.AddMissing = true;
         return;
-      } else {
-        this.AddMissing = false;
       }
-
-      // Kiểm tra xem giá sản phẩm có phải là số không
-      if (isNaN(product.price)) {
-        alert("Giá sản phẩm phải là số");
-        return;
-      }
-
-      // Chuyển đổi giá sản phẩm thành số thập phân
-      const price = parseFloat(product.price);
-
-      // Kiểm tra xem giá sản phẩm có nằm trong phạm vi mong muốn không
-      if (price <= 0 || price > 1000000000 || price < 10000) {
-        alert(
-          "Giá sản phẩm phải lớn hơn 0, nhỏ hơn hoặc bằng 1000000000 và lớn hơn hoặc bằng 10000"
-        );
-        return;
-      }
-
-      // Kiểm tra xem note có quá 500 ký tự không
-      if (product.note && product.note.length > 500) {
-        alert("Note không được quá 500 ký tự");
-        return;
-      }
-
       const formData = new FormData();
       formData.append("name", product.name);
       formData.append("note", product.note || ""); // Đảm bảo note luôn có giá trị để tránh lỗi
@@ -240,7 +210,6 @@ export default {
       formData.append("brand_id", product.brand_id);
       formData.append("image", product.image);
       let token = localStorage.getItem("token");
-
       axios
         .post(BASE_URL + "saveProduct", formData, {
           headers: {
@@ -249,9 +218,7 @@ export default {
           },
         })
         .then((response) => {
-          console.log(response); // Ghi lại phản hồi của API
           this.afterAddProduct = true;
-          // this.$router.push(`/products/${newProductId}`);
         })
         .catch((error) => {
           console.log(error);
@@ -259,7 +226,14 @@ export default {
         .finally(() => {
           this.isShowDialog = false;
           this.page = 1;
-          this.getProducts();
+          setTimeout(() => {
+            this.getProducts().then(() => {
+              if (this.products.length > 0) {
+                console.log(this.products[0].id); // In ra id của sản phẩm đầu tiên trong mảng products
+                this.$router.push(`/product/details/${this.products[0].id}`); // Chuyển hướng đến trang /product/details/$product.id sau 1 giây
+              }
+            });
+          }, 800);
         });
     },
 

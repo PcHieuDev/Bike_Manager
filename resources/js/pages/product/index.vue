@@ -26,14 +26,14 @@ export default {
     async getProducts() {
       var token = localStorage.getItem("token");
       this.isLoading = true;
-      let url = BASE_URL + "products";
+      let url = BASE_URL + "productsFree";
       await axios
         .get(url, {
           params: {
             page: this.page,
             keyword: this.keyword,
           },
-          headers: { Authorization: `Bearer ${token}` },
+          // headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
           this.products = response.data.contents;
