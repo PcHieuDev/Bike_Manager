@@ -106,6 +106,6 @@ class Handler extends ExceptionHandler
         }
 
 
-        throw new \RuntimeException("An error occurred");
+        throw new \RuntimeException("An error occurred: ". $exception);
     }
 }

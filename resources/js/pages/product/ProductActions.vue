@@ -8,7 +8,10 @@
     >
       Thêm sản phẩm
     </button>
-    <SearchBar @handleSearch="handleSearch"></SearchBar>
+    <SearchBar
+      @handleSearch="debouncedSetSearchTermAndFetch"
+      @clear="clearSearchTerm"
+    ></SearchBar>
   </div>
   <!-- List san pham -->
   <ProductItem
@@ -68,10 +71,12 @@
   <!-- popup AddMissing -->
   <Popupaddmissing v-model="AddMissing" @close="AddMissing = false"></Popupaddmissing>
   <!-- popup AddMissing -->
+
+  <!-- popup NoProducts -->
+  <NoProducts v-model="noProductsFound" @close="noProductsFound = false"></NoProducts>
 </template>
 
 <script>
-import axios from "axios";
 import ProductItem from "../../Components/ProductActions/ProductItem.vue";
 import Paginate from "vuejs-paginate";
 import AddProductDialog from "../../Components/ProductActions/AddProductDialog.vue";
@@ -80,9 +85,13 @@ import PopupDeleteSuccess from "../../Components/Popup/DeleteProduct/PopupDelete
 import PopupBeforeDelete from "../../Components/Popup/DeleteProduct/PopupBeforeDelete.vue";
 import AddProductError from "../../Components/Popup/AddProduct/AddProductError.vue";
 import Popupaddmissing from "../../Components/Popup/AddProduct/AddproductMissing.vue";
-import { BASE_URL } from "../../configUrl.js";
+import NoProducts from "../../Components/Popup/Search/noProduct.vue";
+import apiClient from "../../axios-interceptor";
+import debounce from "lodash/debounce";
+
 import SearchBar from "../../Components/common/header/SearchBar.vue";
 import { validateProduct } from "../../validateProduct.js";
+import { toast } from "vue3-toastify";
 
 export default {
   name: "list",
@@ -96,10 +105,14 @@ export default {
     AddProductError,
     Popupaddmissing,
     SearchBar,
+    NoProducts,
   },
 
   data() {
     return {
+      noProductsFound: false,
+      user: null,
+      productId: null,
       products: [],
       page: 1,
       totalPages: null,
@@ -113,6 +126,7 @@ export default {
       beforeDelete: false,
       AddError: false,
       AddMissing: false,
+      NoProducts: false,
       afterDelete: false,
       editproduct: false,
       productIdDelete: null,
@@ -136,6 +150,9 @@ export default {
       this.getProducts();
     },
   },
+  created() {
+    this.debouncedSetSearchTermAndFetch = debounce(this.setSearchTermAndFetch, 1000);
+  },
 
   mounted() {
     this.getProducts();
@@ -147,6 +164,49 @@ export default {
   },
 
   methods: {
+    handleInput(event) {
+      const searchTerm = event.target.value;
+      this.debouncedSetSearchTermAndFetch(searchTerm);
+    },
+    clearSearchTerm() {
+      this.setSearchTerm("");
+      this.searchTerm = "";
+      this.getProducts();
+    },
+    setSearchTermAndFetch(searchTerm) {
+      // Xác thực searchTerm
+      if (searchTerm === null || /^\s+$/.test(searchTerm)) {
+        // Nếu searchTerm là null hoặc chỉ chứa dấu cách, hiển thị thông báo không tìm thấy sản phẩm
+        this.noProductsFound = true;
+        return;
+      } else if (/[!@#$%^&*(),.?":{}|<>]/.test(searchTerm)) {
+        // Nếu searchTerm chứa ký tự đặc biệt, hiển thị toast thông báo không được nhập ký tự đặc biệt
+        toast.error("Không được nhập ký tự đặc biệt");
+        return;
+      }
+
+      // Nếu không phải các trường hợp trên, thực hiện việc gán searchTerm và fetchProducts
+      this.searchTerm = searchTerm;
+      this.getProducts()
+        .then(() => {
+          // Kiểm tra nếu không có sản phẩm được tìm thấy, hiển thị thông báo toast
+          if (this.products.length === 0) {
+            this.noProductsFound = true;
+          }
+        })
+        .catch((error) => {
+          // Xử lý lỗi nếu cần
+          console.error("Error fetching products:", error);
+        });
+    },
+    debouncedSetSearchTermAndFetch(searchTerm) {
+      this.debouncedSearch(searchTerm);
+    },
+
+    clearSearchTerm() {
+      this.searchTerm = "";
+      this.getProducts();
+    },
     showModalDelete(id) {
       console.log(id);
       this.beforeDelete = true;
@@ -156,27 +216,26 @@ export default {
     openEditPopup() {
       this.editproduct = !this.editproduct;
     },
-    handleSearch(key) {
-      this.keyword = key;
-      this.page = 1;
-      this.getProducts();
-    },
+
     async getProducts() {
       var token = localStorage.getItem("token");
       this.isLoading = true;
-      let url = BASE_URL + "products";
-      await axios
+      let url = "products";
+      await apiClient
         .get(url, {
           params: {
             page: this.page,
-            keyword: this.keyword,
+            keyword: this.searchTerm,
           },
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
           this.products = response.data.contents;
+          this.totalRecords = response.data.count;
           this.countRercord = Math.ceil(response.data.count / this.itemsPerPage);
-          console.log(this.products);
+          this.noProductsFound = this.totalRecords === 0;
+
+          console.log(response.data.contents);
         })
         .catch((error) => {
           console.log(error);
@@ -210,14 +269,24 @@ export default {
       formData.append("brand_id", product.brand_id);
       formData.append("image", product.image);
       let token = localStorage.getItem("token");
-      axios
-        .post(BASE_URL + "saveProduct", formData, {
+      apiClient
+        .post("saveProduct", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
           },
         })
         .then((response) => {
+          this.getProducts();
+          const productId = response.data.product.id;
+          console.log(productId); // Đảm bảo rằng productId được log ra đúng
+          setTimeout(() => {
+            // Thiết lập this.afterAddProduct sau 1 giây
+            this.afterAddProduct = true;
+
+            // Chuyển hướng tới trang /product/details/:id
+            this.$router.push({ path: `/product/details/${productId}` });
+          }, 1000);
           this.afterAddProduct = true;
         })
         .catch((error) => {
@@ -226,14 +295,7 @@ export default {
         .finally(() => {
           this.isShowDialog = false;
           this.page = 1;
-          setTimeout(() => {
-            this.getProducts().then(() => {
-              if (this.products.length > 0) {
-                console.log(this.products[0].id); // In ra id của sản phẩm đầu tiên trong mảng products
-                this.$router.push(`/product/details/${this.products[0].id}`); // Chuyển hướng đến trang /product/details/$product.id sau 1 giây
-              }
-            });
-          }, 800);
+          this.getProducts();
         });
     },
 
@@ -242,8 +304,8 @@ export default {
     },
 
     getListCategory() {
-      axios
-        .get(BASE_URL + "categories")
+      apiClient
+        .get("categories")
         .then((response) => {
           this.categories = response.data.contents;
         })
@@ -253,8 +315,8 @@ export default {
     },
 
     getListBrands() {
-      axios
-        .get(BASE_URL + "brands")
+      apiClient
+        .get("brands")
         .then((response) => {
           this.brands = response.data.contents;
         })
@@ -264,8 +326,8 @@ export default {
     },
 
     searchProducts(query) {
-      axios
-        .get(BASE_URL + "search", {
+      apiClient
+        .get("search", {
           params: {
             query: query,
           },
@@ -279,9 +341,9 @@ export default {
     },
 
     deleteProduct() {
-      let url = BASE_URL + `delete_products/${this.productIdDelete}`;
+      let url = `delete_products/${this.productIdDelete}`;
       let token = localStorage.getItem("token");
-      axios
+      apiClient
         .delete(url, {
           headers: { Authorization: `Bearer ${token}` },
         })

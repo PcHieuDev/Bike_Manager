@@ -18,6 +18,18 @@ class Product extends Model
         'category_id'
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+    
+        // Đăng ký sự kiện deleting để xóa các bản ghi liên quan
+        static::deleting(function ($product) {
+            // Xóa tất cả các hình ảnh liên quan
+            $product->images()->delete();
+            // Thêm bất kỳ hành động xóa liên quan nào khác ở đây
+        });
+    }
+
 
     public function brand()
     {

@@ -1,70 +1,44 @@
 <template>
-  <div class="header-product d-flex justify-content-between">
-    <SearchBar @handleSearch="handleSearch"></SearchBar>
+  <div>
+    <div class="header-product d-flex justify-content-between">
+      <SearchBar @input="handleInput" @clear="clearSearchTerm"></SearchBar>
+    </div>
+    <!-- Product List -->
+    <ProductItem :products="products" :showButton="false"></ProductItem>
+
+    <!-- Pagination -->
+    <div class="text-xs-center">
+      <v-pagination
+        v-model="pageClient"
+        :length="totalPages"
+        :total-visible="5"
+      ></v-pagination>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div v-if="isLoading" class="loading-page">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    </div>
   </div>
-
-  <!-- productlisst -->
-  <ProductItem :products="products" :showButton="false"></ProductItem>
-  <!-- productlisst -->
-
-  <!-- button paginate -->
-  <div class="text-xs-center">
-    <v-pagination v-model="page" :length="countRercord" :total-visible="5"></v-pagination>
-  </div>
-  <!-- button paginate -->
-
-  <!--  loading page-->
-  <div v-if="isLoading" class="loading-page">
-    <v-progress-circular indeterminate color="primary"></v-progress-circular>
-  </div>
-  <!--  loading page-->
-
-  <!-- popup add ProductActions -->
-  <AddProductDialog
-    v-model="isShowDialog"
-    :product="product"
-    @addProduct="addProduct"
-  ></AddProductDialog>
-
-  <!-- Use PupupAddSuccess component -->
-  <PupupAddSuccess v-model="afterAddProduct"></PupupAddSuccess>
 </template>
 
 <script>
-import axios from "axios";
+import { mapState, mapGetters, mapActions } from "vuex";
+import debounce from "lodash/debounce";
 import ProductItem from "./ProductItem.vue";
-import Paginate from "vuejs-paginate";
 import SearchBar from "../common/header/SearchBar.vue";
-import AddProductDialog from "./AddProductDialog.vue";
-import PupupAddSuccess from "../Popup/AddProduct/PupupAddSuccess.vue";
-import { BASE_URL } from "../../configUrl.js";
+import { toast } from "vue3-toastify";
 
 export default {
-  name: "list",
   components: {
     ProductItem,
-    Paginate,
     SearchBar,
-    AddProductDialog,
-    PupupAddSuccess,
-    // SearchBar,
   },
-
   data() {
     return {
-      products: [],
-      page: 1,
-      totalPages: null,
-      countRercord: 0,
-      itemsPerPage: 12,
-      isLoading: false,
       isShowDialog: false,
-      addCucces: false,
       afterAddProduct: false,
-      showErrorPopup: false,
-      searchTerm: "",
-      currentCategoryId: null,
-      currentBrandName: "",
+      pageClient: this.page,
       product: {
         name: "",
         price: "",
@@ -73,103 +47,92 @@ export default {
         category_id: "",
         brand_id: "",
       },
-      categories: [],
-      brands: [],
-      keyword: "",
+      debouncedSearch: null, // Chứa hàm debounce
     };
   },
+  computed: {
+    ...mapState(["products", "totalPages", "page", "isLoading"]),
+    ...mapGetters(["products", "totalPages", "isLoading"]),
+  },
   watch: {
-    page(newData) {
-      this.page = newData;
-      this.getProducts();
+    pageClient(newPage) {
+      this.setPage(newPage);
+      this.fetchProducts();
+    },
+    "$route.query.brandId": {
+      immediate: true,
+      handler(newBrandId) {
+        if (newBrandId) {
+          this.changeBrand(newBrandId);
+        }
+      },
+    },
+    "$route.query.categoryId": {
+      immediate: true,
+      handler(newCategoryId) {
+        if (newCategoryId) {
+          this.changeCategory(newCategoryId);
+        }
+      },
     },
   },
-
   created() {
-    this.getProducts();
+    this.debouncedSearch = debounce(this.setSearchTermAndFetch, 1000);
+    this.fetchProducts();
   },
-  mounted() {
-    this.getListCategory();
-    this.getListBrands();
-    var token = localStorage.getItem("token");
-    var user = localStorage.getItem("user");
-    this.user = JSON.parse(localStorage.getItem("user"));
-  },
-
   methods: {
-    onChange(e) {
-      this.product.image = e.target.files[0];
+    ...mapActions([
+      "fetchProducts",
+      "setPage",
+      "setSearchTerm",
+      "setBrandId",
+      "setCategoryId",
+    ]),
+    handleInput(event) {
+      const searchTerm = event.target.value;
+      this.debouncedSearch(searchTerm);
     },
-    handleSearch(key) {
-      this.keyword = key;
-      this.page = 1;
-      this.getProducts();
+    clearSearchTerm() {
+      this.setSearchTerm("");
+      this.fetchProducts();
     },
-
-    async getProducts() {
-      this.isLoading = true;
-      let url = BASE_URL + "productsFree";
-      await axios
-        .get(url, {
-          params: {
-            page: this.page,
-            keyword: this.keyword,
-          },
-        })
-        .then((response) => {
-          this.products = response.data.contents;
-          this.countRercord = Math.ceil(response.data.count / this.itemsPerPage);
-          console.log(this.products);
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    onImageChange(e) {
-      this.product.image = e.target.files[0];
-    },
-
-    changeDialog() {
-      this.isShowDialog = !this.isShowDialog;
-    },
-
-    getListCategory() {
-      axios
-        .get(BASE_URL + "categories")
-        .then((response) => {
-          this.categories = response.data.contents;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-
-    getListBrands() {
-      axios
-        .get(BASE_URL + "brands")
-        .then((response) => {
-          this.brands = response.data.contents;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    selectCategory(categoryId) {
-      let category = this.categories.find((c) => c.id === categoryId);
-      if (category) {
-        this.currentCategoryName = category.name;
-        this.getProducts();
+    setSearchTermAndFetch(searchTerm) {
+      // Xác thực searchTerm
+      if (searchTerm === null || /^\s+$/.test(searchTerm)) {
+        // Nếu searchTerm là null hoặc chỉ chứa dấu cách, hiển thị thông báo không tìm thấy sản phẩm
+        toast.error("Không tìm thấy sản phẩm");
+        return;
+      } else if (/[!@#$%^&*(),.?":{}|<>]/.test(searchTerm)) {
+        // Nếu searchTerm chứa ký tự đặc biệt, hiển thị toast thông báo không được nhập ký tự đặc biệt
+        toast.error("Không được nhập ký tự đặc biệt");
+        return;
       }
+
+      // Nếu không phải các trường hợp trên, thực hiện việc gán searchTerm và fetchProducts
+      this.setSearchTerm(searchTerm);
+      this.fetchProducts()
+        .then(() => {
+          // Kiểm tra nếu không có sản phẩm được tìm thấy, hiển thị thông báo toast
+          if (this.products.length === 0) {
+            toast.error("Không tìm thấy sản phẩm");
+          }
+        })
+        .catch((error) => {
+          // Xử lý lỗi nếu cần
+          console.error("Error fetching products:", error);
+        });
     },
-    selectBrand(brandId) {
-      let brand = this.brands.find((b) => b.id === brandId);
-      if (brand) {
-        this.currentBrandName = brand.name;
-        this.getProducts();
-      }
+
+    changeBrand(brandId) {
+      this.setBrandId(brandId);
+    },
+    // addProduct(product) {
+    //   this.$store.dispatch("addProduct", product);
+    //   this.isShowDialog = false;
+    //   this.afterAddProduct = true;
+    // },
+    changeCategory(categoryId) {
+      this.setCategoryId(categoryId);
     },
   },
 };

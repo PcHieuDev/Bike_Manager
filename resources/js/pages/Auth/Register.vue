@@ -45,7 +45,7 @@
             </div>
             <div class="text-center">
               <button type="submit" class="btn btn-color px-5 mb-5 w-100">Đăng Ký</button>
-              <p class="canh-bao" v-if="error">{{ error }}</p>
+              <!-- <p class="canh-bao" v-if="error">{{ error }}</p> -->
             </div>
             <div id="emailHelp" class="form-text text-center mb-5 text-dark">
               Đã có tài khoản?
@@ -63,16 +63,20 @@
     @close="RegisterSucess = false"
   ></RegisterPopupSuccess>
   <!-- popup RegisterSucess -->
+
+  <!-- popup ErrorRegister -->
+  <ErrorRegister v-model="RegisterFail" @close="RegisterFail = false"></ErrorRegister>
 </template>
 
 <script>
-import axios from "axios";
 import RegisterPopupSuccess from "../../Components/Popup/Register/RegisterPopupSuccess.vue";
-import { BASE_URL } from "../../configUrl.js";
+import apiClient from "../../axios-interceptor.js";
+import ErrorRegister from "../../Components/Popup/Register/ErrorRegister.vue";
 export default {
   data() {
     return {
       RegisterSucess: false,
+      RegisterFail: false,
       user: {
         name: "",
         email: "",
@@ -83,22 +87,24 @@ export default {
   },
   components: {
     RegisterPopupSuccess,
+    ErrorRegister,
   },
   methods: {
     handleRegister() {
       // Kiểm tra tính hợp lệ của email và mật khẩu
-      if (!this.user.email.includes("@")) {
-        this.error = "email không hơp lệ";
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(this.user.email)) {
+        this.RegisterFail = true;
         return;
       }
 
       if (this.user.password.length < 6) {
-        this.error = "Password phải lớn hơn 6 kí tự";
+        this.RegisterFail = true;
         return;
       }
 
-      axios
-        .post(BASE_URL + "Register", this.user)
+      apiClient
+        .post("Register", this.user)
         .then((response) => {
           if (response.status === 201) {
             this.RegisterSucess = true;

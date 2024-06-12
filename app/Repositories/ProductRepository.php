@@ -35,46 +35,44 @@ class ProductRepository implements ProductRepositoryInterface
         return null;
     }
 
-
-    // public function getByBrand($brandId)
-    // {
-    //     return Product::with('brand')
-    //         ->where('brand_id', $brandId)
-    //         ->get();
-    // }
-    // public function getByCategory($categoryId)
-    // {
-    //     return Product::with('brand')
-    //         ->where('category_id', $categoryId)
-    //         ->get();
-    // }
     public function getBybrand($brandId)
     {
         return Product::with('brand')
             ->where('brand_id', $brandId)
-            ->get();                                                    
+            ->get();
     }
 
-    public function paginate($page, $size, $keyword)
+    public function paginate($page, $size, $keyword, $brandId, $categoryId)
     {
         $offset = ($page - 1) * $size;
         $query = Product::with('brand', 'category');
-    
-        if ($keyword != '') {
-            $query->where('name', 'like', "%$keyword%")
-                ->orWhereHas('category', function ($q) use ($keyword) {
-                    $q->where('name', 'like', "%$keyword%");
-                })
-                ->orWhereHas('brand', function ($q) use ($keyword) {
-                    $q->where('name', 'like', "%$keyword%");
-                });
+
+        if ($keyword) {
+            $query->where(function ($sql) use ($keyword) {
+                $sql->where('name', 'like', "%$keyword%")
+                    ->orWhereHas('category', function ($q) use ($keyword) {
+                        $q->where('name', 'like', "%$keyword%");
+                    })
+                    ->orWhereHas('brand', function ($q) use ($keyword) {
+                        $q->where('name', 'like', "%$keyword%");
+                    });
+            });
         }
-    
+
+        if ($brandId) {
+            $query->where('brand_id', $brandId);
+        }
+
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+
         return $query->orderBy('id', 'DESC')
             ->skip($offset)
             ->take($size)
             ->get();
     }
+
 
     public function search($query)
     {
@@ -89,7 +87,6 @@ class ProductRepository implements ProductRepositoryInterface
                     $q->where('name', 'like', "%$query%");
                 });
         }
-
         return $products->paginate(12);
     }
 
@@ -113,46 +110,45 @@ class ProductRepository implements ProductRepositoryInterface
         return Product::with('brand', 'category')->find($id);
     }
 
-    public function count($keyword = null)
+    public function count($keyword = null, $brandId, $categoryId)
     {
+        $query = Product::with('brand', 'category');
 
         if ($keyword != '') {
-            return Product::where('name', 'like', "%$keyword%")->count();
+            $query->where('name', 'like', "%$keyword%")
+                ->orWhereHas('brand', function ($query) use ($keyword) {
+                    $query->where('name', 'like', "%$keyword%");
+                })
+                ->orWhereHas('category', function ($query) use ($keyword) {
+                    $query->where('name', 'like', "%$keyword%");
+                });
         }
-        return Product::count();
+
+        if ($brandId != '') {
+            $query->where('brand_id', $brandId);
+        }
+
+        if ($categoryId != '') {
+            $query->where('category_id', $categoryId);
+        }
+        return $query->count();
     }
 
 
     public function saveProduct($request)
     {
-        $product = new Product();
-
-        if (isset($request->name)) {
-            $product->name = $request->name;
-        }
-
-        if (isset($request->price)) {
-            $product->price = $request->price;
-        }
-
-        if (isset($request->description)) {
-            $product->description = $request->description;
-        }
-
-        if (isset($request->image)) {
-            $product->image = $request->image;
-        }
-
-        $product->save();
+        $product = Product::create([
+            'name' => $request->name,
+            'price' => $request->price,
+            'brand_id' => $request->brand_id,
+            'category_id' => $request->category_id,
+            'image' => $request->image,
+            'note' => $request->note,
+            
+        ]);
+        $id = $product->id;
+        echo $id;
 
         return $product;
     }
-
-    
-
-   
-
-    
-
-
 }

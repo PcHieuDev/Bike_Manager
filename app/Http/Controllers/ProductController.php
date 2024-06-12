@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Log;
 use App\Helpers\ArrayHelper;
 use lang\en\Message;
 use App\Models\ProductImage;
-
+use Psy\Readline\Hoa\Console;
 
 class ProductController extends Controller
 {
@@ -40,28 +40,22 @@ class ProductController extends Controller
                 'products' => $products,
                 'message' => __('messages.success.product_found'),
                 'status' => $this->ok()
-
             ]
         );
     }
-    
-    
-
-    // public function getByCategory($categoryId)
-    // {
-    //     $products = $this->productRepository->getByCategory($categoryId);
-    //     return response()->json($products, 200);
-    // }
 
     public function getData(Request $request)
     {
         $inputs = $request->all();
         $page = ArrayHelper::getValue($inputs, 'page', Constants::DEFAULT_PAGE_NUMBER);
         $keyword = ArrayHelper::getValue($inputs, 'keyword', '');
+        $brandId = ArrayHelper::getValue($inputs, 'brandId', '');
+        $categoryId = ArrayHelper::getValue($inputs, 'categoryId', '');
         $size = ArrayHelper::getValue($inputs, 'size', Constants::DEFAULT_PAGE_SIZE);
-        $data = $this->productRepository->paginate($page, $size, $keyword);
+        $data = $this->productRepository->paginate($page, $size, $keyword, $brandId, $categoryId);
+
         // Sử dụng biến trung gian để lưu trữ kết quả của hàm count
-        $count = $this->productRepository->count($keyword);
+        $count = $this->productRepository->count($keyword, $brandId, $categoryId);
         return response()->json([
             'contents' => $data,
             'count' => $count,
@@ -69,28 +63,20 @@ class ProductController extends Controller
         ]);
     }
 
-    // public function search(Request $request)
-    // {
-    //     $query = $request->input('query');
-    //     $categoryName = $request->input('categoryName');
-    //     $brandName = $request->input('brandName');
-    //     $products = $this->productRepository->search($query, $categoryName, $brandName);
-    //     return response()->json($products);
-    // }
-public function search(Request $request)
-{
-    $validated = $request->validate([
-        'query' => 'required|string',
-        'categoryName' => 'required|string',
-        'brandName' => 'required|string',
-    ]);
+    public function search(Request $request)
+    {
+        $validated = $request->validate([
+            'query' => 'required|string',
+            'categoryName' => 'required|string',
+            'brandName' => 'required|string',
+        ]);
 
-    $query = $validated['query'];
-    $categoryName = $validated['categoryName'];
-    $brandName = $validated['brandName'];
-    $products = $this->productRepository->search($query, $categoryName, $brandName);
-    return response()->json($products);
-}
+        $query = $validated['query'];
+        $categoryName = $validated['categoryName'];
+        $brandName = $validated['brandName'];
+        $products = $this->productRepository->search($query, $categoryName, $brandName);
+        return response()->json($products);
+    }
 
     public function createProduct(ProductRequest $request)
     {
@@ -104,7 +90,9 @@ public function search(Request $request)
             } else {
                 $data['image'] = '';
             }
-            $this->productRepository->create($data);
+            $product = $this->productRepository->create($data); // Lưu kết quả vào biến $product
+            $data['id'] = $product->id; // Lấy id của sản phẩm mới được tạo
+
             return response()->json([
                 'message' => __('messages.product_saved'),
                 'status' => $this->ok(),
@@ -115,20 +103,21 @@ public function search(Request $request)
         }
     }
 
-public function getByBrand($brandId)
-{
-    
-    $products = $this->productRepository->getByBrand($brandId);
-    return response()->json([
-        'products' => $products,
-        'message' => __('messages.success.product_found'),
-        'status' => $this->ok()
-
-    ]);
-}
- 
-    public function updateProduct(ProductRequest $request, $id)
+    public function getByBrand($brandId)
     {
+
+        $products = $this->productRepository->getByBrand($brandId);
+        return response()->json([
+            'products' => $products,
+            'message' => __('messages.success.product_found'),
+            'status' => $this->ok()
+
+        ]);
+    }
+
+    public function update(ProductRequest $request, $id)
+    {
+
         try {
             // Tìm sản phẩm theo ID
             $product = $this->productRepository->find($id);
@@ -138,9 +127,22 @@ public function getByBrand($brandId)
                     'status' => $this->notFound()
                 ]);
             }
+
+            // Kiểm tra quyền truy cập nếu cần
+
             // Xử lý hình ảnh nếu có
-            $image = $request->file('image');
-            if ($image) {
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+
+                // Kiểm tra tính hợp lệ của hình ảnh
+                // Ví dụ: kiểm tra kiểu MIME, kích thước tệp, ...
+
+                // Tạo tên tệp mới
+                $imageName = time() . '.' . $image->getClientOriginalExtension();
+
+                // Di chuyển tệp vào thư mục lưu trữ
+                $image->move(public_path('storage/images'), $imageName);
+
                 // Xóa hình ảnh cũ nếu có
                 if ($product->image) {
                     $oldImagePath = public_path($product->image);
@@ -148,14 +150,15 @@ public function getByBrand($brandId)
                         unlink($oldImagePath);
                     }
                 }
-                // Lưu hình ảnh mới
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
-                $image->storeAs('public/images', $imageName);
+
+                // Cập nhật đường dẫn hình ảnh mới
                 $imagePath = '/storage/images/' . $imageName;
             } else {
-                $imagePath = $product->image; // Giữ nguyên hình ảnh cũ nếu không có hình ảnh mới
+                // Giữ nguyên đường dẫn hình ảnh cũ
+                $imagePath = $product->image;
             }
-            // Cập nhật sản phẩm
+
+            // Cập nhật thông tin sản phẩm
             $this->productRepository->update($id, [
                 'name' => $request->input('name'),
                 'note' => $request->input('note'),
@@ -164,32 +167,48 @@ public function getByBrand($brandId)
                 'brand_id' => $request->input('brand_id'),
                 'image' => $imagePath
             ]);
+
+            if ($request->hasFile('image_detail')) {
+                foreach ($request->file('image_detail') as $index => $image) {
+                    // Thêm chỉ số hoặc chuỗi ngẫu nhiên vào tên tệp để đảm bảo tính duy nhất
+                    $imageProductDetailName = time() . '_' . $index . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('storage/images'), $imageProductDetailName);
+                    $imageProductDetailPath = '/storage/images/' . $imageProductDetailName;
+                    ProductImage::create([
+                        'product_id' => $id,
+                        'image_path' => $imageProductDetailPath
+                    ]);
+                }
+            }
+
             return response()->json([
                 'message' => __('messages.product_updated'),
                 'status' => $this->ok()
             ]);
         } catch (\Exception $e) {
-           throw new ErrorUpdatingProductException($e->getMessage(), $e->getCode(), $e);
+            // Xử lý ngoại lệ
+            throw new ErrorUpdatingProductException($e->getMessage(), $e->getCode(), $e);
         }
     }
-
-    // public function update(ProductRequest $request, $id)
-    // {
-    //     return $this->updateProduct($request, $id);
-    // }
 
     public function show($id)
     {
         try {
             $product = $this->productRepository->find($id);
-    
+
+            $brandId = $product->brand->id; // Get brand id directly
+
+            $products = $this->productRepository->getByBrand($brandId);
+            $imageDetails = ProductImage::where('product_id', $id)->get();                                                  
             return response()->json([
                 'product' => $product,
                 'message' => $product ? __('messages.product_found') : __('messages.product_not_found'),
-                'status' => $product ? $this->ok() : $this->notFound()
+                'status' => $product ? $this->ok() : $this->notFound(),
+                'products' => $products,
+                'imageDetails' => $imageDetails
             ]);
         } catch (\Exception $e) {
-           throw new ErrorFindingProductException($e->getMessage(), $e->getCode(), $e);            
+            throw new ErrorFindingProductException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -209,5 +228,4 @@ public function getByBrand($brandId)
             throw new ProductDeletionException($e->getMessage(), $e->getCode(), $e);
         }
     }
-
 }

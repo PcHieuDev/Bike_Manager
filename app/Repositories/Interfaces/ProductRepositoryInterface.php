@@ -8,7 +8,7 @@ interface ProductRepositoryInterface
 {
     public function all($keyword = '');
 
-    public function paginate($page, $size, $keyword);
+    public function paginate($page, $size, $keyword, $brandId, $categoryId);
 
     public function search($query);
 
@@ -18,7 +18,7 @@ interface ProductRepositoryInterface
 
     public function find($id);
 
-    public function count($keyword = '');
+    public function count($keyword = '', $brandId, $categoryId);
 
     public function update($id, array $productData);
 

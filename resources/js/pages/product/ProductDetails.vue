@@ -29,7 +29,15 @@
           </div>
         </div>
         <div class="column-2">
-          <img :src="product.image" loading="lazy" class="mg-2" />
+          <v-carousel :show-arrows="false" class="carousel-tong">
+            <v-carousel-item
+              v-for="(item, i) in ProductImages"
+              :key="i"
+              :src="item.src"
+              cover
+              class="carousel-image"
+            ></v-carousel-item>
+          </v-carousel>
         </div>
       </div>
     </div>
@@ -63,14 +71,20 @@
 
 <script>
 import axios from "axios";
-import { BASE_URL } from "../../configUrl.js";
 import "vue-slick-carousel/dist/vue-slick-carousel.css";
 import "vue-slick-carousel/dist/vue-slick-carousel-theme.css";
 import VueSlickCarousel from "vue-slick-carousel";
+import VueCarousel from "vue-carousel";
+import apiClient from "../../axios-interceptor";
 
 export default {
+  components: {
+    VueSlickCarousel,
+    VueCarousel,
+  },
   data() {
     return {
+      brandId: null,
       item: null,
       isLoading: false,
       itemsPerPage: 12,
@@ -87,6 +101,17 @@ export default {
       },
       categories: [],
       brands: [],
+      ProductImages: [
+        {
+          src: "http://127.0.0.1:8000/storage/images/1717649634.png",
+        },
+        {
+          src: "http://127.0.0.1:8000/storage/images/1717648189.png",
+        },
+        {
+          src: "http://127.0.0.1:8000/storage/images/1717648746.png",
+        },
+      ],
     };
   },
   mounted() {
@@ -123,8 +148,8 @@ export default {
     fetchProductDetails() {
       const id = this.$route.params.id;
       this.isLoading = true;
-      axios
-        .get(BASE_URL + `products/${id}`)
+      apiClient
+        .get(`products/${id}`)
         .then((response) => {
           if (response.data) {
             this.product = response.data.product;
@@ -140,20 +165,21 @@ export default {
         });
     },
     async getProducts() {
+      const id = this.$route.params.id;
       this.isLoading = true;
-      let url = BASE_URL + "productsFree";
-      await axios
-        .get(url, {
-          params: {
-            keyword: this.keyword,
-          },
-        })
+      apiClient
+        .get(`products/${id}`)
         .then((response) => {
-          this.products = response.data.contents;
-          this.countRercord = Math.ceil(response.data.count / this.itemsPerPage);
+          if (response.data) {
+            this.products = response.data.products;
+            this.imageDetails = response.data.imageDetails;
+            console.log(this.imageDetails);
+          } else {
+            console.log("No data returned from API");
+          }
         })
         .catch((error) => {
-          console.log(error);
+          console.error(error);
         })
         .finally(() => {
           this.isLoading = false;
@@ -169,6 +195,16 @@ export default {
 </script>
 
 <style scoped>
+.carousel-tong {
+  width: 510px;
+  height: 316px !important;
+}
+.carousel-image img {
+  width: 510px !important;
+  height: 316px !important;
+  object-fit: cover; /* Đảm bảo ảnh được phủ kín mà không làm mất tỉ lệ */
+}
+
 .product-list {
   padding-left: 0px;
 }

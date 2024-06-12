@@ -75,8 +75,9 @@
   <!-- popup Login success -->
 </template>
 <script>
-import axios from "axios";
 import LoginPopupSuccess from "../../Components/Popup/Login/LoginPopupSuccess.vue";
+import apiClient from "../../axios-interceptor";
+import { BASE_URL } from "../../configUrl";
 
 export default {
   components: {
@@ -107,8 +108,8 @@ export default {
       }
 
       if (this.email !== "" && this.password !== "") {
-        axios
-          .post("/api/Login", {
+        apiClient
+          .post("Login", {
             email: this.email,
             password: this.password,
           })
@@ -123,16 +124,6 @@ export default {
             }, 1000);
           })
           .catch((error) => {
-            if (error.response) {
-              if (error.response.status === 401) {
-                // Unauthorized
-                this.errorMessage = "Email hoặc mật khẩu không đúng.";
-              } else {
-                this.errorMessage = "Đã xảy ra lỗi. Vui lòng thử lại.";
-              }
-            } else {
-              this.errorMessage = "Đã xảy ra lỗi. Vui lòng thử lại.";
-            }
             console.log(error);
           });
       }

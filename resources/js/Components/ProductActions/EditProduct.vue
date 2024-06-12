@@ -49,7 +49,7 @@
             ></textarea>
           </div>
           <div class="div-17">
-            <button class="div-18">Hủy</button>
+            <button class="div-18" @click="resetForm">Hủy</button>
             <button @click="updateProduct" class="div-19">Lưu</button>
           </div>
         </div>
@@ -59,55 +59,65 @@
           <div class="div-21">
             Ảnh minh họa
             <span style="color: rgba(255, 77, 77, 1)">*</span>
-            <img
-              :src="product.image"
-              class="w-100 shadow-1-strong rounded mb-4"
-              @change="onImageChange"
-            />
+            <div class="image-detail">
+              <img
+                :src="product.image || initialImage"
+                class="fixed-size-image shadow-1-strong rounded mb-4"
+                @click="triggerFileInputMainImage"
+              />
+              <input
+                type="file"
+                ref="mainFileInput"
+                @change="onMainImageChange"
+                style="display: none"
+              />
+              <div class="button-hover">
+                <div>
+                  <button v-if="!product.image" @click="triggerFileInputMainImage">
+                    Cập nhật
+                  </button>
+                  <button v-if="product.image" @click="triggerFileInputMainImage">
+                    Cập nhật
+                  </button>
+                  <button v-if="product.image" @click="removeMainImage">Xóa</button>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="div-22">
             <div class="row p-4">
               <!-- image detail -->
-              <div class="col-lg-6 col-md-12 mb-6 mb-lg-0">
+              <div
+                v-for="(item, index) in imageDetail"
+                class="col-lg-6 col-md-12 mb-6 mb-lg-0"
+              >
                 <span>Ảnh 1</span>
                 <div class="image-detail">
                   <img
-                    :src="imagePreview || placeholderImage"
-                    @click="triggerFileInput"
-                    class="w-100 shadow-1-strong rounded mb-4"
-                    
+                    :src="item.image ? showImageDetail(index) : placeholderImage"
+                    @click="triggerFileInput(index)"
+                    :class="[
+                      'small-image',
+                      item.image ? 'loaded-image' : 'placeholder-image',
+                    ]"
+                    class="shadow-1-strong rounded mb-4"
                   />
                   <input
                     type="file"
-                    ref="fileInput"
-                    @change="onImageChange"
+                    :ref="'fileInput' + index"
+                    @change="onImageChange(index, $event)"
                     style="display: none"
                   />
-                  <div class="button-hover" v-if="imagePreview">
+                  <div class="button-hover" v-if="item.image">
                     <div>
-                      <button @click="updateImage">Cập nhật</button>
+                      <button @click="updateImage(index)">Cập nhật</button>
                     </div>
                     <div>
-                      <button @click="removeImage">Xóa</button>
+                      <button @click="removeImage(index)">Xóa</button>
                     </div>
                   </div>
                 </div>
               </div>
-
-              <!-- button add image -->
-              <!-- <div class="col-lg-6 col-md-12 mb-6 mb-lg-0 custom-btn-add-img">
-                <div class="file-input">
-                  <input
-                    type="file"
-                    name="file-input"
-                    id="file-input"
-                    class="file-input__input"
-                  />
-                  <label class="file-input__label" for="file-input">
-                    <img src="/storage/images/inputfile.png" alt="Boat on Calm Water"
-                  /></label>
-                </div>
-              </div> -->
             </div>
           </div>
         </div>
@@ -141,7 +151,15 @@ export default {
         brand_id: "",
         image1: "",
       },
-      placeholderImage: "/storage/images/input.jpg", // Ảnh placeholder
+
+      imageDetail: [
+        {
+          image: "",
+        },
+      ],
+      initialImage: "", // Lưu trữ hình ảnh ban đầu
+
+      placeholderImage: "/storage/images/inputfile.png", // Ảnh placeholder
       imagePreview: "", // Biến tạm thời để lưu ảnh xem trước
       categories: [],
       brands: [],
@@ -154,70 +172,79 @@ export default {
     this.getProductDetails();
   },
   methods: {
-    triggerFileInput() {
-      this.$refs.fileInput.click();
+    triggerFileInput(index) {
+      this.$refs["fileInput" + index][0].click();
     },
-    onImageChange(event) {
-      const file = event.target.files[0];
+    onImageChange(index, event) {
+      this.imageDetail[index].image = event.target.files[0];
+
+      this.imageDetail.push({
+        image: "",
+      });
+    },
+
+    showImageDetail(index) {
+      const file = this.imageDetail[index].image;
       if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.imagePreview = e.target.result; // Hiển thị ảnh xem trước
-        };
-        reader.readAsDataURL(file);
+        return URL.createObjectURL(file);
       }
     },
-    updateImage() {
+    updateImage(index) {
       this.imagePreview = null;
       this.imageFile = null;
-      this.triggerFileInput();
+      this.triggerFileInput(index);
     },
-    removeImage() {
-      this.imagePreview = ""; // Xóa ảnh xem trước
-      this.$refs.fileInput.value = null; // Reset input file
+    removeImage(index) {
+      this.imageDetail.splice(index, 1);
+      this.$refs["fileInput" + index][0].value = null; // Reset input file
     },
 
     goHome() {
       this.$router.push("/");
     },
-    methods: {
-      updateProduct() {
-        let url = BASE_URL + `products/${this.productId}`;
-        let token = localStorage.getItem("token");
-        let formData = new FormData();
-        formData.append("name", this.product.name);
-        formData.append("price", this.product.price);
-        formData.append("note", this.product.note);
-        formData.append("category_id", this.product.category_id);
-        formData.append("brand_id", this.product.brand_id);
-        if (this.product.image) {
-          formData.append("image", this.product.image);
-        }
 
-        axios
-          .put(url, formData, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
-          })
-          .then((response) => {
-            if (response.data.success) {
-              console.log("Update success");
-              this.afterUpdateProduct = true;
-              // You can add any additional actions on successful update
-            } else {
-              console.log("Update failed");
-              // Handle update failure
-            }
-          })
-          .catch((error) => {
-            console.log(error);
-            // Handle request error
-          });
-      },
-      // other methods...
+    updateProduct() {
+      let url = BASE_URL + `products/${this.productId}`;
+      let token = localStorage.getItem("token");
+      let formData = new FormData();
+      formData.append("_method", "PUT");
+      formData.append("name", this.product.name);
+      formData.append("price", this.product.price);
+      formData.append("note", this.product.note);
+      formData.append("category_id", this.product.category_id);
+      formData.append("brand_id", this.product.brand_id);
+      this.imageDetail.forEach((item, index) => {
+        if (item.image || item.image !== "") {
+          formData.append(`image_detail[${index}]`, item.image);
+        }
+      });
+      if (this.product.image) {
+        formData.append("image", this.product.image);
+      }
+
+      axios
+        .post(url, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((response) => {
+          if (response.data.success) {
+            console.log("Update success");
+            this.afterUpdateProduct = true;
+            // You can add any additional actions on successful update
+          } else {
+            console.log("Update failed");
+            // Handle update failure
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          // Handle request error
+        });
     },
+    // other methods...
 
     getProductDetails() {
       const id = this.$route.params.id; // lấy id từ route
@@ -226,6 +253,8 @@ export default {
         .then((response) => {
           if (response.data) {
             this.product = response.data.product;
+            this.initialImage = this.product.image; // Lưu hình ảnh ban đầu
+
             console.log(this.product.category.name);
             console.log(this.product);
           } else {
@@ -257,6 +286,24 @@ export default {
           console.log(error);
         });
     },
+
+    // main image
+    triggerFileInputMainImage() {
+      this.$refs.mainFileInput.click();
+    },
+    onMainImageChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.product.image = e.target.result; // Cập nhật hình ảnh sản phẩm
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    removeMainImage() {
+      this.product.image = ""; // Xóa hình ảnh sản phẩm
+    },
   },
 };
 </script>
@@ -267,12 +314,29 @@ export default {
   transition: 0.3s all;
 }
 
+.image-detail .small-image {
+  /* Giữ nguyên tỷ lệ khung hình */
+  object-fit: cover;
+  /* Đảm bảo ảnh không bị méo */
+  display: block;
+  margin: 0;
+}
+.placeholder-image {
+  width: 50px;
+  height: auto;
+}
+.loaded-image {
+  width: 192px;
+  height: 118px;
+}
+
 .image-detail .button-hover {
   display: none;
   text-align: center;
   position: absolute;
-  left: 45px;
-  top: 23px;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 10px;
   transition: 0.3s all;
 }
 
@@ -289,32 +353,8 @@ export default {
   padding: 5px 10px;
   border-radius: 5px;
   background-color: #ffffff80;
-}
-
-.file-input__input {
-  width: 0.1px;
-  height: 0.1px;
-  opacity: 0;
-  overflow: hidden;
-  position: absolute;
-  z-index: -1;
-}
-
-.file-input__label {
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-}
-
-.custom-btn-add-img {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.custom-btn-add-img img {
-  width: 50px;
-  cursor: pointer;
+  width: 100px;
+  height: 40px;
 }
 
 .div {
@@ -426,6 +466,7 @@ export default {
     padding: 0 20px;
   }
 }
+
 .div-19 {
   font-family: Inter, sans-serif;
   border-radius: 4px;
@@ -490,6 +531,7 @@ export default {
 @media (max-width: 991px) {
   .div-22 {
     max-width: 100%;
+    height: auto;
   }
 }
 
@@ -500,33 +542,10 @@ export default {
   --Primary: #ffffff;
   --Red: #ff4d4d;
 }
+
 .image-detail {
   position: relative;
   transition: 0.3s all;
-}
-
-.image-detail .button-hover {
-  display: none;
-  text-align: center;
-  position: absolute;
-  left: 45px;
-  top: 23px;
-  transition: 0.3s all;
-}
-
-.image-detail:hover .button-hover {
-  display: block;
-}
-
-.image-detail .button-hover button:first-child {
-  margin-bottom: 5px;
-}
-
-.image-detail .button-hover button {
-  border: 1px solid #333;
-  padding: 5px 10px;
-  border-radius: 5px;
-  background-color: #ffffff80;
 }
 
 .file-input__input {
@@ -553,5 +572,45 @@ export default {
 .custom-btn-add-img img {
   width: 50px;
   cursor: pointer;
+}
+
+/* main image */
+.image-detail {
+  position: relative;
+  transition: 0.3s all;
+}
+
+.fixed-size-image {
+  width: 421px;
+  height: 261px;
+  object-fit: cover;
+  /* Ensure the image covers the area without distorting */
+}
+
+.image-detail .button-hover {
+  display: none;
+  text-align: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 10px;
+  transition: 0.3s all;
+}
+
+.image-detail:hover .button-hover {
+  display: block;
+}
+
+.image-detail .button-hover button:first-child {
+  margin-bottom: 5px;
+}
+
+.image-detail .button-hover button {
+  border: 1px solid #333;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background-color: #ffffff80;
+  width: 100px;
+  height: 40px;
 }
 </style>

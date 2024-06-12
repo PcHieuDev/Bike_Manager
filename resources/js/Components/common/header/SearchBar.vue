@@ -6,6 +6,7 @@
       placeholder="Tìm kiếm"
       aria-label="Username"
       @keyup.enter="handleSearch"
+      @input="onInput"
       aria-describedby="basic-addon1"
       v-model="keyword"
     />
@@ -21,8 +22,15 @@ export default {
   },
 
   methods: {
+    onInput() {
+      this.$emit("handleSearch", this.keyword);
+    },
     handleSearch() {
       this.$emit("handleSearch", this.keyword);
+    },
+    clearSearchTerm() {
+      this.keyword = "";
+      this.$emit("clear");
     },
   },
 };

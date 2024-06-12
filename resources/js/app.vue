@@ -2,7 +2,7 @@
   <div>
     <Header />
     <SlideBar />
-<!--    <SearchBar />-->
+    <!--    <SearchBar />-->
     <router-view></router-view>
   </div>
 </template>
@@ -12,9 +12,9 @@ import Header from "./Components/common/header/index.vue";
 
 import SlideBar from "./Components/common/header/Navbar/index.vue";
 // import Search from "./Components/common/SearchBar/Search.vue";
-
 export default {
   name: "app",
+
   components: {
     Header,
     SlideBar,
