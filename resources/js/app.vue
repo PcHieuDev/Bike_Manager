@@ -1,24 +1,54 @@
 <template>
-  <div>
+  <div id="layout">
     <Header />
-    <SlideBar />
-    <!--    <SearchBar />-->
-    <router-view></router-view>
+    <main>
+      <SlideBar />
+      <div class="main-content">
+        <router-view></router-view>
+      </div>
+    </main>
   </div>
 </template>
 
 <script>
-import Header from "./Components/common/header/index.vue";
+import Header from "./Components/common/Header.vue";
+import SlideBar from "./Components/common/Sidebar.vue";
 
-import SlideBar from "./Components/common/header/Navbar/index.vue";
-// import Search from "./Components/common/SearchBar/Search.vue";
 export default {
-  name: "app",
-
+  name: "App",
   components: {
     Header,
     SlideBar,
-    // Search,
   },
 };
 </script>
+
+<style>
+#layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  display: flex;
+  flex: 1;
+}
+
+.main-content {
+  flex: 1;
+  padding: 1rem;
+  background: #f4f4f4;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  main {
+    flex-direction: column;
+  }
+
+  .main-content {
+    padding: 0.5rem;
+  }
+}
+</style>

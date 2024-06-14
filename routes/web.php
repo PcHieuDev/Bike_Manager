@@ -17,11 +17,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/ProductActions', function () {
+Route::get('/product-management', function () {
     return view('welcome');
 });
 
-Route::get('/ProductActions/{id}', function ($id) {
+Route::get('/product-management/{id}', function ($id) {
     return view('welcome');
 });
 

@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 
 class ProductRepository implements ProductRepositoryInterface
@@ -151,4 +152,18 @@ class ProductRepository implements ProductRepositoryInterface
 
         return $product;
     }
+
+    public function deleteImageDetail($id)
+    {
+        $image = ProductImage::find($id);
+        if (!$image) {
+            return response()->json([
+                'message' => __('messages.image_not_found'),
+            ]);
+        }
+        $image->delete();
+        return response()->json([
+            'message' => __('messages.image_deleted'),
+        ]);
+    }                                   
 }

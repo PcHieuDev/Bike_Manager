@@ -29,15 +29,17 @@
           </div>
         </div>
         <div class="column-2">
-          <v-carousel :show-arrows="false" class="carousel-tong">
-            <v-carousel-item
-              v-for="(item, i) in ProductImages"
-              :key="i"
-              :src="item.src"
-              cover
-              class="carousel-image"
-            ></v-carousel-item>
-          </v-carousel>
+          <template v-if="imageDetails.length">
+            <v-carousel :show-arrows="false" class="carousel-tong" cycle>
+              <v-carousel-item
+                v-for="(item, i) in imageDetails"
+                :key="i"
+                :src="item.image_path"
+                cover
+                class="carousel-image"
+              ></v-carousel-item>
+            </v-carousel>
+          </template>
         </div>
       </div>
     </div>
@@ -101,17 +103,7 @@ export default {
       },
       categories: [],
       brands: [],
-      ProductImages: [
-        {
-          src: "http://127.0.0.1:8000/storage/images/1717649634.png",
-        },
-        {
-          src: "http://127.0.0.1:8000/storage/images/1717648189.png",
-        },
-        {
-          src: "http://127.0.0.1:8000/storage/images/1717648746.png",
-        },
-      ],
+      imageDetails: [],
     };
   },
   mounted() {
@@ -146,6 +138,7 @@ export default {
       this.$router.push("/");
     },
     fetchProductDetails() {
+      this.imageDetails = [];
       const id = this.$route.params.id;
       this.isLoading = true;
       apiClient
@@ -173,7 +166,7 @@ export default {
           if (response.data) {
             this.products = response.data.products;
             this.imageDetails = response.data.imageDetails;
-            console.log(this.imageDetails);
+            console.log("dfdjsfjdsf", this.imageDetails);
           } else {
             console.log("No data returned from API");
           }
@@ -225,4 +218,5 @@ export default {
   flex-direction: column;
   align-items: center;
 }
+
 </style>

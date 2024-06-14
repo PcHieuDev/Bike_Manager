@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use App\Helpers\ArrayHelper;
 use lang\en\Message;
 use App\Models\ProductImage;
+
 use Psy\Readline\Hoa\Console;
 
 class ProductController extends Controller
@@ -199,7 +200,7 @@ class ProductController extends Controller
             $brandId = $product->brand->id; // Get brand id directly
 
             $products = $this->productRepository->getByBrand($brandId);
-            $imageDetails = ProductImage::where('product_id', $id)->get();                                                  
+            $imageDetails = ProductImage::where('product_id', $id)->get();
             return response()->json([
                 'product' => $product,
                 'message' => $product ? __('messages.product_found') : __('messages.product_not_found'),
@@ -210,6 +211,22 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             throw new ErrorFindingProductException($e->getMessage(), $e->getCode(), $e);
         }
+    }
+
+    public function deleteImageDetail($id)
+    {
+        $image = ProductImage::find($id);
+        if (!$image) {
+            return response()->json([
+                'message' => __('messages.image_not_found'),
+                'status' => $this->notFound()
+            ]);
+        }
+        $image->delete();
+        return response()->json([
+            'message' => __('messages.image_deleted'),
+            'status' => $this->ok()
+        ]);
     }
 
     public function delete($id)
@@ -227,5 +244,21 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             throw new ProductDeletionException($e->getMessage(), $e->getCode(), $e);
         }
+    }
+
+    public function deleteSlideImage($id)
+    {
+        $image = ProductImage::find($id);
+        if (!$image) {
+            return response()->json([
+                'message' => __('messages.image_not_found'),
+                'status' => $this->notFound()
+            ]);
+        }
+        $image->delete();
+        return response()->json([
+            'message' => __('messages.image_deleted'),
+            'status' => $this->ok()
+        ]);
     }
 }

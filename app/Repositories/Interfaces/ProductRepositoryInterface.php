@@ -24,5 +24,9 @@ interface ProductRepositoryInterface
 
     public function getBybrand($brandId);
 
+                                                         
+
+
+
    
 }
