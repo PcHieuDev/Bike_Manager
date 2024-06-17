@@ -77,7 +77,6 @@
 <script>
 import LoginPopupSuccess from "../Components/Popup/Login/LoginPopupSuccess.vue";
 import apiClient from "../axios-interceptor";
-import { BASE_URL } from "../configUrl";
 
 export default {
   components: {
@@ -160,7 +159,7 @@ a {
 }
 .container {
   max-width: 900px; /* Đặt độ rộng tối đa cho container */
-  margin: 100px 0 0 0 ; /* Đảm bảo container nằm giữa màn hình */
+  margin: 100px 0 0 0; /* Đảm bảo container nằm giữa màn hình */
   padding: 0 15px; /* Thêm padding nếu cần thiết */
 }
 </style>

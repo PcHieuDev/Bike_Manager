@@ -2,7 +2,7 @@
   <div id="layout">
     <Header />
     <main>
-      <SlideBar />
+      <Sidebar />
       <div class="main-content">
         <router-view></router-view>
       </div>
@@ -12,18 +12,23 @@
 
 <script>
 import Header from "./Components/common/Header.vue";
-import SlideBar from "./Components/common/Sidebar.vue";
+import Sidebar from "./Components/common/Sidebar.vue";
 
 export default {
   name: "App",
   components: {
     Header,
-    SlideBar,
+    Sidebar,
   },
 };
 </script>
 
 <style>
+.v-carousel__controls{
+  background: none !important;
+  color: rgb(125 125 125) !important;
+}
+
 #layout {
   display: flex;
   flex-direction: column;
@@ -38,7 +43,8 @@ main {
 .main-content {
   flex: 1;
   padding: 1rem;
-  background: #f4f4f4;
+  background: #eeeeee;
+;
 }
 
 /* Responsive Styles */
@@ -50,5 +56,9 @@ main {
   .main-content {
     padding: 0.5rem;
   }
+}
+.v-pagination .v-btn {
+  border-radius: 4px;
+  background: #f1f1f1;
 }
 </style>

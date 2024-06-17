@@ -13,6 +13,7 @@ use App\Exceptions\ErrorUpdatingProductException;
 use App\Exceptions\ErrorLoginException;
 use App\Exceptions\ErrorLogoutException;
 use App\Exceptions\ErrorSavingProductException;
+use App\Exceptions\SomethingHasErrorException;
 
 class Handler extends ExceptionHandler
 {
@@ -101,6 +102,13 @@ class Handler extends ExceptionHandler
         if ($exception instanceof ErrorSavingProductException) {
             return response()->json([
                 'message' => __('messages.errors.error_saving_product'),
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+        if($exception instanceof SomethingHasErrorException)
+        {
+            return response()->json([
+                'message' => __('messages.errors.error_something_has_error'),
                 'status' => Response::HTTP_INTERNAL_SERVER_ERROR
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

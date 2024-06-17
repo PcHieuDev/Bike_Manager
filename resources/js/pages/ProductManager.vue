@@ -1,26 +1,23 @@
 <template>
-  <HeaderProduct
-      :user="user"
-      @changeDialog="changeDialog"
-      @input="handleInput"
-      @clear="clearSearchTerm"
-  ></HeaderProduct>
+  <div class="header-product d-flex justify-content-between">
+    <AddProductButton @changeDialog="changeDialog" :user="user"></AddProductButton>
+    <SearchBar @input="handleInput" @clear="clearSearchTerm"></SearchBar>
+  </div>
+
+  <div class="white-box">
   <!-- List san pham -->
-  <ProductItem
-      :products="products"
-      :showActions="true"
-      :showPrice="false"
-      @showModalDelete="showModalDelete"
+  <ProductList
+    :products="products"
+    :showButton="true"
+    :showPrice="false"
+    @showModalDelete="showModalDelete"
   >
-  </ProductItem>
+  </ProductList>
 
   <!-- paginate -->
   <div class="text-xs-center">
-    <v-pagination
-        v-model="page"
-        :length="countRercord"
-        :total-visible="5"
-    ></v-pagination>
+    <v-pagination v-model="page" :length="countRercord" :total-visible="5"></v-pagination>
+  </div>
   </div>
 
   <!--  loading page-->
@@ -31,33 +28,33 @@
 
   <!-- popup add ProductActions -->
   <AddProductDialog
-      v-model="isShowDialog"
-      @submit="addProduct"
-      @close="isShowDialog = false"
-      :categories="categories"
-      :brands="brands"
+    v-model="isShowDialog"
+    @submit="addProduct"
+    @close="isShowDialog = false"
+    :categories="categories"
+    :brands="brands"
   >
   </AddProductDialog>
 
   <!-- popup beforeDelete -->
   <PopupBeforeDelete
-      v-model="beforeDelete"
-      :deleteProduct="deleteProduct"
-      :afterDelete="afterDelete"
-      @close="beforeDelete = false"
+    v-model="beforeDelete"
+    :deleteProduct="deleteProduct"
+    :afterDelete="afterDelete"
+    @close="beforeDelete = false"
   ></PopupBeforeDelete>
 
   <!-- popup afterdelete -->
   <PopupDeleteSuccess
-      v-model="afterDelete"
-      @close="afterDelete = false"
+    v-model="afterDelete"
+    @close="afterDelete = false"
   ></PopupDeleteSuccess>
   <!-- popup afterdelete -->
 
   <!-- popup afterAddProduct -->
   <PupupAddSuccess
-      v-model="afterAddProduct"
-      @close="afterAddProduct = false"
+    v-model="afterAddProduct"
+    @close="afterAddProduct = false"
   ></PupupAddSuccess>
   <!-- popup afterAddProduct -->
 
@@ -74,36 +71,36 @@
 </template>
 
 <script>
-import ProductItem from "../Components/Product/ProductItem.vue";
+import ProductList from "../Components/Product/ProductList.vue";
 import Paginate from "vuejs-paginate";
-import AddProductDialog from "./product/AddProductDialog.vue"
-import PupupAddSuccess from "../Components/Popup/AddProduct/PupupAddSuccess.vue"
+import AddProductDialog from "./product/AddProductDialog.vue";
+import PupupAddSuccess from "../Components/Popup/AddProduct/PupupAddSuccess.vue";
 import PopupDeleteSuccess from "../Components/Popup/DeleteProduct/PopupDeleteSuccess.vue";
 import PopupBeforeDelete from "../Components/Popup/DeleteProduct/PopupBeforeDelete.vue";
 import AddProductError from "../Components/Popup/AddProduct/AddProductError.vue";
 import Popupaddmissing from "../Components/Popup/AddProduct/AddproductMissing.vue";
 // import NoProducts from "../Components/Popup/Search/noProduct.vue";
-import apiClient from "../axios-interceptor"
+import apiClient from "../axios-interceptor";
 import debounce from "lodash/debounce";
-import HeaderProduct from "../Components/common/HeaderProduct.vue";
 import SearchBar from "../Components/common/SearchBar.vue";
-import {validateProduct} from "../validateProduct"
-import {toast} from "vue3-toastify";
-import {mapActions} from "vuex";
+import AddProductButton from "../Components/common/AddProductButton.vue";
+import { validateProduct } from "../validateProduct";
+import { toast } from "vue3-toastify";
+import { mapActions } from "vuex";
 
 export default {
   name: "list",
   components: {
     Paginate,
-    ProductItem,
+    ProductList,
     AddProductDialog,
     PupupAddSuccess,
     PopupDeleteSuccess,
     PopupBeforeDelete,
     AddProductError,
     Popupaddmissing,
+    AddProductButton,
     SearchBar,
-    HeaderProduct,
     // NoProducts,
   },
 
@@ -152,7 +149,6 @@ export default {
   },
   created() {
     this.debouncedSearch = debounce(this.setSearchTermAndFetch, 1000);
-
   },
 
   mounted() {
@@ -165,10 +161,7 @@ export default {
   },
 
   methods: {
-    ...mapActions([
-      "setCategoryId",
-      "setBrandId",
-    ]),
+    ...mapActions(["setCategoryId", "setBrandId"]),
 
     handleInput(event) {
       const searchTerm = event.target.value;
@@ -193,21 +186,20 @@ export default {
       // Nếu không phải các trường hợp trên, thực hiện việc gán searchTerm và fetchProducts
       this.searchTerm = searchTerm; // Update the searchTerm directly
       this.getProducts()
-          .then(() => {
-            // Kiểm tra nếu không có sản phẩm được tìm thấy, hiển thị thông báo toast
-            if (this.products.length === 0) {
-              toast.error("Không tìm thấy sản phẩm");
-            }
-          })
-          .catch((error) => {
-            // Xử lý lỗi nếu cần
-            console.error("Error fetching products:", error);
-          });
+        .then(() => {
+          // Kiểm tra nếu không có sản phẩm được tìm thấy, hiển thị thông báo toast
+          if (this.products.length === 0) {
+            toast.error("Không tìm thấy sản phẩm");
+          }
+        })
+        .catch((error) => {
+          // Xử lý lỗi nếu cần
+          console.error("Error fetching products:", error);
+        });
     },
     debouncedSetSearchTermAndFetch(searchTerm) {
       this.debouncedSearch(searchTerm);
     },
-
 
     showModalDelete(id) {
       console.log(id);
@@ -224,27 +216,27 @@ export default {
       this.isLoading = true;
       let url = "products";
       await apiClient
-          .get(url, {
-            params: {
-              page: this.page,
-              keyword: this.searchTerm,
-            },
-            headers: {Authorization: `Bearer ${token}`},
-          })
-          .then((response) => {
-            this.products = response.data.contents;
-            this.totalRecords = response.data.count;
-            this.countRercord = Math.ceil(response.data.count / this.itemsPerPage);
-            // this.noProductsFound = this.totalRecords === 0;
-            console.log(this.countRercord);
-            console.log(response.data.contents);
-          })
-          .catch((error) => {
-            console.log(error);
-          })
-          .finally(() => {
-            this.isLoading = false;
-          });
+        .get(url, {
+          params: {
+            page: this.page,
+            keyword: this.searchTerm,
+          },
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((response) => {
+          this.products = response.data.contents;
+          this.totalRecords = response.data.count;
+          this.countRercord = Math.ceil(response.data.count / this.itemsPerPage);
+          // this.noProductsFound = this.totalRecords === 0;
+          console.log(this.countRercord);
+          console.log(response.data.contents);
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
     },
 
     computed: {
@@ -272,34 +264,34 @@ export default {
       formData.append("image", product.image);
       let token = localStorage.getItem("token");
       apiClient
-          .post("saveProduct", formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${token}`,
-            },
-          })
-          .then((response) => {
-            this.getProducts();
-            const productId = response.data.product.id;
-            // open popup afterAddProduct
-            console.log(productId); // Đảm bảo rằng productId được log ra đúng
-            setTimeout(() => {
-              // Thiết lập this.afterAddProduct sau 1 giây
-              this.afterAddProduct = true;
-
-              // Chuyển hướng tới trang /product/details/:id
-              this.$router.push({path: `/product/details/${productId}`});
-            }, 1000);
+        .post("saveProduct", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          this.getProducts();
+          const productId = response.data.product.id;
+          // open popup afterAddProduct
+          console.log(productId); // Đảm bảo rằng productId được log ra đúng
+          setTimeout(() => {
+            // Thiết lập this.afterAddProduct sau 1 giây
             this.afterAddProduct = true;
-          })
-          .catch((error) => {
-            console.log(error);
-          })
-          .finally(() => {
-            this.isShowDialog = false;
-            this.page = 1;
-            this.getProducts();
-          });
+
+            // Chuyển hướng tới trang /product/details/:id
+            this.$router.push({ path: `/product/details/${productId}` });
+          }, 1000);
+          this.afterAddProduct = true;
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .finally(() => {
+          this.isShowDialog = false;
+          this.page = 1;
+          this.getProducts();
+        });
     },
 
     onChange(e) {
@@ -308,62 +300,62 @@ export default {
 
     getListCategory() {
       apiClient
-          .get("categories")
-          .then((response) => {
-            this.categories = response.data.contents;
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        .get("categories")
+        .then((response) => {
+          this.categories = response.data.contents;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
 
     getListBrands() {
       apiClient
-          .get("brands")
-          .then((response) => {
-            this.brands = response.data.contents;
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        .get("brands")
+        .then((response) => {
+          this.brands = response.data.contents;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
 
     searchProducts(query) {
       apiClient
-          .get("search", {
-            params: {
-              query: query,
-            },
-          })
-          .then((response) => {
-            this.products = response.data.contents;
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        .get("search", {
+          params: {
+            query: query,
+          },
+        })
+        .then((response) => {
+          this.products = response.data.contents;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
 
     deleteProduct() {
       let url = `delete_products/${this.productIdDelete}`;
       let token = localStorage.getItem("token");
       apiClient
-          .delete(url, {
-            headers: {Authorization: `Bearer ${token}`},
-          })
-          .then(() => {
-            this.beforeDelete = false;
-            this.afterDelete = true;
-            console.log("delete success");
-          })
-          .catch((error) => {
-            console.log(error);
-          })
-          .finally(() => {
-            if (this.products.length === 1 && this.page > 1) {
-              this.page--;
-            }
-            this.getProducts();
-          });
+        .delete(url, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then(() => {
+          this.beforeDelete = false;
+          this.afterDelete = true;
+          console.log("delete success");
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .finally(() => {
+          if (this.products.length === 1 && this.page > 1) {
+            this.page--;
+          }
+          this.getProducts();
+        });
     },
   },
 };
@@ -372,7 +364,20 @@ export default {
 <style scoped>
 .header-product {
   padding-top: 60px;
-  width: 92%;
-  margin-left: 20px;
+  width: 100%;
+  margin-left: 0px;
+  margin-bottom: 30px;
 }
+.white-box {
+  background-color: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+
+}
+.text-xs-center {
+  margin-top: 20px;
+}
+
+
 </style>

@@ -32,8 +32,8 @@
 
             <div class="form-group">
               <label class="form-label mt-4 required">Danh Mục</label>
-              <select class="form-select" v-model="product.category_id">
-                <template v-for="(item, index) in categories" :key="index">
+              <select class="form-select" v-model="product.brand_id">
+                <template v-for="(item, index) in brands" :key="index">
                   <option :value="item.id">{{ item.name }}</option>
                 </template>
               </select>
@@ -41,8 +41,8 @@
 
             <div class="form-group">
               <label class="form-label mt-4 required">Hãng sản xuất</label>
-              <select class="form-select" v-model="product.brand_id">
-                <template v-for="(item, index) in brands" :key="index">
+              <select class="form-select" v-model="product.category_id">
+                <template v-for="(item, index) in categories" :key="index">
                   <option :value="item.id">{{ item.name }}</option>
                 </template>
               </select>
@@ -68,13 +68,20 @@
         </form>
       </v-card-text>
 
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <button @click="addProduct" type="button" class="btn btn-outline-primary">
-          Thêm sản phẩm
-        </button>
-        <button @click="closePopup" type="button" class="btn btn-outline-secondary">
+      <v-card-actions class="justify-center">
+        <button
+          @click="closePopup"
+          type="button"
+          class="btn btn-outline-secondary btn-wide btn-black-text"
+        >
           Hủy
+        </button>
+        <button
+          @click="addProduct"
+          type="button"
+          class="btn btn-outline-primary btn-wide"
+        >
+          Thêm sản phẩm
         </button>
       </v-card-actions>
     </v-card>
@@ -130,14 +137,37 @@ export default {
 </script>
 
 <style scoped>
-.btn-outline-primary {
-  background-color: #007bff;
-  color: white;
-  border: 1px solid #007bff;
-  border-radius: 5px;
+.btn-outline-primary,
+.btn-outline-secondary {
+  border-radius: 20px;
   padding: 5px 10px;
-  display: block;
-  margin-right: 244px;
+  display: inline-block;
+}
+
+.btn-outline-primary {
+  background-color: #00b5ff; /* Sky blue color */
+  color: white;
+  border: 1px solid #00b5ff;
+}
+
+.btn-outline-secondary {
+  background-color: #ffffff;
+  color: white;
+  border: 1px solid #00b5ff;
+}
+
+.btn-black-text {
+  color: black; /* Black text color for the Hủy button */
+}
+
+.btn-wide {
+  width: 150px; /* Set a fixed width for both buttons */
+}
+
+.v-card-actions.justify-center {
+  justify-content: center;
+  display: flex;
+  gap: 10px; /* Add some space between the buttons */
 }
 
 .required::after {

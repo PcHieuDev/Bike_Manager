@@ -12,17 +12,24 @@ class ProductRepository implements ProductRepositoryInterface
     public function all($keyword = '')
     {
         $query = Product::with('brand', 'category');
-
+    
         if ($keyword != '') {
-            $query->where('name', 'like', "%$keyword%")
-                ->orWhereHas('brand', function ($query) use ($keyword) {
-                    $query->where('name', 'like', "%$keyword%");
-                })
-                ->orWhereHas('category', function ($query) use ($keyword) {
-                    $query->where('name', 'like', "%$keyword%");
-                });
+            $query->where(function ($query) use ($keyword) {
+                $query->where('name', 'like', "%$keyword%")
+                    ->orWhereHas('brand', function ($query) use ($keyword) {
+                        $query->where('name', 'like', "%$keyword%");
+                    })
+                    ->orWhereHas('category', function ($query) use ($keyword) {
+                        $query->where('name', 'like', "%$keyword%");
+                    });
+    
+                // Kiểm tra xem keyword có phải là số (id) không
+                if (is_numeric($keyword)) {
+                    $query->orWhere('id', $keyword);
+                }
+            });
         }
-
+    
         return $query->get();
     }
 
@@ -43,7 +50,7 @@ class ProductRepository implements ProductRepositoryInterface
             ->get();
     }
 
-    public function paginate($page, $size, $keyword, $brandId, $categoryId)
+    public function paginate($page, $size, $keyword, $brandId, $categoryId, $productId)
     {
         $offset = ($page - 1) * $size;
         $query = Product::with('brand', 'category');
@@ -57,6 +64,11 @@ class ProductRepository implements ProductRepositoryInterface
                     ->orWhereHas('brand', function ($q) use ($keyword) {
                         $q->where('name', 'like', "%$keyword%");
                     });
+
+                if (is_numeric($keyword)) {
+                    $sql->orWhere('id', $keyword);
+                }
+
             });
         }
 
@@ -66,6 +78,10 @@ class ProductRepository implements ProductRepositoryInterface
 
         if ($categoryId) {
             $query->where('category_id', $categoryId);
+        }
+
+        if ($productId) {
+            $query->where('id', $productId);
         }
 
         return $query->orderBy('id', 'DESC')
@@ -78,16 +94,23 @@ class ProductRepository implements ProductRepositoryInterface
     public function search($query)
     {
         $products = Product::query();
-
+    
         if (!empty($query)) {
-            $products->where('name', 'like', "%$query%")
-                ->whereHas('category', function ($q) use ($query) {
-                    $q->where('name', 'like', "%$query%");
-                })
-                ->whereHas('brand', function ($q) use ($query) {
-                    $q->where('name', 'like', "%$query%");
-                });
+            $products->where(function ($q) use ($query) {
+                $q->where('name', 'like', "%$query%")
+                  ->orWhereHas('category', function ($q) use ($query) {
+                      $q->where('name', 'like', "%$query%");
+                  })
+                  ->orWhereHas('brand', function ($q) use ($query) {
+                      $q->where('name', 'like', "%$query%");
+                  });
+            });
+    
+            if (is_numeric($query)) {
+                $products->orWhere('id', $query);
+            }
         }
+    
         return $products->paginate(12);
     }
 
@@ -111,7 +134,7 @@ class ProductRepository implements ProductRepositoryInterface
         return Product::with('brand', 'category')->find($id);
     }
 
-    public function count($keyword = null, $brandId, $categoryId)
+    public function count($keyword = null, $brandId, $categoryId, $productId)
     {
         $query = Product::with('brand', 'category');
 
@@ -123,6 +146,7 @@ class ProductRepository implements ProductRepositoryInterface
                 ->orWhereHas('category', function ($query) use ($keyword) {
                     $query->where('name', 'like', "%$keyword%");
                 });
+
         }
 
         if ($brandId != '') {
@@ -131,6 +155,10 @@ class ProductRepository implements ProductRepositoryInterface
 
         if ($categoryId != '') {
             $query->where('category_id', $categoryId);
+        }
+
+        if ($productId != '') {
+            $query->where('id', $productId);
         }
         return $query->count();
     }
@@ -153,17 +181,5 @@ class ProductRepository implements ProductRepositoryInterface
         return $product;
     }
 
-    public function deleteImageDetail($id)
-    {
-        $image = ProductImage::find($id);
-        if (!$image) {
-            return response()->json([
-                'message' => __('messages.image_not_found'),
-            ]);
-        }
-        $image->delete();
-        return response()->json([
-            'message' => __('messages.image_deleted'),
-        ]);
-    }                                   
+
 }

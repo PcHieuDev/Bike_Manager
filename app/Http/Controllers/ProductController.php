@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\SomethingHasErrorException;
 use App\Http\Requests\ProductRequest;
 use Illuminate\Http\Request;
 use App\Models\Product;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Log;
 use App\Helpers\ArrayHelper;
 use lang\en\Message;
 use App\Models\ProductImage;
+use App\Http\Requests\SearchProductRequest;
 
 use Psy\Readline\Hoa\Console;
 
@@ -51,12 +53,13 @@ class ProductController extends Controller
         $page = ArrayHelper::getValue($inputs, 'page', Constants::DEFAULT_PAGE_NUMBER);
         $keyword = ArrayHelper::getValue($inputs, 'keyword', '');
         $brandId = ArrayHelper::getValue($inputs, 'brandId', '');
+        $productId = ArrayHelper::getValue($inputs, 'productId', '');
         $categoryId = ArrayHelper::getValue($inputs, 'categoryId', '');
         $size = ArrayHelper::getValue($inputs, 'size', Constants::DEFAULT_PAGE_SIZE);
-        $data = $this->productRepository->paginate($page, $size, $keyword, $brandId, $categoryId);
+        $data = $this->productRepository->paginate($page, $size, $keyword, $brandId, $categoryId, $productId);
 
         // Sử dụng biến trung gian để lưu trữ kết quả của hàm count
-        $count = $this->productRepository->count($keyword, $brandId, $categoryId);
+        $count = $this->productRepository->count($keyword, $brandId, $categoryId, $productId);
         return response()->json([
             'contents' => $data,
             'count' => $count,
@@ -64,18 +67,13 @@ class ProductController extends Controller
         ]);
     }
 
-    public function search(Request $request)
+    public function search(SearchProductRequest $request)
     {
-        $validated = $request->validate([
-            'query' => 'required|string',
-            'categoryName' => 'required|string',
-            'brandName' => 'required|string',
-        ]);
-
-        $query = $validated['query'];
-        $categoryName = $validated['categoryName'];
-        $brandName = $validated['brandName'];
-        $products = $this->productRepository->search($query, $categoryName, $brandName);
+        $query = $request->input('query');
+        $categoryName = $request->input('categoryName');
+        $brandName = $request->input('brandName');
+        $productId = $request->input('productId');
+        $products = $this->productRepository->search($query, $categoryName, $brandName, $productId);
         return response()->json($products);
     }
 
@@ -118,30 +116,23 @@ class ProductController extends Controller
 
     public function update(ProductRequest $request, $id)
     {
-
         try {
             // Tìm sản phẩm theo ID
             $product = $this->productRepository->find($id);
+            // Nếu không tìm thấy sản phẩm, ném ra ngoại lệ
             if (!$product) {
-                return response()->json([
-                    'message' => __('messages.product_not_found'),
-                    'status' => $this->notFound()
-                ]);
+                throw new ProductNotFoundException();
             }
-
-            // Kiểm tra quyền truy cập nếu cần
 
             // Xử lý hình ảnh nếu có
             if ($request->hasFile('image')) {
+                // Lấy file ảnh từ request
                 $image = $request->file('image');
 
-                // Kiểm tra tính hợp lệ của hình ảnh
-                // Ví dụ: kiểm tra kiểu MIME, kích thước tệp, ...
-
-                // Tạo tên tệp mới
+                // Tạo tên file mới
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
 
-                // Di chuyển tệp vào thư mục lưu trữ
+                // Di chuyển file vào thư mục lưu trữ
                 $image->move(public_path('storage/images'), $imageName);
 
                 // Xóa hình ảnh cũ nếu có
@@ -155,7 +146,7 @@ class ProductController extends Controller
                 // Cập nhật đường dẫn hình ảnh mới
                 $imagePath = '/storage/images/' . $imageName;
             } else {
-                // Giữ nguyên đường dẫn hình ảnh cũ
+                // Giữ nguyên đường dẫn hình ảnh cũ nếu không có hình ảnh mới
                 $imagePath = $product->image;
             }
 
@@ -169,9 +160,20 @@ class ProductController extends Controller
                 'image' => $imagePath
             ]);
 
+            // Xử lý các ảnh chi tiết nếu có
             if ($request->hasFile('image_detail')) {
+                // Xóa tất cả ảnh chi tiết cũ
+                $oldImages = ProductImage::where('product_id', $id)->get();
+                foreach ($oldImages as $oldImage) {
+                    $oldImagePath = public_path($oldImage->image_path);
+                    if (file_exists($oldImagePath)) {
+                        unlink($oldImagePath);
+                    }
+                    $oldImage->delete();
+                }
+
+                // Thêm ảnh chi tiết mới
                 foreach ($request->file('image_detail') as $index => $image) {
-                    // Thêm chỉ số hoặc chuỗi ngẫu nhiên vào tên tệp để đảm bảo tính duy nhất
                     $imageProductDetailName = time() . '_' . $index . '.' . $image->getClientOriginalExtension();
                     $image->move(public_path('storage/images'), $imageProductDetailName);
                     $imageProductDetailPath = '/storage/images/' . $imageProductDetailName;
@@ -182,28 +184,30 @@ class ProductController extends Controller
                 }
             }
 
+            // Trả về response thành công cùng với sản phẩm
             return response()->json([
-                'message' => __('messages.product_updated'),
-                'status' => $this->ok()
+                'success' => true,
+                'product' => $product
             ]);
         } catch (\Exception $e) {
             // Xử lý ngoại lệ
             throw new ErrorUpdatingProductException($e->getMessage(), $e->getCode(), $e);
         }
     }
-
     public function show($id)
     {
         try {
             $product = $this->productRepository->find($id);
 
-            $brandId = $product->brand->id; // Get brand id directly
-
+            $brandId = null;
+            if (isset($product) && isset($product->brand)) {
+                $brandId = $product->brand->id;
+            }
             $products = $this->productRepository->getByBrand($brandId);
             $imageDetails = ProductImage::where('product_id', $id)->get();
             return response()->json([
                 'product' => $product,
-                'message' => $product ? __('messages.product_found') : __('messages.product_not_found'),
+//                'message' => $product ? __('messages.product_found') : __('messages.product_not_found'),
                 'status' => $product ? $this->ok() : $this->notFound(),
                 'products' => $products,
                 'imageDetails' => $imageDetails
@@ -217,10 +221,7 @@ class ProductController extends Controller
     {
         $image = ProductImage::find($id);
         if (!$image) {
-            return response()->json([
-                'message' => __('messages.image_not_found'),
-                'status' => $this->notFound()
-            ]);
+            throw new SomethingHasErrorException();
         }
         $image->delete();
         return response()->json([
@@ -246,19 +247,5 @@ class ProductController extends Controller
         }
     }
 
-    public function deleteSlideImage($id)
-    {
-        $image = ProductImage::find($id);
-        if (!$image) {
-            return response()->json([
-                'message' => __('messages.image_not_found'),
-                'status' => $this->notFound()
-            ]);
-        }
-        $image->delete();
-        return response()->json([
-            'message' => __('messages.image_deleted'),
-            'status' => $this->ok()
-        ]);
-    }
+
 }

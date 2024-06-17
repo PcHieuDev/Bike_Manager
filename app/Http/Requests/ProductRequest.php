@@ -26,9 +26,11 @@ class ProductRequest extends FormRequest
         return [
             'name' => 'required',
             'price' => 'required',
-            'image' => 'required',
+            'image' => 'nullable',
             'brand_id' => 'required',
             'category_id' => 'required',
+            'images_to_delete' => 'array', // Kiểm tra mảng
+            'images_to_delete.*' => 'integer|exists:product_images,id' // Mỗi phần tử trong mảng phải là số nguyên và tồn tại trong bảng product_images
         ];
     }
 

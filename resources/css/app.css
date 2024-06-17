@@ -444,8 +444,8 @@
 
 .header-product {
     padding-top: 60px;
-    width: 92%;
-    margin-left: 20px;
+    width: 100%;
+    /* margin-left: 20px; */
 }
 
 .custom-search {
@@ -652,7 +652,7 @@ body {
     flex-direction: column;
     padding: 30px 54px;
     /*margin-left: 355px;*/
-    margin-top: 120px
+    margin-top: 70px
 }
 
 @media (max-width: 991px) {
@@ -661,8 +661,7 @@ body {
     }
 }
 
-.div-2 {
-}
+.div-2 {}
 
 @media (max-width: 991px) {
     .div-2 {
@@ -813,7 +812,7 @@ body {
     text-transform: capitalize;
     margin-top: 48px;
     font-family: none;
-    font-weight:bold;
+    font-weight: bold;
 }
 
 @media (max-width: 991px) {
@@ -948,6 +947,8 @@ body {
     letter-spacing: 0.35px;
     width: 100%;
     padding: 7px 12px 23px;
+    margin-left: 10px;
+    margin-top: 5px;
 }
 
 @media (max-width: 991px) {
@@ -1023,6 +1024,7 @@ body {
     letter-spacing: 0.35px;
     width: 100%;
     height: auto;
+    margin-top : 35px;
 }
 
 @media (max-width: 991px) {
@@ -1129,19 +1131,24 @@ body {
 }
 
 .edit-button {
-    background-color: #2ecc71; /* Màu xanh */
-    color: #fff; /* Màu chữ trắng */
+    background-color: #76cb44;
+    /* Màu xanh */
+    color: #fff;
+    /* Màu chữ trắng */
 
     text-decoration: none;
 }
 
 .delete-button {
-    background-color: #e74c3c; /* Màu đỏ */
-    color: #fff; /* Màu chữ trắng */
+    background-color: #e74c3c;
+    /* Màu đỏ */
+    color: #fff;
+    /* Màu chữ trắng */
 }
 
 .product-details {
-    margin-top: 10px; /* Khoảng cách giữa ảnh sản phẩm và thông tin sản phẩm */
+    margin-top: 0px;
+    /* Khoảng cách giữa ảnh sản phẩm và thông tin sản phẩm */
 }
 
 .product-name {
@@ -1152,9 +1159,12 @@ body {
 }
 
 .product-price {
-    display: block; /* Hiển thị trên mỗi dòng */
-    color: #333; /* Màu xám đen */
-    text-decoration: none; /* Loại bỏ gạch chân */
+    display: block;
+    /* Hiển thị trên mỗi dòng */
+    color: #333;
+    /* Màu xám đen */
+    text-decoration: none;
+    /* Loại bỏ gạch chân */
     display: flex;
 
 }

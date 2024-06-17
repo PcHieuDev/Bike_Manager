@@ -7,7 +7,7 @@
     <div v-if="showNavbar && showSidebar" class="filter">
       <div class="category">
         <div class="category-header" @click="toggleBrands">
-          <div class="text">Hãng Sản Xuất</div>
+          <div class="text">Danh Mục</div>
           <img
             class="ic-arrow-top"
             :class="{ rotated: showBrands }"
@@ -15,7 +15,14 @@
             src="https://c.animaapp.com/6fNIys5x/img/ic-arrow-top.svg"
           />
         </div>
-        <div v-if="showBrands" class="brands-list">
+        <div v-if="showBrands && !isProductManagementActions" class="brands-list">
+          <div
+            class="brand-item bold-text"
+            @click="selectBrand(null)"
+            :class="{ selected: selectedBrandId === null }"
+          >
+            Tất cả
+          </div>
           <div
             v-for="(brand, index) in brands"
             :key="index"
@@ -31,7 +38,7 @@
 
       <div class="category-2">
         <div class="category-header" @click="toggleCategories">
-          <div class="text">Danh Mục</div>
+          <div class="text">Hãng Sản Xuất</div>
           <img
             class="ic-arrow-top"
             :class="{ rotated: showCategories }"
@@ -39,7 +46,15 @@
             src="https://c.animaapp.com/6fNIys5x/img/ic-arrow-top-1.svg"
           />
         </div>
-        <div v-if="showCategories" class="categories-list">
+
+        <div v-if="showCategories && !isProductManagementActions" class="categories-list">
+          <div
+            class="category-item bold-text"
+            @click="selectCategory(null)"
+            :class="{ selected: selectedCategoryId === null }"
+          >
+            Tất cả
+          </div>
           <div
             v-for="category in categories"
             :key="category.id"
@@ -99,6 +114,9 @@ export default {
   computed: {
     showNavbar() {
       return this.$route.path !== "/Login" && this.$route.path !== "/Register";
+    },
+    isProductManagementActions() {
+      return this.$route.path === "/product-management/actions";
     },
   },
   mounted() {
@@ -230,7 +248,6 @@ export default {
 .all-categories {
   padding: 10px 0;
   font-size: 16px;
-  font-weight: 400;
   color: #000;
   cursor: pointer;
 }
@@ -250,7 +267,6 @@ export default {
   color: var(--blue); /* Thay đổi màu thành màu xanh đậm */
 }
 .bold-text {
-  font-weight: bold; /* Đặt kiểu chữ là đậm */
 }
 
 /* Responsive Styles */

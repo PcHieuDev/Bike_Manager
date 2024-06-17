@@ -16,16 +16,16 @@
           </div>
           <div class="form-group">
             <label>Danh mục sản phẩm</label>
-            <select class="form-select" v-model="product.category_id">
-              <template v-for="(item, index) in categories" :key="index">
+            <select class="form-select" v-model="product.brand_id">
+              <template v-for="(item, index) in brands" :key="index">
                 <option :value="item.id">{{ item.name }}</option>
               </template>
             </select>
           </div>
           <div class="form-group">
             <label>Hãng sản xuất</label>
-            <select class="form-select" v-model="product.brand_id">
-              <template v-for="(item, index) in brands" :key="index">
+            <select class="form-select" v-model="product.category_id">
+              <template v-for="(item, index) in categories" :key="index">
                 <option :value="item.id">{{ item.name }}</option>
               </template>
             </select>
@@ -61,7 +61,7 @@
             <span style="color: rgba(255, 77, 77, 1)">*</span>
             <div class="image-detail">
               <img
-                :src="product.image || initialImage"
+                :src="imagePreview || initialImage"
                 class="fixed-size-image shadow-1-strong rounded mb-4"
                 @click="triggerFileInputMainImage"
               />
@@ -124,24 +124,30 @@
       </div>
     </div>
   </div>
+  <UpdatePopupSuccess v-model="UpdateSuccess" @close="UpdateSuccess = false" />
+  <UpdatePopupFail v-model="UpdateFail" @close="UpdateFail = false" />
 </template>
 
 <script>
-import axios from "axios";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/swiper-bundle.css";
-import UpdateproductSuccess from "../../Components/Popup/UpdateProduct/UpdateproductSuccess.vue";
-import { BASE_URL } from "../../configUrl.js";
+import UpdatePopupSuccess from "../../Components/Popup/UpdateProduct/UpdateproductSuccess.vue";
+import apiClient from "../../axios-interceptor.js";
+import UpdatePopupFail from "../../Components/Popup/UpdateProduct/UpdateProductFail.vue";
 
 export default {
   name: "EditProduct",
   components: {
     Swiper,
     SwiperSlide,
-    UpdateproductSuccess,
+    UpdatePopupSuccess,
+    UpdatePopupFail,
   },
   data() {
     return {
+      UpdateSuccess: false,
+      UpdateFail: false,
+
       product: {
         name: "",
         price: "",
@@ -151,7 +157,6 @@ export default {
         brand_id: "",
         image1: "",
       },
-
       imageDetail: [{ image: "" }, { image: "" }, { image: "" }, { image: "" }],
       initialImage: "", // Lưu trữ hình ảnh ban đầu
       placeholderImage: "/storage/images/inputfile.png", // Ảnh placeholder
@@ -159,6 +164,7 @@ export default {
       categories: [],
       brands: [],
       productId: this.$route.params.id,
+      removedImageIndexes: [], // Mảng lưu các chỉ mục của các ảnh chi tiết bị xóa
     };
   },
   mounted() {
@@ -173,7 +179,6 @@ export default {
     onImageChange(index, event) {
       this.imageDetail[index].image = event.target.files[0];
     },
-
     showImageDetail(index) {
       const file = this.imageDetail[index].image;
       if (file) {
@@ -187,17 +192,15 @@ export default {
     },
     removeImage(index) {
       this.imageDetail[index].image = "";
-      // this.imageDetail.splice(index, 1);
-
       this.$refs["fileInput" + index][0].value = null; // Reset input file
+      this.removedImageIndexes.push(index); // Thêm chỉ mục của ảnh bị xóa vào mảng
     },
-
     goHome() {
       this.$router.push("/");
     },
 
     updateProduct() {
-      let url = BASE_URL + `products/${this.productId}`;
+      let url = `products/${this.productId}`;
       let token = localStorage.getItem("token");
       let formData = new FormData();
       formData.append("_method", "PUT");
@@ -206,16 +209,23 @@ export default {
       formData.append("note", this.product.note);
       formData.append("category_id", this.product.category_id);
       formData.append("brand_id", this.product.brand_id);
-      this.imageDetail.forEach((item, index) => {
-        if (item.image || item.image !== "") {
-          formData.append(`image_detail[${index}]`, item.image);
-        }
-      });
-      if (this.product.image) {
+
+      // Thêm ảnh minh họa vào formData
+      if (this.product.image instanceof File) {
         formData.append("image", this.product.image);
       }
 
-      axios
+      // Thêm ảnh chi tiết nếu có
+      for (let i = 0; i < 4; i++) {
+        if (this.imageDetail[i].image instanceof File) {
+          formData.append(`image_detail[${i}]`, this.imageDetail[i].image);
+        }
+      }
+
+      // Thêm các chỉ mục của ảnh cần xóa vào formData
+      formData.append("removed_images", JSON.stringify(this.removedImageIndexes));
+
+      apiClient
         .post(url, formData, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -224,25 +234,66 @@ export default {
         })
         .then((response) => {
           if (response.data.success) {
+            this.UpdateSuccess = true;
             console.log("Update success");
-            this.afterUpdateProduct = true;
-            // You can add any additional actions on successful update
+            // Thực hiện hành động sau khi cập nhật thành công
           } else {
+            this.UpdateFail = true;
             console.log("Update failed");
-            // Handle update failure
+            // Xử lý trường hợp cập nhật thất bại
           }
         })
         .catch((error) => {
           console.log(error);
-          // Handle request error
+          // Xử lý lỗi
         });
     },
     // other methods...
-
+    async urlToFile(url) {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const fileName = url.split("/").pop();
+      return new File([blob], fileName, { type: blob.type });
+    },
+    // main image
+    triggerFileInputMainImage() {
+      this.$refs.mainFileInput.click();
+    },
+    onMainImageChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.product.image = file; // Lưu trữ file ảnh để gửi lên server
+        this.imagePreview = URL.createObjectURL(file); // Tạo URL để hiển thị
+      }
+    },
+    removeMainImage() {
+      this.product.image = ""; // Xóa hình ảnh sản phẩm
+      this.imagePreview = null; // Xóa hình ảnh xem trước
+    },
+    getListCategory() {
+      apiClient
+        .get("categories")
+        .then((response) => {
+          this.categories = response.data.contents;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    getListBrands() {
+      apiClient
+        .get("brands")
+        .then((response) => {
+          this.brands = response.data.contents;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
     getProductDetails() {
       const id = this.$route.params.id; // lấy id từ route
-      axios
-        .get(BASE_URL + `products/${id}`)
+      apiClient
+        .get(`products/${id}`)
         .then(async (response) => {
           if (response.data) {
             this.product = response.data.product;
@@ -280,54 +331,16 @@ export default {
         });
     },
 
-    async urlToFile(url) {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      const fileName = url.split("/").pop();
-      return new File([blob], fileName, { type: blob.type });
-    },
-
-    getListCategory() {
-      axios
-        .get(BASE_URL + "categories")
-        .then((response) => {
-          this.categories = response.data.contents;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    getListBrands() {
-      axios
-        .get(BASE_URL + "brands")
-        .then((response) => {
-          this.brands = response.data.contents;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-
-    // main image
-    triggerFileInputMainImage() {
-      this.$refs.mainFileInput.click();
-    },
-    onMainImageChange(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.product.image = e.target.result; // Cập nhật hình ảnh sản phẩm
-        };
-        reader.readAsDataURL(file);
-      }
-    },
-    removeMainImage() {
-      this.product.image = ""; // Xóa hình ảnh sản phẩm
+    resetForm() {
+      this.$router.go(-1);
     },
   },
 };
 </script>
+
+<style>
+/* Add your styles here */
+</style>
 
 <style scoped>
 .image-detail {
@@ -337,6 +350,8 @@ export default {
 
 .image-detail .small-image {
   /* Giữ nguyên tỷ lệ khung hình */
+  height: auto;
+
   object-fit: cover;
   /* Đảm bảo ảnh không bị méo */
   display: block;
@@ -394,7 +409,6 @@ export default {
 }
 
 .div-2 {
-  gap: 20px;
   display: flex;
 }
 
@@ -605,7 +619,7 @@ export default {
 
 .fixed-size-image {
   width: 421px;
-  height: 261px;
+  height: auto;
   object-fit: cover;
   /* Ensure the image covers the area without distorting */
 }
