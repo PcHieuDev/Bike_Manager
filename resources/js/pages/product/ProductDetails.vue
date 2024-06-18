@@ -53,7 +53,11 @@
       <div class="product-list">
         <template v-for="item in randomProducts" :key="item.id">
           <router-link :to="`/product/details/${item.id}`" style="text-decoration: none">
-            <ProductItem :product="item" :showPrice="true" :showButton="false"></ProductItem>
+            <ProductItem
+              :product="item"
+              :showPrice="true"
+              :showButton="false"
+            ></ProductItem>
           </router-link>
         </template>
       </div>
@@ -71,7 +75,6 @@ import VueSlickCarousel from "vue-slick-carousel";
 import VueCarousel from "vue-carousel";
 import apiClient from "../../axios-interceptor";
 import ProductItem from "../../Components/Product/ProductItem.vue";
-
 
 export default {
   components: {
@@ -225,5 +228,41 @@ export default {
 .main-image {
   width: 510px;
   height: auto;
+}
+/* Điều chỉnh cho màn hình dưới 768px */
+@media (max-width: 768px) {
+  .carousel-tong,
+  .carousel-image img,
+  .main-image {
+    width: 100% !important; /* Cho phép carousel và hình ảnh chính chiếm toàn bộ chiều rộng */
+    height: auto !important; /* Điều chỉnh chiều cao tự động */
+  }
+
+  .container {
+    flex-direction: column; /* Chuyển container sang hiển thị theo cột */
+  }
+
+  .product-list,
+  .div-13,
+  .div {
+    padding: 0 10px; /* Thêm padding vào hai bên để không bị sát mép */
+  }
+}
+
+/* Điều chỉnh cho màn hình dưới 480px */
+@media (max-width: 480px) {
+  .div-7,
+  .div-8,
+  .div-9,
+  .div-10,
+  .div-11,
+  .div-12 {
+    font-size: 14px; /* Giảm kích thước font cho các phần tử văn bản */
+  }
+
+  .div-6,
+  .div-13 {
+    font-size: 16px; /* Giảm kích thước font cho tiêu đề */
+  }
 }
 </style>

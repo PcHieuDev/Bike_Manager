@@ -21,6 +21,11 @@ use App\Helpers\ArrayHelper;
 use lang\en\Message;
 use App\Models\ProductImage;
 use App\Http\Requests\SearchProductRequest;
+use App\Repositories\Interfaces\ProductImageRepositoryInterface;
+
+
+
+
 
 use Psy\Readline\Hoa\Console;
 
@@ -29,11 +34,16 @@ class ProductController extends Controller
     use HttpResponseCode;
 
     protected $productRepository;
+    protected $productImageRepository;
 
-    public function __construct(ProductRepositoryInterface $productRepository)
+
+    public function __construct(ProductRepositoryInterface $productRepository , ProductImageRepositoryInterface $productImageRepository)
     {
         $this->productRepository = $productRepository;
+        $this->productImageRepository = $productImageRepository;
+
     }
+
 
     public function getProducts()
     {
@@ -81,7 +91,7 @@ class ProductController extends Controller
     {
         try {
             $data = $request->all();
-            $image = $request->file('image');
+            $image = $data['image'];
             if ($image) {
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
                 $image->storeAs('public/images', $imageName);
@@ -163,7 +173,8 @@ class ProductController extends Controller
             // Xử lý các ảnh chi tiết nếu có
             if ($request->hasFile('image_detail')) {
                 // Xóa tất cả ảnh chi tiết cũ
-                $oldImages = ProductImage::where('product_id', $id)->get();
+                // $oldImages = ProductImage::where('product_id', $id)->get();
+                $oldImages = $this->productImageRepository->getByProductId($id);
                 foreach ($oldImages as $oldImage) {
                     $oldImagePath = public_path($oldImage->image_path);
                     if (file_exists($oldImagePath)) {
@@ -177,9 +188,10 @@ class ProductController extends Controller
                     $imageProductDetailName = time() . '_' . $index . '.' . $image->getClientOriginalExtension();
                     $image->move(public_path('storage/images'), $imageProductDetailName);
                     $imageProductDetailPath = '/storage/images/' . $imageProductDetailName;
-                    ProductImage::create([
+                    $this->productImageRepository->create([
                         'product_id' => $id,
-                        'image_path' => $imageProductDetailPath
+                        'image_path' => $imageProductDetailPath,
+                        'image_possiton' => $index + 1, // 
                     ]);
                 }
             }
@@ -197,17 +209,14 @@ class ProductController extends Controller
     public function show($id)
     {
         try {
-            $product = $this->productRepository->find($id);
-
-            $brandId = null;
-            if (isset($product) && isset($product->brand)) {
-                $brandId = $product->brand->id;
-            }
+            // Sử dụng eager loading để tải thông tin brand id cùng sản phẩm
+            $product = $this->productRepository->find($id)->load('brand');
+            // Truy cập brand_id một cách trực tiếp
+            $brandId = $product->brand_id;
             $products = $this->productRepository->getByBrand($brandId);
-            $imageDetails = ProductImage::where('product_id', $id)->get();
+            $imageDetails = $this->productImageRepository->getByProductId($id);
             return response()->json([
                 'product' => $product,
-//                'message' => $product ? __('messages.product_found') : __('messages.product_not_found'),
                 'status' => $product ? $this->ok() : $this->notFound(),
                 'products' => $products,
                 'imageDetails' => $imageDetails
@@ -217,18 +226,6 @@ class ProductController extends Controller
         }
     }
 
-    public function deleteImageDetail($id)
-    {
-        $image = ProductImage::find($id);
-        if (!$image) {
-            throw new SomethingHasErrorException();
-        }
-        $image->delete();
-        return response()->json([
-            'message' => __('messages.image_deleted'),
-            'status' => $this->ok()
-        ]);
-    }
 
     public function delete($id)
     {
@@ -246,6 +243,4 @@ class ProductController extends Controller
             throw new ProductDeletionException($e->getMessage(), $e->getCode(), $e);
         }
     }
-
-
 }

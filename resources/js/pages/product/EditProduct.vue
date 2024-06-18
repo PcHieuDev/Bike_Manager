@@ -114,6 +114,7 @@
                     </div>
                     <div>
                       <button @click="removeImage(index)">Xóa</button>
+                      <!-- <button @click="showModalDelete">Xóa</button> -->
                     </div>
                   </div>
                 </div>
@@ -126,6 +127,11 @@
   </div>
   <UpdatePopupSuccess v-model="UpdateSuccess" @close="UpdateSuccess = false" />
   <UpdatePopupFail v-model="UpdateFail" @close="UpdateFail = false" />
+  <DeleteImage
+    v-model="beforeDelete"
+    @close="beforeDelete = false"
+    @remove="removeImage(index)"
+  />
 </template>
 
 <script>
@@ -134,7 +140,7 @@ import "swiper/swiper-bundle.css";
 import UpdatePopupSuccess from "../../Components/Popup/UpdateProduct/UpdateproductSuccess.vue";
 import apiClient from "../../axios-interceptor.js";
 import UpdatePopupFail from "../../Components/Popup/UpdateProduct/UpdateProductFail.vue";
-
+import DeleteImage from "../../Components/Popup/DeleteProduct/PopupDeleteImage.vue";
 export default {
   name: "EditProduct",
   components: {
@@ -142,11 +148,13 @@ export default {
     SwiperSlide,
     UpdatePopupSuccess,
     UpdatePopupFail,
+    DeleteImage,
   },
   data() {
     return {
       UpdateSuccess: false,
       UpdateFail: false,
+      beforeDelete: false,
 
       product: {
         name: "",
@@ -173,6 +181,10 @@ export default {
     this.getProductDetails();
   },
   methods: {
+    showModalDelete(index) {
+      this.selectedImageIndex = index; // Lưu chỉ mục của hình ảnh được chọn để xóa
+      this.beforeDelete = true;
+    },
     triggerFileInput(index) {
       this.$refs["fileInput" + index][0].click();
     },
@@ -191,9 +203,11 @@ export default {
       this.triggerFileInput(index);
     },
     removeImage(index) {
+      // Logic xóa hình ảnh dựa trên chỉ mục
       this.imageDetail[index].image = "";
       this.$refs["fileInput" + index][0].value = null; // Reset input file
       this.removedImageIndexes.push(index); // Thêm chỉ mục của ảnh bị xóa vào mảng
+      this.beforeDelete = false; // Đóng popup sau khi xóa
     },
     goHome() {
       this.$router.push("/");
@@ -267,8 +281,7 @@ export default {
       }
     },
     removeMainImage() {
-      this.product.image = ""; // Xóa hình ảnh sản phẩm
-      this.imagePreview = null; // Xóa hình ảnh xem trước
+      this.product.image = ""; // Xóa hình ảnh sản phẩm      this.imagePreview = null; // Xóa hình ảnh xem trước
     },
     getListCategory() {
       apiClient

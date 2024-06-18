@@ -5,19 +5,23 @@
   </div>
 
   <div class="white-box">
-  <!-- List san pham -->
-  <ProductList
-    :products="products"
-    :showButton="true"
-    :showPrice="false"
-    @showModalDelete="showModalDelete"
-  >
-  </ProductList>
+    <!-- List san pham -->
+    <ProductList
+      :products="products"
+      :showButton="true"
+      :showPrice="false"
+      @showModalDelete="showModalDelete"
+    >
+    </ProductList>
 
-  <!-- paginate -->
-  <div class="text-xs-center">
-    <v-pagination v-model="page" :length="countRercord" :total-visible="5"></v-pagination>
-  </div>
+    <!-- paginate -->
+    <div class="text-xs-center">
+      <v-pagination
+        v-model="page"
+        :length="countRercord"
+        :total-visible="5"
+      ></v-pagination>
+    </div>
   </div>
 
   <!--  loading page-->
@@ -106,6 +110,7 @@ export default {
 
   data() {
     return {
+      searchKeyword: "",
       noProductsFound: false,
       user: null,
       productId: null,
@@ -152,6 +157,9 @@ export default {
   },
 
   mounted() {
+    if (localStorage.getItem("searchKeyword")) {
+      this.keyword = localStorage.getItem("searchKeyword");
+    }
     this.getProducts();
     this.getListCategory();
     this.getListBrands();
@@ -368,16 +376,15 @@ export default {
   margin-left: 0px;
   margin-bottom: 30px;
 }
+
 .white-box {
   background-color: white;
   border-radius: 20px;
   padding: 20px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-
 }
+
 .text-xs-center {
   margin-top: 20px;
 }
-
-
 </style>
