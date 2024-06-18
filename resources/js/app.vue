@@ -61,4 +61,7 @@ main {
   border-radius: 4px;
   background: #f1f1f1;
 }
+.v-pagination__list{
+  width: 93% !important;
+}
 </style>

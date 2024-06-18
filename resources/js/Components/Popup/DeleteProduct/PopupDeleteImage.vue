@@ -28,10 +28,14 @@
 <script>
 export default {
   name: "DeleteImage",
-  props: ["beforeDelete", "removeImage"],
+  props: ["beforeDelete", "removeImage", "selectedImageIndex"],
   methods: {
     closePopup() {
       this.$emit("close");
+    },
+    removeImage() {
+      this.$emit('removeImage', this.selectedImageIndex);
+      this.closePopup();
     },
   },
 };

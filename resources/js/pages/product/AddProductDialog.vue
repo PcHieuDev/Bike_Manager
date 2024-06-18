@@ -20,15 +20,7 @@
                 placeholder="Enter name"
               />
             </div>
-            <div class="form-group">
-              <label class="form-label mt-4 required">Giá</label>
-              <input
-                type="text"
-                class="form-control"
-                v-model="product.price"
-                placeholder="Enter price"
-              />
-            </div>
+
 
             <div class="form-group">
               <label class="form-label mt-4 required">Danh Mục</label>
@@ -46,6 +38,15 @@
                   <option :value="item.id">{{ item.name }}</option>
                 </template>
               </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label mt-4 required">Giá</label>
+              <input
+                  type="text"
+                  class="form-control"
+                  v-model="product.price"
+                  placeholder="Enter price"
+              />
             </div>
             <div class="form-group">
               <label class="form-label mt-4 required">Mô tả</label>
@@ -168,6 +169,7 @@ export default {
   justify-content: center;
   display: flex;
   gap: 10px; /* Add some space between the buttons */
+  margin-bottom: 20px;
 }
 
 .required::after {

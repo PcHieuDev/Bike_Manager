@@ -134,9 +134,10 @@ export default {
   methods: {
     goBack() {
       this.$router.go(-1);
+      this.$set(this, 'imageDetails', []); // Sử dụng this.$set thay vì gán trực tiếp
     },
     fetchProductDetails() {
-      this.imageDetails = [];
+      // this.imageDetails = [];
       const id = this.$route.params.id;
       this.isLoading = true;
       apiClient
@@ -144,6 +145,8 @@ export default {
         .then((response) => {
           if (response.data) {
             this.product = response.data.product;
+            this.imageDetails = response.data.imageDetails; // Cập nhật imageDetails với thông tin mới từ API
+
           } else {
             console.log("No data returned from API");
           }
@@ -164,7 +167,7 @@ export default {
           if (response.data) {
             this.products = response.data.products;
             this.imageDetails = response.data.imageDetails;
-            console.log("dfdjsfjdsf", this.imageDetails);
+            console.log("image Slide", this.imageDetails);
           } else {
             console.log("No data returned from API");
           }
@@ -179,7 +182,7 @@ export default {
   },
   beforeRouteUpdate(to, from, next) {
     this.productId = to.params.id;
-    this.fetchProductDetails();
+    this.fetchProductDetails(); // Gọi fetchProductDetails khi chuyển đổi giữa các sản phẩm
     next();
   },
 };

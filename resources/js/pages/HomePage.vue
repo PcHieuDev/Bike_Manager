@@ -22,12 +22,12 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import {mapState, mapActions} from "vuex";
 import debounce from "lodash/debounce";
 import ProductList from "../Components/Product/ProductList.vue";
 import SearchBar from "../Components/common/SearchBar.vue";
 import Pagination from "../Components/common/CustomPagination.vue";
-import { toast } from "vue3-toastify";
+import {toast} from "vue3-toastify";
 
 export default {
   components: {
@@ -95,14 +95,14 @@ export default {
 
       this.setSearchTerm(searchTerm);
       this.fetchProducts()
-        .then(() => {
-          if (this.products.length === 0) {
-            toast.error("Không tìm thấy sản phẩm");
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching products:", error);
-        });
+          .then(() => {
+            if (this.products.length === 0) {
+              toast.error("Không tìm thấy sản phẩm");
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching products:", error);
+          });
     },
     updatePage(newPage) {
       this.setPage(newPage);
@@ -122,8 +122,9 @@ export default {
 .custom-search {
   width: 445px !important;
   margin-left: 750px;
-  margin-bottom : 30px;
+  margin-bottom: 30px;
 }
+
 .white-box {
   background-color: white;
   border-radius: 20px;

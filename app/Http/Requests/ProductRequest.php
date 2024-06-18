@@ -29,6 +29,8 @@ class ProductRequest extends FormRequest
             'image' => 'nullable',
             'brand_id' => 'required',
             'category_id' => 'required',
+            'image_position' => 'array',
+            'image_position.*' => 'integer',
             'images_to_delete' => 'array', // Kiểm tra mảng
             'images_to_delete.*' => 'integer|exists:product_images,id' // Mỗi phần tử trong mảng phải là số nguyên và tồn tại trong bảng product_images
         ];

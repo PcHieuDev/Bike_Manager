@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\SomethingHasErrorException;
 use App\Http\Requests\ProductRequest;
 use Illuminate\Http\Request;
-use App\Models\Product;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 use App\Http\Traits\HttpResponseCode;
-use Illuminate\Support\Facades\Storage;
 use App\Exceptions\ProductNotFoundException;
 use App\Exceptions\ProductDeletionException;
 use App\Exceptions\ErrorFindingProductException;
@@ -16,18 +13,13 @@ use App\Exceptions\ErrorUpdatingProductException;
 use App\Exceptions\ErrorSavingProductException;
 use Illuminate\Http\Response;
 use App\Constants\Constants;
-use Illuminate\Support\Facades\Log;
 use App\Helpers\ArrayHelper;
 use lang\en\Message;
-use App\Models\ProductImage;
 use App\Http\Requests\SearchProductRequest;
 use App\Repositories\Interfaces\ProductImageRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
 
-
-
-
-use Psy\Readline\Hoa\Console;
 
 class ProductController extends Controller
 {
@@ -37,7 +29,7 @@ class ProductController extends Controller
     protected $productImageRepository;
 
 
-    public function __construct(ProductRepositoryInterface $productRepository , ProductImageRepositoryInterface $productImageRepository)
+    public function __construct(ProductRepositoryInterface $productRepository, ProductImageRepositoryInterface $productImageRepository)
     {
         $this->productRepository = $productRepository;
         $this->productImageRepository = $productImageRepository;
@@ -126,6 +118,7 @@ class ProductController extends Controller
 
     public function update(ProductRequest $request, $id)
     {
+        DB::beginTransaction();
         try {
             // Tìm sản phẩm theo ID
             $product = $this->productRepository->find($id);
@@ -191,21 +184,24 @@ class ProductController extends Controller
                     $this->productImageRepository->create([
                         'product_id' => $id,
                         'image_path' => $imageProductDetailPath,
-                        'image_possiton' => $index + 1, // 
+                        'image_position' => $index, // Thêm vị trí của ảnh
+
                     ]);
                 }
             }
-
+            DB::commit();
             // Trả về response thành công cùng với sản phẩm
             return response()->json([
                 'success' => true,
                 'product' => $product
             ]);
         } catch (\Exception $e) {
+            DB::rollBack();
             // Xử lý ngoại lệ
             throw new ErrorUpdatingProductException($e->getMessage(), $e->getCode(), $e);
         }
     }
+
     public function show($id)
     {
         try {

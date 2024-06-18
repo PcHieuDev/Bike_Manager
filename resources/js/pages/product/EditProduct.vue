@@ -8,10 +8,10 @@
           <div class="form-group">
             <label>Tên sản phẩm</label>
             <input
-              type="text"
-              class="form-control"
-              v-model="product.name"
-              placeholder="Enter name"
+                type="text"
+                class="form-control"
+                v-model="product.name"
+                placeholder="Enter name"
             />
           </div>
           <div class="form-group">
@@ -33,19 +33,19 @@
           <div class="form-group">
             <label>Giá</label>
             <input
-              type="text"
-              class="form-control"
-              v-model="product.price"
-              placeholder="Enter price"
+                type="text"
+                class="form-control"
+                v-model="product.price"
+                placeholder="Enter price"
             />
           </div>
           <div class="form-group">
             <label>Mô tả</label>
             <textarea
-              class="form-control"
-              id="exampleFormControlTextarea1"
-              v-model="product.note"
-              rows="3"
+                class="form-control"
+                id="exampleFormControlTextarea1"
+                v-model="product.note"
+                rows="3"
             ></textarea>
           </div>
           <div class="div-17">
@@ -61,15 +61,15 @@
             <span style="color: rgba(255, 77, 77, 1)">*</span>
             <div class="image-detail">
               <img
-                :src="imagePreview || initialImage"
-                class="fixed-size-image shadow-1-strong rounded mb-4"
-                @click="triggerFileInputMainImage"
+                  :src="imagePreview || initialImage"
+                  class="fixed-size-image shadow-1-strong rounded mb-4"
+                  @click="triggerFileInputMainImage"
               />
               <input
-                type="file"
-                ref="mainFileInput"
-                @change="onMainImageChange"
-                style="display: none"
+                  type="file"
+                  ref="mainFileInput"
+                  @change="onMainImageChange"
+                  style="display: none"
               />
               <div class="button-hover">
                 <div>
@@ -88,33 +88,34 @@
             <div class="row p-4">
               <!-- image detail -->
               <div
-                v-for="(item, index) in imageDetail"
-                class="col-lg-6 col-md-12 mb-6 mb-lg-0"
+                  v-for="(item, index) in imageDetail"
+                  class="col-lg-6 col-md-12 mb-6 mb-lg-0"
               >
                 <span>Ảnh {{ index + 1 }}</span>
                 <div class="image-detail">
                   <img
-                    :src="item.image ? showImageDetail(index) : placeholderImage"
-                    @click="triggerFileInput(index)"
-                    :class="[
+                      :src="item.image ? showImageDetail(index) : placeholderImage"
+                      @click="triggerFileInput(index)"
+                      :class="[
                       'small-image',
                       item.image ? 'loaded-image' : 'placeholder-image',
                     ]"
-                    class="shadow-1-strong rounded mb-4"
+                      class="shadow-1-strong rounded mb-4"
                   />
                   <input
-                    type="file"
-                    :ref="'fileInput' + index"
-                    @change="onImageChange(index, $event)"
-                    style="display: none"
+                      type="file"
+                      :ref="'fileInput' + index"
+                      @change="onImageChange(index, $event)"
+                      style="display: none"
                   />
                   <div class="button-hover" v-if="item.image">
                     <div>
                       <button @click="updateImage(index)">Cập nhật</button>
                     </div>
                     <div>
-                      <button @click="removeImage(index)">Xóa</button>
-                      <!-- <button @click="showModalDelete">Xóa</button> -->
+                      <button @click="showModalDelete(index)">Xóa</button>
+
+                      <!--                      <button @click="removeImage(index)">Xóa</button>-->
                     </div>
                   </div>
                 </div>
@@ -125,22 +126,24 @@
       </div>
     </div>
   </div>
-  <UpdatePopupSuccess v-model="UpdateSuccess" @close="UpdateSuccess = false" />
-  <UpdatePopupFail v-model="UpdateFail" @close="UpdateFail = false" />
-  <DeleteImage
-    v-model="beforeDelete"
-    @close="beforeDelete = false"
-    @remove="removeImage(index)"
-  />
+  <UpdatePopupSuccess v-model="UpdateSuccess" @close="UpdateSuccess = false"/>
+  <UpdatePopupFail v-model="UpdateFail" @close="UpdateFail = false"/>
+  <beforeDelete
+      v-model="beforeDelete"
+      @close="beforeDelete = false"
+      @removeImage="removeImage"
+      :selectedImageIndex="selectedImageIndex">
+  </beforeDelete>
 </template>
 
 <script>
-import { Swiper, SwiperSlide } from "swiper/vue";
+import {Swiper, SwiperSlide} from "swiper/vue";
 import "swiper/swiper-bundle.css";
 import UpdatePopupSuccess from "../../Components/Popup/UpdateProduct/UpdateproductSuccess.vue";
 import apiClient from "../../axios-interceptor.js";
 import UpdatePopupFail from "../../Components/Popup/UpdateProduct/UpdateProductFail.vue";
-import DeleteImage from "../../Components/Popup/DeleteProduct/PopupDeleteImage.vue";
+import beforeDelete from "../../Components/Popup/DeleteProduct/PopupDeleteImage.vue";
+
 export default {
   name: "EditProduct",
   components: {
@@ -148,13 +151,14 @@ export default {
     SwiperSlide,
     UpdatePopupSuccess,
     UpdatePopupFail,
-    DeleteImage,
+    beforeDelete,
   },
   data() {
     return {
       UpdateSuccess: false,
       UpdateFail: false,
       beforeDelete: false,
+      selectedImageIndex: null,
 
       product: {
         name: "",
@@ -165,7 +169,7 @@ export default {
         brand_id: "",
         image1: "",
       },
-      imageDetail: [{ image: "" }, { image: "" }, { image: "" }, { image: "" }],
+      imageDetail: [{image: ""}, {image: ""}, {image: ""}, {image: ""}],
       initialImage: "", // Lưu trữ hình ảnh ban đầu
       placeholderImage: "/storage/images/inputfile.png", // Ảnh placeholder
       imagePreview: "", // Biến tạm thời để lưu ảnh xem trước
@@ -182,8 +186,8 @@ export default {
   },
   methods: {
     showModalDelete(index) {
-      this.selectedImageIndex = index; // Lưu chỉ mục của hình ảnh được chọn để xóa
       this.beforeDelete = true;
+      this.selectedImageIndex = index;
     },
     triggerFileInput(index) {
       this.$refs["fileInput" + index][0].click();
@@ -203,11 +207,9 @@ export default {
       this.triggerFileInput(index);
     },
     removeImage(index) {
-      // Logic xóa hình ảnh dựa trên chỉ mục
       this.imageDetail[index].image = "";
       this.$refs["fileInput" + index][0].value = null; // Reset input file
       this.removedImageIndexes.push(index); // Thêm chỉ mục của ảnh bị xóa vào mảng
-      this.beforeDelete = false; // Đóng popup sau khi xóa
     },
     goHome() {
       this.$router.push("/");
@@ -240,34 +242,39 @@ export default {
       formData.append("removed_images", JSON.stringify(this.removedImageIndexes));
 
       apiClient
-        .post(url, formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then((response) => {
-          if (response.data.success) {
-            this.UpdateSuccess = true;
-            console.log("Update success");
-            // Thực hiện hành động sau khi cập nhật thành công
-          } else {
-            this.UpdateFail = true;
-            console.log("Update failed");
-            // Xử lý trường hợp cập nhật thất bại
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          // Xử lý lỗi
-        });
+          .post(url, formData, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          })
+          .then((response) => {
+            if (response.data.success) {
+              this.UpdateSuccess = true;
+              console.log("Update success");
+              localStorage.setItem('currentPage', this.page);
+
+              // thanh cong thi chuyen den trang chi tiet san pham
+              setTimeout(() => {
+                this.$router.push(`/product/details/${this.productId}`);
+              }, 1000);              // Thực hiện hành động sau khi cập nhật thành công
+            } else {
+              this.UpdateFail = true;
+              console.log("Update failed");
+              // Xử lý trường hợp cập nhật thất bại
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+            // Xử lý lỗi
+          });
     },
     // other methods...
     async urlToFile(url) {
       const response = await fetch(url);
       const blob = await response.blob();
       const fileName = url.split("/").pop();
-      return new File([blob], fileName, { type: blob.type });
+      return new File([blob], fileName, {type: blob.type});
     },
     // main image
     triggerFileInputMainImage() {
@@ -281,67 +288,63 @@ export default {
       }
     },
     removeMainImage() {
-      this.product.image = ""; // Xóa hình ảnh sản phẩm      this.imagePreview = null; // Xóa hình ảnh xem trước
+      this.product.image = ""; // Xóa hình ảnh sản phẩm
+      this.imagePreview = null; // Xóa hình ảnh xem trước
     },
     getListCategory() {
       apiClient
-        .get("categories")
-        .then((response) => {
-          this.categories = response.data.contents;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+          .get("categories")
+          .then((response) => {
+            this.categories = response.data.contents;
+          })
+          .catch((error) => {
+            console.log(error);
+          });
     },
     getListBrands() {
       apiClient
-        .get("brands")
-        .then((response) => {
-          this.brands = response.data.contents;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+          .get("brands")
+          .then((response) => {
+            this.brands = response.data.contents;
+          })
+          .catch((error) => {
+            console.log(error);
+          });
     },
+
     getProductDetails() {
       const id = this.$route.params.id; // lấy id từ route
       apiClient
-        .get(`products/${id}`)
-        .then(async (response) => {
-          if (response.data) {
-            this.product = response.data.product;
-            this.initialImage = this.product.image; // Lưu hình ảnh ban đầu
+          .get(`products/${id}`)
+          .then(async (response) => {
+            if (response.data) {
+              this.product = response.data.product;
+              this.initialImage = this.product.image; // Lưu hình ảnh ban đầu
+              let dataImageDetails = [];
+              if (response.data.imageDetails.length) {
+                const imagePromises = response.data.imageDetails.map(async (detail) => {
+                  const file = await this.urlToFile(
+                      "http://127.0.0.1:8000" + detail.image_path
+                  );
+                  return {image: file , position: detail.image_position };
+                });
 
-            if (response.data.imageDetails.length) {
-              const imagePromises = response.data.imageDetails.map(async (detail) => {
-                const file = await this.urlToFile(
-                  "http://127.0.0.1:8000" + detail.image_path
-                );
-                return { image: file };
-              });
-
-              this.imageDetail = await Promise.all(imagePromises);
-            } else {
-              this.imageDetail = [];
-            }
-
-            if (this.imageDetail.length < 4) {
-              for (let i = this.imageDetail.length; i < 4; i++) {
-                this.imageDetail.push({ image: "" });
+                dataImageDetails = await Promise.all(imagePromises);
               }
-            }
 
-            console.log("anh slide", this.imageDetail); // This should now log the files
-            console.log(this.product.category.name);
-            console.log(this.product);
-          } else {
-            // Xử lý trường hợp dữ liệu trả về null ở đây
-            console.log("No data returned from API");
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+              dataImageDetails.forEach(item => {
+                if (this.imageDetail[item.position]) {
+                  this.imageDetail[item.position].image = item.image;
+                }
+              });
+            } else {
+              // Xử lý trường hợp dữ liệu trả về null ở đây
+              console.log("No data returned from API");
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
     },
 
     resetForm() {

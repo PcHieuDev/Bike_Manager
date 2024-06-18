@@ -120,7 +120,7 @@ export default {
             this.LoginSuccess = true;
             setTimeout(() => {
               this.$router.push("/product-management/actions");
-            }, 1000);
+            }, 800);
           })
           .catch((error) => {
             console.log(error);

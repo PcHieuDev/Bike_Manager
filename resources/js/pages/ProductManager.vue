@@ -90,7 +90,7 @@ import SearchBar from "../Components/common/SearchBar.vue";
 import AddProductButton from "../Components/common/AddProductButton.vue";
 import { validateProduct } from "../validateProduct";
 import { toast } from "vue3-toastify";
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "list",
@@ -146,6 +146,7 @@ export default {
       debouncedSearch: null,
     };
   },
+
   watch: {
     page(newData) {
       this.page = newData;
@@ -169,8 +170,6 @@ export default {
   },
 
   methods: {
-    ...mapActions(["setCategoryId", "setBrandId"]),
-
     handleInput(event) {
       const searchTerm = event.target.value;
       this.debouncedSearch(searchTerm);
@@ -228,6 +227,7 @@ export default {
           params: {
             page: this.page,
             keyword: this.searchTerm,
+
           },
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -248,6 +248,10 @@ export default {
     },
 
     computed: {
+      ...mapGetters([
+        'products', // add this line
+        // other getters...
+      ]),
       isProductActionsPath() {
         return this.$route.path === "/ProductActions/actions";
       },
@@ -376,15 +380,19 @@ export default {
   margin-left: 0px;
   margin-bottom: 30px;
 }
+.product-list{
+  padding-left: 10px;
+}
 
 .white-box {
   background-color: white;
   border-radius: 20px;
-  padding: 20px;
+  padding: 20px  15px 15px 5px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
 .text-xs-center {
   margin-top: 20px;
 }
+
 </style>

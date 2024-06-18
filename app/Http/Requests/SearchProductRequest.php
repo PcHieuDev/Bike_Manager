@@ -27,6 +27,7 @@ class SearchProductRequest extends FormRequest
             'query' => 'required|string',
             'categoryName' => 'required|string',
             'brandName' => 'required|string',
+            'product_id' => 'required|integer',
         ];
     }
 }

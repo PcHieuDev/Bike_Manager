@@ -971,6 +971,7 @@ body {
     line-height: 150%;
     margin: 5px 0 0 14px;
     text-decoration: none !important;
+    margin-right: 1.5%;
 }
 
 @media (max-width: 991px) {

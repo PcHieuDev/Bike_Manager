@@ -44,15 +44,3 @@ export default {
 };
 </script>
 
-<!--<style scoped>-->
-<!--/* Add any styles specific to ProductList here */-->
-<!--.product-list {-->
-<!--  background-color: white; /* Màu nền trắng */-->
-<!--  padding: 10px; /* Khoảng cách giữa khung và sản phẩm */-->
-<!--  border-radius: 20px; /* Viền bo tròn */-->
-<!--  margin-top: 20px; /* Khoảng cách giữa khung và sản phẩm */-->
-<!--  padding-top: 40px;-->
-<!--  padding-left: 5px;-->
-<!--  padding-bottom: 40px;-->
-<!--}-->
-<!--</style>-->

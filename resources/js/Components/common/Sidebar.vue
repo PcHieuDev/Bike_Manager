@@ -118,6 +118,9 @@ export default {
     isProductManagementActions() {
       return this.$route.path === "/product-management/actions";
     },
+    isProductDetail() {
+      return this.$route.path === "//product/details/:id";
+    },
   },
   mounted() {
     this.getListCategory();
