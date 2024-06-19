@@ -725,7 +725,7 @@ body {
 
 .img {
     aspect-ratio: 1.08;
-    object-fit: auto;
+    /*object-fit: auto;*/
     object-position: center;
     width: 15px;
     align-self: start;
@@ -794,7 +794,7 @@ body {
 
 .img-2 {
     aspect-ratio: 1.61;
-    object-fit: auto;
+    /*object-fit: auto;*/
     object-position: center;
     width: 100%;
     margin-top: 56px;
