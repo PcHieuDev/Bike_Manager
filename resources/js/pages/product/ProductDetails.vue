@@ -134,8 +134,9 @@ export default {
   methods: {
     goBack() {
       this.$router.go(-1);
-      this.$set(this, 'imageDetails', []); // Sử dụng this.$set thay vì gán trực tiếp
+      this.imageDetails = []; // Cập nhật trực tiếp mà không cần sử dụng $set
     },
+
     fetchProductDetails() {
       // this.imageDetails = [];
       const id = this.$route.params.id;
@@ -189,6 +190,9 @@ export default {
 </script>
 
 <style scoped>
+.div {
+  max-width: 1080px;
+}
 .carousel-tong {
   width: 510px !important;
   height: 316px !important;
@@ -203,7 +207,9 @@ export default {
 
 .product-list {
   padding-left: 0px;
+  gap: 35px;
 }
+
 
 .container {
   display: flex;
@@ -232,6 +238,7 @@ export default {
   width: 510px;
   height: auto;
 }
+
 /* Điều chỉnh cho màn hình dưới 768px */
 @media (max-width: 768px) {
   .carousel-tong,
@@ -268,4 +275,7 @@ export default {
     font-size: 16px; /* Giảm kích thước font cho tiêu đề */
   }
 }
+
+
 </style>
+

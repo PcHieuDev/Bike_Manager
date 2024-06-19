@@ -2,7 +2,7 @@
   <header class="header">
     <div class="overlap">
       <div
-        v-if="user"
+          v-if="user && !isMobile"
         class="s-n-ph-m-2"
         @click="goProductAction"
         :class="{ clicked: productClicked }"
@@ -19,7 +19,7 @@
           @click="goHome"
           class="image-3"
           alt="Image"
-          src="https://ncc.asia/assets/images/logo.png"
+          src="https://career.ncc.asia/wp-content/uploads/2021/03/logo.png"
         />
       </div>
 
@@ -59,6 +59,7 @@ export default {
 
   data() {
     return {
+      isMobile: false, // new property for mobile check
       email: "",
       password: "",
       ShowLogin: false,
@@ -82,9 +83,22 @@ export default {
 
   mounted() {
     this.getAuth();
+    this.handleResize();
+    window.addEventListener('resize', this.handleResize);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize);
   },
 
   methods: {
+    handleResize() {
+      if (window.innerWidth <= 768) {
+        this.isMobile = true;
+      } else {
+        this.isMobile = false;
+      }
+    },
+
     goHome() {
       this.$router.push("/");
       this.homeClicked = true;
@@ -127,6 +141,49 @@ export default {
 </script>
 
 <style scoped>
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+  .header {
+    height: 50px; /* smaller header for smaller screens */
+  }
+
+  .header .s-n-ph-m, .header .s-n-ph-m-2 {
+    font-size: 12px; /* smaller font size */
+    top: 15px; /* adjust position */
+  }
+
+  .header .text-wrapper-6 {
+    font-size: 24px; /* smaller logo text */
+  }
+
+  .header .image-3 {
+    left: 50px; /* adjust logo image position */
+    top: 8px;
+    width: 24px;
+    height: 24px;
+  }
+
+  .header .custom-profile span {
+    font-size: 14px; /* smaller user name font size */
+  }
+
+  .header .btn-custom {
+    padding: 3px 6px; /* smaller buttons */
+  }
+}
+
+@media (max-width: 480px) {
+  .header .overlap-group-3,
+  .header .custom-profile,
+  .header .s-n-ph-m,
+  .header .s-n-ph-m-2 {
+    display: none; /* hide elements on very small screens */
+  }
+
+  .header .text-wrapper-6 {
+    width: 100%; /* full-width logo text */
+  }
+}
 .header .s-n-ph-m-2.clicked,
 .header .s-n-ph-m.clicked {
   color: black;

@@ -16,7 +16,7 @@
             <button type="button" @click="closePopup" class="popup-detail-btn cancel">
               Hủy
             </button>
-            <button type="button" @click="removeImage" class="popup-detail-btn submit">
+            <button type="button" @click="removeImageMethod" class="popup-detail-btn submit">
               Xóa
             </button>
           </div>
@@ -33,7 +33,7 @@ export default {
     closePopup() {
       this.$emit("close");
     },
-    removeImage() {
+    removeImageMethod() {
       this.$emit('removeImage', this.selectedImageIndex);
       this.closePopup();
     },

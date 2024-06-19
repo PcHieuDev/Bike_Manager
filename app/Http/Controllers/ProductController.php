@@ -20,7 +20,6 @@ use App\Repositories\Interfaces\ProductImageRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
 
-
 class ProductController extends Controller
 {
     use HttpResponseCode;
@@ -166,7 +165,6 @@ class ProductController extends Controller
             // Xử lý các ảnh chi tiết nếu có
             if ($request->hasFile('image_detail')) {
                 // Xóa tất cả ảnh chi tiết cũ
-                // $oldImages = ProductImage::where('product_id', $id)->get();
                 $oldImages = $this->productImageRepository->getByProductId($id);
                 foreach ($oldImages as $oldImage) {
                     $oldImagePath = public_path($oldImage->image_path);
@@ -184,7 +182,7 @@ class ProductController extends Controller
                     $this->productImageRepository->create([
                         'product_id' => $id,
                         'image_path' => $imageProductDetailPath,
-                        'image_position' => $index, // Thêm vị trí của ảnh
+                        'image_position' => $index, // Thêm vị trí của ảnh = vị trí trong mảng ảnh
 
                     ]);
                 }

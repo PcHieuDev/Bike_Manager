@@ -89,8 +89,6 @@ class ProductRepository implements ProductRepositoryInterface
             ->take($size)
             ->get();
     }
-
-
     public function search($query)
     {
         $products = Product::query();

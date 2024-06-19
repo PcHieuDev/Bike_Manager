@@ -2,7 +2,7 @@
   <v-dialog
     :value="isShowDialog"
     @input="$emit('update:isShowDialog', $event)"
-    max-width="674"
+    :max-width="dialogWidth"
   >
     <v-card>
       <v-spacer></v-spacer>
@@ -106,6 +106,18 @@ export default {
       },
     };
   },
+  computed: {
+    dialogWidth() {
+      if (window.innerWidth < 600) {
+        return '95vw'; // Very small devices
+      } else if (window.innerWidth < 960) {
+        return '80vw'; // Small devices
+      } else {
+        return '50vw'; // Default for others
+      }
+    }
+  },
+
 
   methods: {
     addProduct() {
@@ -138,6 +150,9 @@ export default {
 </script>
 
 <style scoped>
+.headline{
+  text-align: center !important;
+}
 .btn-outline-primary,
 .btn-outline-secondary {
   border-radius: 20px;
@@ -166,14 +181,43 @@ export default {
 }
 
 .v-card-actions.justify-center {
-  justify-content: center;
-  display: flex;
+  justify-content: space-around; /* Distribute space around items */
+  flex-wrap: wrap; /* Allow buttons to wrap on small screens */
   gap: 10px; /* Add some space between the buttons */
   margin-bottom: 20px;
+  padding: 15px; /* Padding around the action area */
+
 }
 
 .required::after {
   content: "*";
   color: red;
 }
+.form-group {
+  margin-bottom: 0px; /* Add spacing between form fields */
+}
+input[type="text"],
+input[type="file"],
+textarea,
+select {
+  width: 100%; /* Full width to fill the form */
+  box-sizing: border-box; /* Include padding and border in the element's width */
+}
+@media (max-width: 600px) {
+  .btn-wide {
+    width: 100%; /* Full width buttons on small screens */
+    margin-bottom: 10px; /* Space between buttons when wrapped */
+  }
+
+  .v-card-title {
+    font-size: 18px; /* Smaller text for small devices */
+
+  }
+
+  .v-card-text {
+    padding: 0px 24px 0px; /* Less padding inside the card on small devices */
+  }
+}
+
+
 </style>

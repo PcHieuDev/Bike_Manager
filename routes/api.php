@@ -22,7 +22,6 @@ Route::prefix('v1')->group(function () {
     Route::get('/brands/{brandId}/products', [ProductController::class, 'getByBrand']);
     // category api
     Route::get('/categories', [CategoryController::class, 'getAll']);
-
     // product api
     Route::get('/', [ProductController::class, 'getProducts']);
     Route::get('/products/{id}', [ProductController::class, 'show']);

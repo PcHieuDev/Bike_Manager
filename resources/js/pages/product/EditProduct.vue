@@ -3,7 +3,7 @@
     <div class="div-2">
       <div class="column">
         <div class="div-3">
-          <div class="div-4x" @click="$router.go(-1)">Quay Lại</div>
+<!--          <div class="div-4x" @click="$router.go(-1)">Quay Lại</div>-->
           <div class="div-4">Thông tin sản phẩm</div>
           <div class="form-group">
             <label>Tên sản phẩm</label>
@@ -79,7 +79,7 @@
                   <button v-if="product.image" @click="triggerFileInputMainImage">
                     Cập nhật
                   </button>
-                  <button v-if="product.image" @click="removeMainImage">Xóa</button>
+<!--                  <button v-if="product.image" @click="removeMainImage">Xóa</button>-->
                 </div>
               </div>
             </div>
@@ -320,7 +320,7 @@ export default {
             if (response.data) {
               this.product = response.data.product;
               this.initialImage = this.product.image; // Lưu hình ảnh ban đầu
-              let dataImageDetails = [];
+              let dataImageDetails = []; // khoi tao mang chua anh chi tiet
               if (response.data.imageDetails.length) {
                 const imagePromises = response.data.imageDetails.map(async (detail) => {
                   const file = await this.urlToFile(
@@ -331,10 +331,9 @@ export default {
 
                 dataImageDetails = await Promise.all(imagePromises);
               }
-
-              dataImageDetails.forEach(item => {
-                if (this.imageDetail[item.position]) {
-                  this.imageDetail[item.position].image = item.image;
+              dataImageDetails.forEach(item => { // lap qua tung phan tu trong mang
+                if (this.imageDetail[item.position]) { // kiem tra xem vi tri do co ton tai trong mang imageDetail khong
+                  this.imageDetail[item.position].image = item.image; // gan file anh vao vi tri tuong ung
                 }
               });
             } else {
@@ -354,9 +353,6 @@ export default {
 };
 </script>
 
-<style>
-/* Add your styles here */
-</style>
 
 <style scoped>
 .image-detail {

@@ -294,4 +294,39 @@ export default {
     /* Above the sidebar */
   }
 }
+@media (max-width: 1024px) {
+  .filter {
+    width: 100%; /* Make sidebar full-width on very small screens */
+    padding-top: 56px; /* Adjust padding-top to align with any fixed header */
+    margin-top: 0; /* Remove margin-top to allow sidebar to align with the top of the viewport */
+    transform: translateX(-100%); /* Start off-screen */
+  }
+
+  .showSidebar { /* This class should be toggled based on the state */
+    transform: translateX(0); /* Bring sidebar on-screen when toggled */
+  }
+
+  .sidebar-toggle {
+    display: block; /* Ensure toggle button is visible only on small screens */
+  }
+}
+
+@media (min-width: 1025px) {
+  .sidebar-toggle {
+    display: none; /* Hide toggle button on large screens */
+  }
+
+  .filter {
+    transform: none; /* Sidebar always visible on large screens */
+  }
+}
+
+/* Additional responsive handling for very small devices */
+@media (max-width: 480px) {
+  .category-header .text,
+  .brand-item,
+  .category-item {
+    font-size: 14px; /* Smaller font size for very small devices */
+  }
+}
 </style>

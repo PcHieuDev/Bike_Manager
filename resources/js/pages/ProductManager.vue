@@ -168,6 +168,13 @@ export default {
     var user = localStorage.getItem("user");
     this.user = JSON.parse(localStorage.getItem("user"));
   },
+  computed: {
+    ...mapGetters([
+    ]),
+    isProductActionsPath() {
+      return this.$route.path === "/ProductActions/actions";
+    },
+  },
 
   methods: {
     handleInput(event) {
@@ -236,7 +243,6 @@ export default {
           this.totalRecords = response.data.count;
           this.countRercord = Math.ceil(response.data.count / this.itemsPerPage);
           // this.noProductsFound = this.totalRecords === 0;
-          console.log(this.countRercord);
           console.log(response.data.contents);
         })
         .catch((error) => {
@@ -245,16 +251,6 @@ export default {
         .finally(() => {
           this.isLoading = false;
         });
-    },
-
-    computed: {
-      ...mapGetters([
-        'products', // add this line
-        // other getters...
-      ]),
-      isProductActionsPath() {
-        return this.$route.path === "/ProductActions/actions";
-      },
     },
 
     changeDialog() {
