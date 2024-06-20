@@ -6,7 +6,6 @@
   >
     <v-card>
       <v-spacer></v-spacer>
-
       <v-card-title class="headline">Thêm sản phẩm</v-card-title>
       <v-card-text>
         <form ref="productForm">
@@ -20,8 +19,6 @@
                 placeholder="Enter name"
               />
             </div>
-
-
             <div class="form-group">
               <label class="form-label mt-4 required">Danh Mục</label>
               <select class="form-select" v-model="product.brand_id">
@@ -117,7 +114,6 @@ export default {
       }
     }
   },
-
 
   methods: {
     addProduct() {

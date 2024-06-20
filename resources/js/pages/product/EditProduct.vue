@@ -85,6 +85,7 @@
             </div>
           </div>
           <div class="div-22">
+
             <div class="row p-4">
               <!-- image detail -->
               <div
@@ -134,6 +135,8 @@
       @removeImage="removeImage"
       :selectedImageIndex="selectedImageIndex">
   </beforeDelete>
+
+  <Popupaddmissing v-model="AddMissing" @close="AddMissing = false"></Popupaddmissing>
 </template>
 
 <script>
@@ -143,6 +146,10 @@ import UpdatePopupSuccess from "../../Components/Popup/UpdateProduct/Updateprodu
 import apiClient from "../../axios-interceptor.js";
 import UpdatePopupFail from "../../Components/Popup/UpdateProduct/UpdateProductFail.vue";
 import beforeDelete from "../../Components/Popup/DeleteProduct/PopupDeleteImage.vue";
+import { validateProduct } from "../../validateProduct.js";
+import Popupaddmissing from "../../Components/Popup/AddProduct/AddproductMissing.vue"
+
+
 
 export default {
   name: "EditProduct",
@@ -152,6 +159,7 @@ export default {
     UpdatePopupSuccess,
     UpdatePopupFail,
     beforeDelete,
+    Popupaddmissing,
   },
   data() {
     return {
@@ -159,6 +167,7 @@ export default {
       UpdateFail: false,
       beforeDelete: false,
       selectedImageIndex: null,
+      AddMissing: false,
 
       product: {
         name: "",
@@ -216,6 +225,10 @@ export default {
     },
 
     updateProduct() {
+      if (!validateProduct(this.product)) {
+        this.AddMissing = true;
+        return;
+      }
       let url = `products/${this.productId}`;
       let token = localStorage.getItem("token");
       let formData = new FormData();

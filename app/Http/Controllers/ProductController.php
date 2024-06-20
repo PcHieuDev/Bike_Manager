@@ -35,7 +35,6 @@ class ProductController extends Controller
 
     }
 
-
     public function getProducts()
     {
         $products = $this->productRepository->all();
@@ -50,17 +49,24 @@ class ProductController extends Controller
 
     public function getData(Request $request)
     {
-        $inputs = $request->all();
-        $page = ArrayHelper::getValue($inputs, 'page', Constants::DEFAULT_PAGE_NUMBER);
-        $keyword = ArrayHelper::getValue($inputs, 'keyword', '');
-        $brandId = ArrayHelper::getValue($inputs, 'brandId', '');
-        $productId = ArrayHelper::getValue($inputs, 'productId', '');
-        $categoryId = ArrayHelper::getValue($inputs, 'categoryId', '');
-        $size = ArrayHelper::getValue($inputs, 'size', Constants::DEFAULT_PAGE_SIZE);
+        // Sử dụng only để lấy chỉ các trường dữ liệu cần thiết
+        $validatedData = $request->only('page', 'keyword', 'brandId', 'productId', 'categoryId', 'size');
+
+        // Sử dụng các giá trị mặc định nếu không tồn tại
+        $page = $validatedData['page'] ?? Constants::DEFAULT_PAGE_NUMBER;
+        $size = $validatedData['size'] ?? Constants::DEFAULT_PAGE_SIZE;
+        $keyword = $validatedData['keyword'] ?? '';
+        $brandId = $validatedData['brandId'] ?? '';
+        $productId = $validatedData['productId'] ?? '';
+        $categoryId = $validatedData['categoryId'] ?? '';
+
+        // Gọi phương thức paginate từ repository
         $data = $this->productRepository->paginate($page, $size, $keyword, $brandId, $categoryId, $productId);
 
-        // Sử dụng biến trung gian để lưu trữ kết quả của hàm count
+        // Sử dụng phương thức count từ repository để lấy số lượng kết quả tìm kiếm tổng thể
         $count = $this->productRepository->count($keyword, $brandId, $categoryId, $productId);
+
+        // Trả về response JSON với các dữ liệu đã lấy được
         return response()->json([
             'contents' => $data,
             'count' => $count,
@@ -71,10 +77,7 @@ class ProductController extends Controller
     public function search(SearchProductRequest $request)
     {
         $query = $request->input('query');
-        $categoryName = $request->input('categoryName');
-        $brandName = $request->input('brandName');
-        $productId = $request->input('productId');
-        $products = $this->productRepository->search($query, $categoryName, $brandName, $productId);
+        $products = $this->productRepository->search($query);
         return response()->json($products);
     }
 
@@ -84,7 +87,7 @@ class ProductController extends Controller
             $data = $request->all();
             $image = $data['image'];
             if ($image) {
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
+                $imageName = time() . '.' . $image->getClientOriginalExtension(); // Tạo tên mới cho ảnh
                 $image->storeAs('public/images', $imageName);
                 $data['image'] = '/storage/images/' . $imageName;
             } else {
@@ -203,7 +206,7 @@ class ProductController extends Controller
     public function show($id)
     {
         try {
-            // Sử dụng eager loading để tải thông tin brand id cùng sản phẩm
+            //  tải thông tin brand id cùng sản phẩm
             $product = $this->productRepository->find($id)->load('brand');
             // Truy cập brand_id một cách trực tiếp
             $brandId = $product->brand_id;
@@ -220,15 +223,17 @@ class ProductController extends Controller
         }
     }
 
-
     public function delete($id)
     {
-        $product = $this->productRepository->find($id);
-        if (!$product) {
-            throw new ProductNotFoundException();
-        }
         try {
-            $product->delete();
+            // Sử dụng phương thức delete() từ ProductReposi
+            $deleted = $this->productRepository->delete($id);
+
+            // Kiểm tra xem sản phẩm có được xóa thành công
+            if (!$deleted) {
+                throw new ProductNotFoundException();
+            }
+
             return response()->json([
                 'message' => __('messages.product_deleted'),
                 'status' => Response::HTTP_OK

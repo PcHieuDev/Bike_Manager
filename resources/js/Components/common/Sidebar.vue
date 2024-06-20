@@ -73,28 +73,10 @@
 <script>
 import axios from "axios";
 import { mapActions } from "vuex";
-import { BASE_URL } from "../../configUrl";
+import { BASE_URL } from "../../baseUrl";
 import { useToast } from "vue3-toastify";
+import apiClient from "../../axios-interceptor.js";
 
-const apiClient = axios.create({
-  baseURL: BASE_URL,
-});
-
-// Thêm response interceptor
-apiClient.interceptors.response.use(
-  (response) => {
-    // Nếu response không phải lỗi, chỉ cần trả về response
-    return response;
-  },
-  (error) => {
-    // Nếu có lỗi, xử lý lỗi
-    console.error(error);
-    const toast = useToast();
-
-    toast.error("An error occurred while fetching data.");
-    throw error;
-  }
-);
 export default {
   name: "Filter",
   data() {
@@ -119,7 +101,7 @@ export default {
       return this.$route.path === "/product-management/actions";
     },
     isProductDetail() {
-      return this.$route.path === "//product/details/:id";
+      return this.$route.path === "/product/details/:id";
     },
   },
   mounted() {
@@ -136,7 +118,6 @@ export default {
     ...mapActions([
       "setBrandId",
       "fetchProducts",
-      "fetchProductsAction",
       "setCategoryId",
     ]),
     async getListCategory() {
@@ -157,8 +138,6 @@ export default {
 
       this.selectedCategoryId = categoryId; // Gán giá trị cho biến lưu trạng thái của category được chọn
       this.setCategoryId(categoryId);
-
-      // this.fetchProducts(null, categoryId);
     },
     toggleCategories() {
       this.showCategories = !this.showCategories;
@@ -182,8 +161,6 @@ export default {
       this.selectedBrandId = brandId; // Gán giá trị cho biến lưu trạng thái của brand được chọn
       this.$router.push({ path: "/", query: { brandId } });
       this.setBrandId(brandId);
-
-      // this.fetchProducts(brandId);
     },
   },
 };

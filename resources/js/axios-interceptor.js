@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BASE_URL } from "./configUrl.js";
+import { BASE_URL } from "./baseUrl.js";
 import { toast } from "vue3-toastify";
 
 const apiClient = axios.create({
@@ -17,16 +17,16 @@ apiClient.interceptors.response.use(
     if (error.response) {
       // Lỗi từ server (có mã trạng thái và dữ liệu phản hồi)
       if (error.response.status === 500) {
-        // Xử lý lỗi 500 (Internal Server Error) ở đây
-        toast.error("Internal Server Error: " + error.response.data);
+        // Xử lý lỗi 500 (Internal Server Error)
+        toast.error("Đã có lỗi, thử lại: " + error.response.data);
       } else if (error.response.status === 404) {
-        // Xử lý lỗi 404 (Not Found) ở đây
+        // Xử lý lỗi 404 (Not Found)
         toast.error("Not Found: " + error.response.data);
       } else if (error.response.status === 401) {
-        // Xử lý lỗi 401 (Unauthorized) ở đây
+        // Xử lý lỗi 401 (Unauthorized)
         toast.error("Unauthorized: " + error.response.data);
       } else {
-        // Xử lý các mã lỗi khác nếu cần
+        // Xử lý các mã lỗi khác
         toast.error("Error: " + error.response.data);
       }
     } else if (error.request) {

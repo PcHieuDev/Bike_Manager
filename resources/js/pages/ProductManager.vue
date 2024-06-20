@@ -7,6 +7,7 @@
   <div class="white-box">
     <!-- List san pham -->
     <ProductList
+        v-if="products && products.length > 0"
       :products="products"
       :showButton="true"
       :showPrice="false"
@@ -15,13 +16,18 @@
     </ProductList>
 
     <!-- paginate -->
-    <div class="text-xs-center">
-      <v-pagination
-        v-model="page"
-        :length="countRercord"
-        :total-visible="5"
-      ></v-pagination>
+    <div v-if="products && products.length > 0" class="text-xs-center">
+      <!-- Paginate Component -->
+      <Pagination
+          :pages="countRercord"
+          :initial-page="page"
+          @update:page="handlePageChange"
+      ></Pagination>
     </div>
+    <div v-else class="no-products">
+      Không có sản phẩm
+    </div>
+
   </div>
 
   <!--  loading page-->
@@ -91,11 +97,12 @@ import AddProductButton from "../Components/common/AddProductButton.vue";
 import { validateProduct } from "../validateProduct";
 import { toast } from "vue3-toastify";
 import { mapActions, mapGetters } from "vuex";
+import Pagination from "../Components/common/Paginate.vue";
 
 export default {
   name: "list",
   components: {
-    Paginate,
+    Pagination,
     ProductList,
     AddProductDialog,
     PupupAddSuccess,
@@ -144,6 +151,7 @@ export default {
       brands: [],
       keyword: "",
       debouncedSearch: null,
+      imageNull: "/storage/images/noproduct.png",
     };
   },
 
@@ -152,6 +160,7 @@ export default {
       this.page = newData;
       this.getProducts();
     },
+
   },
   created() {
     this.debouncedSearch = debounce(this.setSearchTermAndFetch, 1000);
@@ -177,6 +186,12 @@ export default {
   },
 
   methods: {
+
+    handlePageChange(newPage) {
+      this.page = newPage;
+      this.getProducts(); // Hàm lấy dữ liệu sản phẩm dựa trên trang mới
+    },
+
     handleInput(event) {
       const searchTerm = event.target.value;
       this.debouncedSearch(searchTerm);
@@ -189,7 +204,7 @@ export default {
       // Xác thực searchTerm
       if (searchTerm === null || /^\s+$/.test(searchTerm)) {
         // Nếu searchTerm là null hoặc chỉ chứa dấu cách, hiển thị thông báo không tìm thấy sản phẩm
-        toast.error("Không tìm thấy sản phẩm");
+        toast.error("Nhập gì đó khác ik");
         return;
       } else if (/[!@#$%^&*(),.?":{}|<>]/.test(searchTerm)) {
         // Nếu searchTerm chứa ký tự đặc biệt, hiển thị toast thông báo không được nhập ký tự đặc biệt
@@ -203,7 +218,11 @@ export default {
         .then(() => {
           // Kiểm tra nếu không có sản phẩm được tìm thấy, hiển thị thông báo toast
           if (this.products.length === 0) {
-            toast.error("Không tìm thấy sản phẩm");
+            // toast.error("Không tìm thấy sản phẩm");
+            setTimeout(() => {
+              this.searchTerm = ""; // Reset searchTerm
+              this.getProducts();
+            }, 3000);
           }
         })
         .catch((error) => {
@@ -234,6 +253,8 @@ export default {
           params: {
             page: this.page,
             keyword: this.searchTerm,
+            itemsPerPage: this.itemsPerPage,
+
 
           },
           headers: { Authorization: `Bearer ${token}` },
@@ -370,6 +391,18 @@ export default {
 </script>
 
 <style scoped>
+
+.no-products {
+  text-align: center; /* Căn giữa nội dung ngang */
+  padding: 20px;
+  font-size: 18px;
+  color: #666;
+  display: flex; /* Sử dụng flexbox */
+  align-items: center; /* Căn giữa các item theo chiều ngang */
+  justify-content: center; /* Căn giữa các item theo chiều dọc */
+  height: 300px; /* Đặt chiều cao div tối đa hoặc theo nhu cầu */
+}
+
 .header-product {
   padding-top: 60px;
   width: 100%;

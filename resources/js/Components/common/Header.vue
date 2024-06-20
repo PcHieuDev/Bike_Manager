@@ -271,7 +271,7 @@ export default {
 
 .header .text-wrapper-6 {
   color: var(--white);
-  font-family: "Petrona", Helvetica;
+  font-family: none;
   font-size: 48px;
   font-weight: 700;
   height: 64px;

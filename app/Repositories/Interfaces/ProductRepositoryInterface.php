@@ -24,6 +24,9 @@ interface ProductRepositoryInterface
 
     public function getBybrand($brandId);
 
+    public function applyKeywordFilters($query, $keyword);
+
+
                                                          
 
 

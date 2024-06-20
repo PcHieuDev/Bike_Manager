@@ -3,15 +3,20 @@
     <div class="header-product d-flex justify-content-between">
       <SearchBar @input="handleInput" @clear="clearSearchTerm"></SearchBar>
     </div>
-
     <!-- Danh sách sản phẩm và phân trang trong khung màu trắng -->
     <div class="white-box">
-      <ProductList :products="products"></ProductList>
-      <Pagination
-          :page="page"
-          :totalPages="totalPages"
-          @updatePage="updatePage"
+      <!-- Chỉ hiển thị ProductList và Pagination nếu có sản phẩm -->
+      <ProductList v-if="products && products.length > 0" :products="products"></ProductList>
+      <Pagination v-if="products && products.length > 0"
+                  :page="page"
+                  :totalVisible="5"
+                  :totalPages="totalPages"
+                  @updatePage="updatePage"
       ></Pagination>
+      <!-- Hiển thị thông báo nếu không có sản phẩm -->
+      <div v-else class="no-products">
+        Không có sản phẩm
+      </div>
     </div>
 
     <!-- Loading Indicator -->
@@ -97,7 +102,11 @@ export default {
       this.fetchProducts()
           .then(() => {
             if (this.products.length === 0) {
-              toast.error("Không tìm thấy sản phẩm");
+              // toast.error("Không tìm thấy sản phẩm");
+              setTimeout(() => {
+                this.setSearchTerm("");
+                this.fetchProducts();
+              }, 3000);
             }
           })
           .catch((error) => {
@@ -132,4 +141,14 @@ export default {
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 
 }
+
+.no-products {
+  padding-top: 150px;
+  text-align: center;
+  font-size: 18px;
+  color: #666;
+  height: 300px;
+  font-weight: bold;
+}
+
 </style>
