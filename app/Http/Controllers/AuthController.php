@@ -4,12 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Passport\HasApiTokens;
 use App\Models\User;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Response;
-use App\Exceptions\ErrorRegisteringUserException;
-use App\Exceptions\ErrorLoginException;
-use App\Exceptions\ErrorLogoutException;
+use App\Exceptions\SomethingHasErrorException;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Http\Traits\HttpResponseCode;
 
@@ -31,12 +30,12 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (!Auth::attempt($request->only('email', 'password'))) { //  nếu không thể xác thực người dùng với thông tin được cung cấp
             return response()->json(['error' => 'Unauthenticated'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $user = Auth::user();
-        $token = $user->createToken('token')->accessToken;
+        $user = Auth::user(); // Lấy thông tin người dùng đã xác thực   
+        $token = $user->createToken('token')->accessToken; // Tạo token cho người dùng đã xác thực  
 
         return response()->json(['token' => $token, 'user' => $user], Response::HTTP_OK);
     }
@@ -45,7 +44,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         try {
-            $this->userRepository->create([
+            $this->userRepository->create([ // Tạo mới người dùng
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => bcrypt($request->password)
@@ -53,17 +52,17 @@ class AuthController extends Controller
 
             return response()->json(['message' => 'User created'], 201);
         } catch (\Exception $e) {
-            throw new ErrorRegisteringUserException($e->getMessage(), $e->getCode(), $e);
+            throw new SomethingHasErrorException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
     public function logout(Request $request)
     {
         try {
-            $request->user()->token()->revoke();
+            $request->user()->token()->revoke(); // Revoke the token on logout
             return response()->json(['message' => 'User logged out'], Response::HTTP_OK);
         } catch (\Exception $e) {
-            throw new ErrorLogoutException($e->getMessage(), $e->getCode(), $e);
+            throw new SomethingHasErrorException($e->getMessage(), $e->getCode(), $e);
         }
     }
 }

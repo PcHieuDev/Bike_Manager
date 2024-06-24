@@ -3,15 +3,15 @@
     <div class="div-2">
       <div class="column">
         <div class="div-3">
-<!--          <div class="div-4x" @click="$router.go(-1)">Quay Lại</div>-->
+          <!--          <div class="div-4x" @click="$router.go(-1)">Quay Lại</div>-->
           <div class="div-4">Thông tin sản phẩm</div>
           <div class="form-group">
             <label>Tên sản phẩm</label>
             <input
-                type="text"
-                class="form-control"
-                v-model="product.name"
-                placeholder="Enter name"
+              type="text"
+              class="form-control"
+              v-model="product.name"
+              placeholder="Enter name"
             />
           </div>
           <div class="form-group">
@@ -33,19 +33,19 @@
           <div class="form-group">
             <label>Giá</label>
             <input
-                type="text"
-                class="form-control"
-                v-model="product.price"
-                placeholder="Enter price"
+              type="text"
+              class="form-control"
+              v-model="product.price"
+              placeholder="Enter price"
             />
           </div>
           <div class="form-group">
             <label>Mô tả</label>
             <textarea
-                class="form-control"
-                id="exampleFormControlTextarea1"
-                v-model="product.note"
-                rows="3"
+              class="form-control"
+              id="exampleFormControlTextarea1"
+              v-model="product.note"
+              rows="3"
             ></textarea>
           </div>
           <div class="div-17">
@@ -61,15 +61,15 @@
             <span style="color: rgba(255, 77, 77, 1)">*</span>
             <div class="image-detail">
               <img
-                  :src="imagePreview || initialImage"
-                  class="fixed-size-image shadow-1-strong rounded mb-4"
-                  @click="triggerFileInputMainImage"
+                :src="imagePreview || initialImage"
+                class="fixed-size-image shadow-1-strong rounded mb-4"
+                @click="triggerFileInputMainImage"
               />
               <input
-                  type="file"
-                  ref="mainFileInput"
-                  @change="onMainImageChange"
-                  style="display: none"
+                type="file"
+                ref="mainFileInput"
+                @change="onMainImageChange"
+                style="display: none"
               />
               <div class="button-hover">
                 <div>
@@ -79,35 +79,34 @@
                   <button v-if="product.image" @click="triggerFileInputMainImage">
                     Cập nhật
                   </button>
-<!--                  <button v-if="product.image" @click="removeMainImage">Xóa</button>-->
+                  <!--                  <button v-if="product.image" @click="removeMainImage">Xóa</button>-->
                 </div>
               </div>
             </div>
           </div>
           <div class="div-22">
-
             <div class="row p-4">
               <!-- image detail -->
               <div
-                  v-for="(item, index) in imageDetail"
-                  class="col-lg-6 col-md-12 mb-6 mb-lg-0"
+                v-for="(item, index) in imageDetail"
+                class="col-lg-6 col-md-12 mb-6 mb-lg-0"
               >
                 <span>Ảnh {{ index + 1 }}</span>
                 <div class="image-detail">
                   <img
-                      :src="item.image ? showImageDetail(index) : placeholderImage"
-                      @click="triggerFileInput(index)"
-                      :class="[
+                    :src="item.image ? showImageDetail(index) : placeholderImage"
+                    @click="triggerFileInput(index)"
+                    :class="[
                       'small-image',
                       item.image ? 'loaded-image' : 'placeholder-image',
                     ]"
-                      class="shadow-1-strong rounded mb-4"
+                    class="shadow-1-strong rounded mb-4"
                   />
                   <input
-                      type="file"
-                      :ref="'fileInput' + index"
-                      @change="onImageChange(index, $event)"
-                      style="display: none"
+                    type="file"
+                    :ref="'fileInput' + index"
+                    @change="onImageChange(index, $event)"
+                    style="display: none"
                   />
                   <div class="button-hover" v-if="item.image">
                     <div>
@@ -115,7 +114,6 @@
                     </div>
                     <div>
                       <button @click="showModalDelete(index)">Xóa</button>
-
                       <!--                      <button @click="removeImage(index)">Xóa</button>-->
                     </div>
                   </div>
@@ -127,29 +125,27 @@
       </div>
     </div>
   </div>
-  <UpdatePopupSuccess v-model="UpdateSuccess" @close="UpdateSuccess = false"/>
-  <UpdatePopupFail v-model="UpdateFail" @close="UpdateFail = false"/>
+  <UpdatePopupSuccess v-model="UpdateSuccess" @close="UpdateSuccess = false" />
+  <UpdatePopupFail v-model="UpdateFail" @close="UpdateFail = false" />
   <beforeDelete
-      v-model="beforeDelete"
-      @close="beforeDelete = false"
-      @removeImage="removeImage"
-      :selectedImageIndex="selectedImageIndex">
+    v-model="beforeDelete"
+    @close="beforeDelete = false"
+    @removeImage="removeImage"
+    :selectedImageIndex="selectedImageIndex"
+  >
   </beforeDelete>
-
   <Popupaddmissing v-model="AddMissing" @close="AddMissing = false"></Popupaddmissing>
 </template>
 
 <script>
-import {Swiper, SwiperSlide} from "swiper/vue";
+import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/swiper-bundle.css";
 import UpdatePopupSuccess from "../../Components/Popup/UpdateProduct/UpdateproductSuccess.vue";
 import apiClient from "../../axios-interceptor.js";
 import UpdatePopupFail from "../../Components/Popup/UpdateProduct/UpdateProductFail.vue";
 import beforeDelete from "../../Components/Popup/DeleteProduct/PopupDeleteImage.vue";
 import { validateProduct } from "../../validateProduct.js";
-import Popupaddmissing from "../../Components/Popup/AddProduct/AddproductMissing.vue"
-
-
+import Popupaddmissing from "../../Components/Popup/AddProduct/AddproductMissing.vue";
 
 export default {
   name: "EditProduct",
@@ -178,7 +174,7 @@ export default {
         brand_id: "",
         image1: "",
       },
-      imageDetail: [{image: ""}, {image: ""}, {image: ""}, {image: ""}],
+      imageDetail: [{ image: "" }, { image: "" }, { image: "" }, { image: "" }],
       initialImage: "", // Lưu trữ hình ảnh ban đầu
       placeholderImage: "/storage/images/inputfile.png", // Ảnh placeholder
       imagePreview: "", // Biến tạm thời để lưu ảnh xem trước
@@ -235,7 +231,7 @@ export default {
       formData.append("_method", "PUT");
       formData.append("name", this.product.name);
       formData.append("price", this.product.price);
-      formData.append("note", this.product.note);
+      formData.append('note', this.product.note || "");
       formData.append("category_id", this.product.category_id);
       formData.append("brand_id", this.product.brand_id);
 
@@ -255,39 +251,74 @@ export default {
       formData.append("removed_images", JSON.stringify(this.removedImageIndexes));
 
       apiClient
-          .post(url, formData, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
-          })
-          .then((response) => {
-            if (response.data.success) {
-              this.UpdateSuccess = true;
-              console.log("Update success");
-              localStorage.setItem('currentPage', this.page);
+        .post(url, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((response) => {
+          if (response.data.success) {
+            this.UpdateSuccess = true;
+            console.log("Update success");
+            localStorage.setItem("currentPage", this.page);
 
-              // thanh cong thi chuyen den trang chi tiet san pham
-              setTimeout(() => {
-                this.$router.push(`/product/details/${this.productId}`);
-              }, 1000);              // Thực hiện hành động sau khi cập nhật thành công
-            } else {
-              this.UpdateFail = true;
-              console.log("Update failed");
-              // Xử lý trường hợp cập nhật thất bại
+            // thanh cong thi chuyen den trang chi tiet san pham
+            setTimeout(() => {
+              this.$router.push(`/product/details/${this.productId}`);
+            }, 1000); // Thực hiện hành động sau khi cập nhật thành công
+          } else {
+            this.UpdateFail = true;
+            console.log("Update failed");
+            // Xử lý trường hợp cập nhật thất bại
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          // Xử lý lỗi
+        });
+    },
+    getProductDetails() {
+      const id = this.$route.params.id; // lấy id từ route
+      apiClient
+        .get(`products/${id}`)
+        .then(async (response) => {
+          if (response.data) {
+            this.product = response.data.product;
+            this.initialImage = this.product.image; // Lưu hình ảnh ban đầu
+            let dataImageDetails = []; // khoi tao mang chua anh chi tiet
+            if (response.data.imageDetails.length) {
+              const imagePromises = response.data.imageDetails.map(async (detail) => {
+                const file = await this.urlToFile(
+                  "http://127.0.0.1:8000" + detail.image_path
+                );
+                return { image: file, position: detail.image_position };
+              });
+
+              dataImageDetails = await Promise.all(imagePromises);
             }
-          })
-          .catch((error) => {
-            console.log(error);
-            // Xử lý lỗi
-          });
+            dataImageDetails.forEach((item) => {
+              // lap qua tung phan tu trong mang
+              if (this.imageDetail[item.position]) {
+                // kiem tra xem vi tri do co ton tai trong mang imageDetail khong
+                this.imageDetail[item.position].image = item.image; // gan anh vao vi tri do
+              }
+            });
+          } else {
+            // Xử lý trường hợp dữ liệu trả về null ở đây
+            console.log("No data returned from API");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
     // other methods...
     async urlToFile(url) {
       const response = await fetch(url);
       const blob = await response.blob();
       const fileName = url.split("/").pop();
-      return new File([blob], fileName, {type: blob.type});
+      return new File([blob], fileName, { type: blob.type });
     },
     // main image
     triggerFileInputMainImage() {
@@ -306,57 +337,23 @@ export default {
     },
     getListCategory() {
       apiClient
-          .get("categories")
-          .then((response) => {
-            this.categories = response.data.contents;
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        .get("categories")
+        .then((response) => {
+          this.categories = response.data.contents;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     getListBrands() {
       apiClient
-          .get("brands")
-          .then((response) => {
-            this.brands = response.data.contents;
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-    },
-
-    getProductDetails() {
-      const id = this.$route.params.id; // lấy id từ route
-      apiClient
-          .get(`products/${id}`)
-          .then(async (response) => {
-            if (response.data) {
-              this.product = response.data.product;
-              this.initialImage = this.product.image; // Lưu hình ảnh ban đầu
-              let dataImageDetails = []; // khoi tao mang chua anh chi tiet
-              if (response.data.imageDetails.length) {
-                const imagePromises = response.data.imageDetails.map(async (detail) => {
-                  const file = await this.urlToFile(
-                      "http://127.0.0.1:8000" + detail.image_path
-                  );
-                  return {image: file , position: detail.image_position };
-                });
-
-                dataImageDetails = await Promise.all(imagePromises);
-              }
-              dataImageDetails.forEach(item => { // lap qua tung phan tu trong mang
-                if (this.imageDetail[item.position]) { // kiem tra xem vi tri do co ton tai trong mang imageDetail khong
-                  this.imageDetail[item.position].image = item.image; // gan file anh vao vi tri tuong ung
-                }
-              });
-            } else {
-              // Xử lý trường hợp dữ liệu trả về null ở đây
-              console.log("No data returned from API");
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-          });
+        .get("brands")
+        .then((response) => {
+          this.brands = response.data.contents;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
 
     resetForm() {
@@ -365,7 +362,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .image-detail {

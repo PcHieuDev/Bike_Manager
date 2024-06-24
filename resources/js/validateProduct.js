@@ -11,7 +11,7 @@ export function validateProduct(product) {
         product.price > 1000000 ||
         product.price < 10000 ||
         (product.note && product.note.length > 500) ||
-        product.name.length <= 6 ||
+        product.name.length <= 10 ||
         nameContainsInvalidCharacters ||
         nameIsOnlyNumbers
     ) {

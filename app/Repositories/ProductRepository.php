@@ -45,9 +45,15 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function update($id, array $data)
     {
+
+        // dd($data); // kiểm tra dữ liệu truyền vào (tạm thời để debug, sau xóa đi
         $product = $this->find($id);
         if ($product) {
             $product->update($data);
+            // $product->note = null;
+            // dd($product->toArray());
+            // $product->update($product->toArray()); // cập nhật dữ liệu mới vào dữ liệu cũ (giữ nguyên dữ liệu cũ nếu không có dữ liệu mới)
+            // $product->fill($data )->save() ; // cập nhật dữ liệu mới vào dữ liệu cũ (xóa dữ liệu cũ nếu không có dữ liệu mới)
             return $product;
         }
         return null;
@@ -70,19 +76,19 @@ class ProductRepository implements ProductRepositoryInterface
             ->get();
     }
 
-    public function paginate($page, $size, $keyword, $brandId, $categoryId, $productId)
+    public function paginate($page, $size, $keyword, $brandId, $categoryId, $productId) // thêm tham số $brandId, $categoryId, $productId
     {
-        $offset = ($page - 1) * $size;
-        $query = Product::with('brand', 'category');
+        $offset = ($page - 1) * $size;  // tính offset dựa trên page và size
+        $query = Product::with('brand', 'category'); // eager loading brand và category
 
-        $this->applyKeywordFilters($query, $keyword);
+        $this->applyKeywordFilters($query, $keyword); // áp dụng bộ lọc theo từ khóa
 
         if ($brandId) {
-            $query->where('brand_id', $brandId);
+            $query->where('brand_id', $brandId); // thêm điều kiện lọc theo brandId
         }
 
         if ($categoryId) {
-            $query->where('category_id', $categoryId);
+            $query->where('category_id', $categoryId); // thêm điều kiện lọc theo categoryId
         }
 
         if ($productId) {
@@ -97,14 +103,14 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function search($query)
     {
-        $products = Product::query();
-        $this->applyKeywordFilters($products, $query);
+        $products = Product::query(); // dùng query() để tạo query builder, áp dụng các bộ lọc sau đó
+        $this->applyKeywordFilters($products, $query); // áp dụng bộ lọc theo từ khóa
         return $products->paginate(12);
     }
 
     public function count($keyword = null, $brandId, $categoryId, $productId)
     {
-        $query = Product::with('brand', 'category');
+        $query = Product::with('brand', 'category');  // eager loading brand và category
 
         $this->applyKeywordFilters($query, $keyword);
 

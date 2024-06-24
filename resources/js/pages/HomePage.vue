@@ -6,17 +6,19 @@
     <!-- Danh sách sản phẩm và phân trang trong khung màu trắng -->
     <div class="white-box">
       <!-- Chỉ hiển thị ProductList và Pagination nếu có sản phẩm -->
-      <ProductList v-if="products && products.length > 0" :products="products"></ProductList>
-      <Pagination v-if="products && products.length > 0"
-                  :page="page"
-                  :totalVisible="5"
-                  :totalPages="totalPages"
-                  @updatePage="updatePage"
+      <ProductList
+        v-if="products && products.length > 0"
+        :products="products"
+      ></ProductList>
+      <Pagination
+        v-if="products && products.length > 0"
+        :page="page"
+        :totalVisible="5"
+        :totalPages="totalPages"
+        @updatePage="updatePage"
       ></Pagination>
       <!-- Hiển thị thông báo nếu không có sản phẩm -->
-      <div v-else class="no-products">
-        Không có sản phẩm
-      </div>
+      <div v-else class="no-products">Không có sản phẩm</div>
     </div>
 
     <!-- Loading Indicator -->
@@ -27,12 +29,12 @@
 </template>
 
 <script>
-import {mapState, mapActions} from "vuex";
+import { mapState, mapActions } from "vuex";
 import debounce from "lodash/debounce";
 import ProductList from "../Components/Product/ProductList.vue";
 import SearchBar from "../Components/common/SearchBar.vue";
-import Pagination from "../Components/common/CustomPagination.vue";
-import {toast} from "vue3-toastify";
+import Pagination from "../Components/common/Pagination.vue";
+import { toast } from "vue3-toastify";
 
 export default {
   components: {
@@ -100,18 +102,18 @@ export default {
 
       this.setSearchTerm(searchTerm);
       this.fetchProducts()
-          .then(() => {
-            if (this.products.length === 0) {
-              // toast.error("Không tìm thấy sản phẩm");
-              setTimeout(() => {
-                this.setSearchTerm("");
-                this.fetchProducts();
-              }, 3000);
-            }
-          })
-          .catch((error) => {
-            console.error("Error fetching products:", error);
-          });
+        .then(() => {
+          if (this.products.length === 0) {
+            // toast.error("Không tìm thấy sản phẩm");
+            setTimeout(() => {
+              this.setSearchTerm("");
+              this.fetchProducts();
+            }, 3000);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching products:", error);
+        });
     },
     updatePage(newPage) {
       this.setPage(newPage);
@@ -139,7 +141,6 @@ export default {
   border-radius: 20px;
   padding: 20px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-
 }
 
 .no-products {
@@ -150,5 +151,4 @@ export default {
   height: 300px;
   font-weight: bold;
 }
-
 </style>

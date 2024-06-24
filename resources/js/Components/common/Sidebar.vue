@@ -71,10 +71,7 @@
 </template>
 
 <script>
-import axios from "axios";
 import { mapActions } from "vuex";
-import { BASE_URL } from "../../baseUrl";
-import { useToast } from "vue3-toastify";
 import apiClient from "../../axios-interceptor.js";
 
 export default {
@@ -115,11 +112,7 @@ export default {
     window.removeEventListener("resize", this.handleResize);
   },
   methods: {
-    ...mapActions([
-      "setBrandId",
-      "fetchProducts",
-      "setCategoryId",
-    ]),
+    ...mapActions(["setBrandId", "fetchProducts", "setCategoryId"]),
     async getListCategory() {
       try {
         const response = await apiClient.get("categories");
@@ -135,7 +128,6 @@ export default {
     selectCategory(categoryId) {
       console.log(categoryId);
       this.$router.push({ path: "/", query: { categoryId } });
-
       this.selectedCategoryId = categoryId; // Gán giá trị cho biến lưu trạng thái của category được chọn
       this.setCategoryId(categoryId);
     },
@@ -279,7 +271,8 @@ export default {
     transform: translateX(-100%); /* Start off-screen */
   }
 
-  .showSidebar { /* This class should be toggled based on the state */
+  .showSidebar {
+    /* This class should be toggled based on the state */
     transform: translateX(0); /* Bring sidebar on-screen when toggled */
   }
 

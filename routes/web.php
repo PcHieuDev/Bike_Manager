@@ -26,7 +26,6 @@ Route::get('/product-management/{id}', function ($id) {
 });
 
 
-
 Route::post('/addproduct', function () {
     return view('welcome');
 });

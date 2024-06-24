@@ -1,7 +1,7 @@
 <template>
   <div class="div">
     <div class="div-2">
-      <div class="div-3">
+      <div class="div-3" v-if="product">
         <div class="column">
           <div class="div-4">
             <div class="div-5">
@@ -47,9 +47,10 @@
           </div>
         </div>
       </div>
+      <div v-else class="no-product">không có sản phẩm</div>
     </div>
-    <div class="div-13">gợi ý cho bạn:</div>
-    <div class="container">
+    <div class="div-13" v-if="products.length">gợi ý cho bạn:</div>
+    <div class="container" v-if="products.length">
       <div class="product-list">
         <template v-for="item in randomProducts" :key="item.id">
           <router-link :to="`/product/details/${item.id}`" style="text-decoration: none">
@@ -73,9 +74,11 @@ import "vue-slick-carousel/dist/vue-slick-carousel.css";
 import "vue-slick-carousel/dist/vue-slick-carousel-theme.css";
 import VueSlickCarousel from "vue-slick-carousel";
 import VueCarousel from "vue-carousel";
-import apiClient from "../../axios-interceptor";
+// import apiClient from "../../axios-interceptor";
 import ProductItem from "../../Components/Product/ProductItem.vue";
+import { BASE_URL } from "./../../baseUrl.js";
 
+import axios from "axios";
 export default {
   components: {
     VueSlickCarousel,
@@ -91,14 +94,7 @@ export default {
       countRercord: 0,
       productId: this.$route.params.id,
       products: [],
-      product: {
-        name: "",
-        price: "",
-        note: "",
-        image: "",
-        category_id: "",
-        brand_id: "",
-      },
+      product: null,
       categories: [],
       brands: [],
       imageDetails: [],
@@ -134,26 +130,27 @@ export default {
   methods: {
     goBack() {
       this.$router.go(-1);
-      this.imageDetails = []; // Cập nhật trực tiếp mà không cần sử dụng $set
+      this.imageDetails = []; // Cập nhật trực tiếp
     },
-
     fetchProductDetails() {
-      // this.imageDetails = [];
       const id = this.$route.params.id;
       this.isLoading = true;
-      apiClient
-        .get(`products/${id}`)
+      axios
+        .get(BASE_URL + `products/${id}`)
         .then((response) => {
           if (response.data) {
-            this.product = response.data.product;
-            this.imageDetails = response.data.imageDetails; // Cập nhật imageDetails với thông tin mới từ API
-
+            this.product = response.data.product || null;
+            this.imageDetails = response.data.imageDetails || [];
           } else {
             console.log("No data returned from API");
+            this.product = null;
+            this.imageDetails = [];
           }
         })
         .catch((error) => {
           console.error(error);
+          this.product = null;
+          this.imageDetails = [];
         })
         .finally(() => {
           this.isLoading = false;
@@ -162,19 +159,23 @@ export default {
     async getProducts() {
       const id = this.$route.params.id;
       this.isLoading = true;
-      apiClient
-        .get(`products/${id}`)
+      axios
+        .get(BASE_URL + `products/${id}`)
         .then((response) => {
           if (response.data) {
-            this.products = response.data.products;
-            this.imageDetails = response.data.imageDetails;
+            this.products = response.data.products || [];
+            this.imageDetails = response.data.imageDetails || [];
             console.log("image Slide", this.imageDetails);
           } else {
             console.log("No data returned from API");
+            this.products = [];
+            this.imageDetails = [];
           }
         })
         .catch((error) => {
           console.error(error);
+          this.products = [];
+          this.imageDetails = [];
         })
         .finally(() => {
           this.isLoading = false;
@@ -190,6 +191,11 @@ export default {
 </script>
 
 <style scoped>
+.no-product {
+  font-size: 24px;
+  text-align: center;
+  margin-top: 20px;
+}
 .div {
   max-width: 1080px;
 }
@@ -209,7 +215,6 @@ export default {
   padding-left: 0px;
   gap: 35px;
 }
-
 
 .container {
   display: flex;
@@ -275,7 +280,4 @@ export default {
     font-size: 16px; /* Giảm kích thước font cho tiêu đề */
   }
 }
-
-
 </style>
-

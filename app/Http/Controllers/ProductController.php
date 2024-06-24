@@ -6,19 +6,15 @@ use App\Http\Requests\ProductRequest;
 use Illuminate\Http\Request;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 use App\Http\Traits\HttpResponseCode;
-use App\Exceptions\ProductNotFoundException;
-use App\Exceptions\ProductDeletionException;
-use App\Exceptions\ErrorFindingProductException;
-use App\Exceptions\ErrorUpdatingProductException;
-use App\Exceptions\ErrorSavingProductException;
+use App\Exceptions\SomethingHasErrorException;
 use Illuminate\Http\Response;
 use App\Constants\Constants;
-use App\Helpers\ArrayHelper;
 use lang\en\Message;
 use App\Http\Requests\SearchProductRequest;
 use App\Repositories\Interfaces\ProductImageRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
+use function PHPUnit\Framework\isNull;
 
 class ProductController extends Controller
 {
@@ -32,7 +28,6 @@ class ProductController extends Controller
     {
         $this->productRepository = $productRepository;
         $this->productImageRepository = $productImageRepository;
-
     }
 
     public function getProducts()
@@ -102,7 +97,7 @@ class ProductController extends Controller
                 'product' => $data
             ]);
         } catch (\Exception $e) {
-            throw new ErrorSavingProductException($e->getMessage(), $e->getCode(), $e);
+            throw new SomethingHasErrorException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -118,90 +113,99 @@ class ProductController extends Controller
         ]);
     }
 
+    
     public function update(ProductRequest $request, $id)
     {
         DB::beginTransaction();
         try {
-            // Tìm sản phẩm theo ID
-            $product = $this->productRepository->find($id);
-            // Nếu không tìm thấy sản phẩm, ném ra ngoại lệ
-            if (!$product) {
-                throw new ProductNotFoundException();
-            }
-
-            // Xử lý hình ảnh nếu có
-            if ($request->hasFile('image')) {
-                // Lấy file ảnh từ request
-                $image = $request->file('image');
-
-                // Tạo tên file mới
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
-
-                // Di chuyển file vào thư mục lưu trữ
-                $image->move(public_path('storage/images'), $imageName);
-
-                // Xóa hình ảnh cũ nếu có
-                if ($product->image) {
-                    $oldImagePath = public_path($product->image);
-                    if (file_exists($oldImagePath)) {
-                        unlink($oldImagePath);
-                    }
-                }
-
-                // Cập nhật đường dẫn hình ảnh mới
-                $imagePath = '/storage/images/' . $imageName;
-            } else {
-                // Giữ nguyên đường dẫn hình ảnh cũ nếu không có hình ảnh mới
-                $imagePath = $product->image;
-            }
-
-            // Cập nhật thông tin sản phẩm
-            $this->productRepository->update($id, [
-                'name' => $request->input('name'),
-                'note' => $request->input('note'),
-                'price' => $request->input('price'),
-                'category_id' => $request->input('category_id'),
-                'brand_id' => $request->input('brand_id'),
-                'image' => $imagePath
-            ]);
-
-            // Xử lý các ảnh chi tiết nếu có
-            if ($request->hasFile('image_detail')) {
-                // Xóa tất cả ảnh chi tiết cũ
-                $oldImages = $this->productImageRepository->getByProductId($id);
-                foreach ($oldImages as $oldImage) {
-                    $oldImagePath = public_path($oldImage->image_path);
-                    if (file_exists($oldImagePath)) {
-                        unlink($oldImagePath);
-                    }
-                    $oldImage->delete();
-                }
-
-                // Thêm ảnh chi tiết mới
-                foreach ($request->file('image_detail') as $index => $image) {
-                    $imageProductDetailName = time() . '_' . $index . '.' . $image->getClientOriginalExtension();
-                    $image->move(public_path('storage/images'), $imageProductDetailName);
-                    $imageProductDetailPath = '/storage/images/' . $imageProductDetailName;
-                    $this->productImageRepository->create([
-                        'product_id' => $id,
-                        'image_path' => $imageProductDetailPath,
-                        'image_position' => $index, // Thêm vị trí của ảnh = vị trí trong mảng ảnh
-
-                    ]);
-                }
-            }
+            // Tìm sản phẩm dựa trên ID và kiểm tra nếu không tồn tại thì báo lỗi
+            $product = $this->findProduct($id);
+            // Xử lý và lưu hình ảnh sản phẩm, trả về đường dẫn của hình ảnh
+            $imagePath = $this->handleProductImage($request, $product);
+            // Cập nhật thông tin sản phẩm vào cơ sở dữ liệu
+            $this->updateProductInfo($request, $id, $imagePath);
+            // Xử lý và lưu các hình ảnh chi tiết của sản phẩm
+            $this->handleProductDetailImages($request, $id);
             DB::commit();
-            // Trả về response thành công cùng với sản phẩm
-            return response()->json([
-                'success' => true,
-                'product' => $product
-            ]);
+            // Trả về phản hồi thành công cùng với thông tin sản phẩm
+            return response()->json(['success' => true, 'product' => $product]);
         } catch (\Exception $e) {
             DB::rollBack();
-            // Xử lý ngoại lệ
-            throw new ErrorUpdatingProductException($e->getMessage(), $e->getCode(), $e);
+            throw new SomethingHasErrorException($e->getMessage(), $e->getCode(), $e);
         }
     }
+
+    // Tìm kiếm sản phẩm dựa trên ID và kiểm tra sự tồn tại của sản phẩm
+    private function findProduct($id)
+    {
+        $product = $this->productRepository->find($id);
+        if (!$product) {
+            throw new SomethingHasErrorException();
+        }
+        return $product;
+    }
+
+    // Xử lý việc tải lên và cập nhật hình ảnh sản phẩm
+    private function handleProductImage($request, $product)
+    {
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('storage/images'), $imageName);
+            // Xóa hình ảnh cũ nếu có
+            $this->deleteOldImage($product->image);
+            return '/storage/images/' . $imageName;
+        }
+        return $product->image;
+    }
+
+    // Xóa hình ảnh cũ khỏi hệ thống file
+    private function deleteOldImage($imagePath)
+    {
+        if ($imagePath && file_exists(public_path($imagePath))) {
+            unlink(public_path($imagePath));
+        }
+    }
+
+    // Cập nhật thông tin sản phẩm vào cơ sở dữ liệu
+    private function updateProductInfo($request, $id, $imagePath)
+    {
+        $this->productRepository->update($id, [
+            'name' => $request->input('name'),
+            'note' => $request->input('note'),
+            'price' => $request->input('price'),
+            'category_id' => $request->input('category_id'),
+            'brand_id' => $request->input('brand_id'),
+            'image' => $imagePath
+        ]);
+        //  dd(is_null($request->input('note')));
+
+
+  }
+
+    // Xử lý việc tải lên và cập nhật các hình ảnh chi tiết của sản phẩm
+    private function handleProductDetailImages($request, $id)
+    {
+        if ($request->hasFile('image_detail')) {
+            // Xóa các hình ảnh chi tiết cũ của sản phẩm
+            $oldImages = $this->productImageRepository->getByProductId($id); // Lấy tất cả ảnh chi tiết của sản phẩm
+            foreach ($oldImages as $oldImage) { // Duyệt qua từng ảnh chi tiết
+                $this->deleteOldImage($oldImage->image_path); // Xóa ảnh chi tiết cũ
+                $oldImage->delete();
+            }
+            // Tải lên và lưu các hình ảnh chi tiết mới
+            foreach ($request->file('image_detail') as $index => $image) {
+                $imageName = time() . '_' . $index . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('storage/images'), $imageName); // Lưu ảnh vào thư mục
+                $this->productImageRepository->create([
+                    'product_id' => $id,
+                    'image_path' => '/storage/images/' . $imageName, // Thêm đường dẫn ảnh
+                    'image_position' => $index, // Thêm vị trí của ảnh = vị trí trong mảng ảnh
+                ]);
+            }
+        }
+    }
+
 
     public function show($id)
     {
@@ -219,7 +223,7 @@ class ProductController extends Controller
                 'imageDetails' => $imageDetails
             ]);
         } catch (\Exception $e) {
-            throw new ErrorFindingProductException($e->getMessage(), $e->getCode(), $e);
+            throw new SomethingHasErrorException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -231,7 +235,7 @@ class ProductController extends Controller
 
             // Kiểm tra xem sản phẩm có được xóa thành công
             if (!$deleted) {
-                throw new ProductNotFoundException();
+                throw new SomethingHasErrorException();
             }
 
             return response()->json([
@@ -239,7 +243,7 @@ class ProductController extends Controller
                 'status' => Response::HTTP_OK
             ], Response::HTTP_OK);
         } catch (\Exception $e) {
-            throw new ProductDeletionException($e->getMessage(), $e->getCode(), $e);
+            throw new SomethingHasErrorException($e->getMessage(), $e->getCode(), $e);
         }
     }
 }

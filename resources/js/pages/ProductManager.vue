@@ -7,7 +7,7 @@
   <div class="white-box">
     <!-- List san pham -->
     <ProductList
-        v-if="products && products.length > 0"
+      v-if="products && products.length > 0"
       :products="products"
       :showButton="true"
       :showPrice="false"
@@ -19,15 +19,12 @@
     <div v-if="products && products.length > 0" class="text-xs-center">
       <!-- Paginate Component -->
       <Pagination
-          :pages="countRercord"
-          :initial-page="page"
-          @update:page="handlePageChange"
+        :pages="countRercord"
+        :initial-page="page"
+        @update:page="handlePageChange"
       ></Pagination>
     </div>
-    <div v-else class="no-products">
-      Không có sản phẩm
-    </div>
-
+    <div v-else class="no-products">Không có sản phẩm</div>
   </div>
 
   <!--  loading page-->
@@ -89,7 +86,6 @@ import PopupDeleteSuccess from "../Components/Popup/DeleteProduct/PopupDeleteSuc
 import PopupBeforeDelete from "../Components/Popup/DeleteProduct/PopupBeforeDelete.vue";
 import AddProductError from "../Components/Popup/AddProduct/AddProductError.vue";
 import Popupaddmissing from "../Components/Popup/AddProduct/AddproductMissing.vue";
-// import NoProducts from "../Components/Popup/Search/noProduct.vue";
 import apiClient from "../axios-interceptor";
 import debounce from "lodash/debounce";
 import SearchBar from "../Components/common/SearchBar.vue";
@@ -160,7 +156,6 @@ export default {
       this.page = newData;
       this.getProducts();
     },
-
   },
   created() {
     this.debouncedSearch = debounce(this.setSearchTermAndFetch, 1000);
@@ -178,15 +173,12 @@ export default {
     this.user = JSON.parse(localStorage.getItem("user"));
   },
   computed: {
-    ...mapGetters([
-    ]),
     isProductActionsPath() {
       return this.$route.path === "/ProductActions/actions";
     },
   },
 
   methods: {
-
     handlePageChange(newPage) {
       this.page = newPage;
       this.getProducts(); // Hàm lấy dữ liệu sản phẩm dựa trên trang mới
@@ -254,8 +246,6 @@ export default {
             page: this.page,
             keyword: this.searchTerm,
             itemsPerPage: this.itemsPerPage,
-
-
           },
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -263,7 +253,6 @@ export default {
           this.products = response.data.contents;
           this.totalRecords = response.data.count;
           this.countRercord = Math.ceil(response.data.count / this.itemsPerPage);
-          // this.noProductsFound = this.totalRecords === 0;
           console.log(response.data.contents);
         })
         .catch((error) => {
@@ -391,7 +380,6 @@ export default {
 </script>
 
 <style scoped>
-
 .no-products {
   text-align: center; /* Căn giữa nội dung ngang */
   padding: 20px;
@@ -409,19 +397,18 @@ export default {
   margin-left: 0px;
   margin-bottom: 30px;
 }
-.product-list{
+.product-list {
   padding-left: 10px;
 }
 
 .white-box {
   background-color: white;
   border-radius: 20px;
-  padding: 20px  15px 15px 5px;
+  padding: 20px 15px 15px 5px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
 .text-xs-center {
   margin-top: 20px;
 }
-
 </style>

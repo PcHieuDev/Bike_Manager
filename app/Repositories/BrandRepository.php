@@ -30,10 +30,6 @@ class BrandRepository implements BrandRepositoryInterface
     {
         return Brand::find($id);
     }
-
-    
-
-
     
 }
 
